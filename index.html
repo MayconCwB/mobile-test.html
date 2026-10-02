@@ -918,7 +918,9 @@ function TJVoltarLoginDireto(ev){
                   <button type="button" class="btn-tj-secondary" data-action="simular-anexo" data-id="foto">📎 Adicionar fotos</button>
                   <button type="button" class="btn-tj-secondary" data-action="simular-anexo" data-id="video">📹 Adicionar vídeo</button>
                 </div>
-                <div id="anexos-preview" style="font-size: 0.78rem; color: #64748B; margin-top: 6px;">Nenhum arquivo anexado.</div>
+                <input id="input-anexo-foto" type="file" accept="image/*" multiple style="display:none" aria-hidden="true">
+                <input id="input-anexo-video" type="file" accept="video/*" style="display:none" aria-hidden="true">
+                <div id="anexos-preview" style="font-size: 0.78rem; color: #64748B; margin-top: 8px; line-height: 1.5;">Nenhum arquivo selecionado.</div>
               </div>
 
               <button type="button" class="btn-tj" style="width: 100%; margin-top: 10px;" data-action="enviar-novo-chamado">
@@ -4717,16 +4719,18 @@ function TJVoltarLoginDireto(ev){
       }
 
       if (acao === "novo-chamado" || acao === "abrir-novo-chamado") {
+        if (window.TJLimparAnexosNovoChamado) window.TJLimparAnexosNovoChamado();
         abrirTela("tela-cli-novo-chamado");
         return;
       }
 
       if (acao === "simular-anexo") {
-        var prev = document.getElementById("anexos-preview");
-        if (prev) {
-          prev.textContent = "1 anexo adicionado: problema_motor_" + (id || "foto") + ".jpg";
+        // Agora é um seletor REAL de arquivos. No celular abre fotos/galeria ou vídeos.
+        if (window.TJAbrirSeletorAnexo) {
+          window.TJAbrirSeletorAnexo(id || "foto");
+        } else {
+          toast("Não foi possível abrir o seletor de arquivos.");
         }
-        toast("Arquivo anexado com sucesso!");
         return;
       }
 
@@ -5805,6 +5809,90 @@ rodaTudo();
 })();
 </script>
 <!-- ===== FIM DOS AJUSTES TJ ===== -->
+
+<!-- ===== TJ ANEXOS MOBILE: SELEÇÃO REAL DE FOTOS E VÍDEOS ===== -->
+<script>
+(function(){
+  'use strict';
+
+  var anexos = { fotos: [], videos: [] };
+  window.TJAnexosSelecionados = anexos;
+
+  function tamanhoLegivel(bytes){
+    if(!bytes) return '0 KB';
+    var mb = bytes / (1024 * 1024);
+    if(mb >= 1) return mb.toFixed(mb >= 10 ? 0 : 1) + ' MB';
+    return Math.max(1, Math.round(bytes / 1024)) + ' KB';
+  }
+
+  function escapar(txt){
+    return String(txt || '').replace(/[&<>"']/g,function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  function renderizar(){
+    var box = document.getElementById('anexos-preview');
+    if(!box) return;
+    var todos = anexos.fotos.concat(anexos.videos);
+    if(!todos.length){
+      box.textContent = 'Nenhum arquivo selecionado.';
+      return;
+    }
+    var linhas = [];
+    if(anexos.fotos.length) linhas.push('<strong>📷 Fotos:</strong> ' + anexos.fotos.length);
+    if(anexos.videos.length) linhas.push('<strong>🎥 Vídeo:</strong> ' + anexos.videos.length);
+    todos.forEach(function(f){
+      linhas.push('• ' + escapar(f.name) + ' (' + tamanhoLegivel(f.size) + ')');
+    });
+    box.innerHTML = linhas.join('<br>');
+  }
+
+  function adicionarArquivos(tipo, lista){
+    var recebidos = Array.prototype.slice.call(lista || []);
+    if(!recebidos.length) return;
+
+    if(tipo === 'foto'){
+      recebidos = recebidos.filter(function(f){ return !f.type || f.type.indexOf('image/') === 0; });
+      anexos.fotos = recebidos;
+      if(typeof toast === 'function') toast(recebidos.length === 1 ? 'Foto selecionada.' : recebidos.length + ' fotos selecionadas.');
+    } else {
+      recebidos = recebidos.filter(function(f){ return !f.type || f.type.indexOf('video/') === 0; });
+      anexos.videos = recebidos.slice(0,1);
+      if(typeof toast === 'function') toast(anexos.videos.length ? 'Vídeo selecionado.' : 'Selecione um arquivo de vídeo válido.');
+    }
+    renderizar();
+  }
+
+  window.TJAbrirSeletorAnexo = function(tipo){
+    var input = document.getElementById(tipo === 'video' ? 'input-anexo-video' : 'input-anexo-foto');
+    if(!input) return;
+    // Zera o valor para permitir escolher novamente o mesmo arquivo.
+    input.value = '';
+    input.click();
+  };
+
+  window.TJLimparAnexosNovoChamado = function(){
+    anexos.fotos = [];
+    anexos.videos = [];
+    var foto = document.getElementById('input-anexo-foto');
+    var video = document.getElementById('input-anexo-video');
+    if(foto) foto.value = '';
+    if(video) video.value = '';
+    renderizar();
+  };
+
+  document.addEventListener('change',function(ev){
+    if(!ev.target) return;
+    if(ev.target.id === 'input-anexo-foto'){
+      adicionarArquivos('foto', ev.target.files);
+    } else if(ev.target.id === 'input-anexo-video'){
+      adicionarArquivos('video', ev.target.files);
+    }
+  },true);
+})();
+</script>
+<!-- ===== FIM TJ ANEXOS MOBILE ===== -->
 
 <!-- ===== TJ FIREBASE: AUTENTICAÇÃO, SESSÃO E PERSISTÊNCIA ===== -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
