@@ -914,12 +914,21 @@ function TJVoltarLoginDireto(ev){
 
               <div class="form-group">
                 <label class="form-label">Anexos (fotos ou vídeos do problema)</label>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                  <button type="button" class="btn-tj-secondary" data-action="simular-anexo" data-id="foto">📎 Adicionar fotos</button>
-                  <button type="button" class="btn-tj-secondary" data-action="simular-anexo" data-id="video">📹 Adicionar vídeo</button>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                  <label class="btn-tj-secondary tj-file-picker" style="position:relative; overflow:hidden; cursor:pointer; min-height:44px;">
+                    📎 Adicionar fotos
+                    <input id="input-anexo-foto" type="file" accept="image/*" multiple
+                      style="position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; font-size:100px;"
+                      aria-label="Selecionar fotos do problema">
+                  </label>
+                  <label class="btn-tj-secondary tj-file-picker" style="position:relative; overflow:hidden; cursor:pointer; min-height:44px;">
+                    📹 Adicionar vídeo
+                    <input id="input-anexo-video" type="file" accept="video/*"
+                      style="position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; font-size:100px;"
+                      aria-label="Selecionar vídeo do problema">
+                  </label>
                 </div>
-                <input id="input-anexo-foto" type="file" accept="image/*" multiple style="display:none" aria-hidden="true">
-                <input id="input-anexo-video" type="file" accept="video/*" style="display:none" aria-hidden="true">
+                <div style="font-size:0.72rem; color:#64748B; margin-top:6px;">No celular, toque no botão e escolha a câmera/galeria quando o sistema oferecer.</div>
                 <div id="anexos-preview" style="font-size: 0.78rem; color: #64748B; margin-top: 8px; line-height: 1.5;">Nenhum arquivo selecionado.</div>
               </div>
 
@@ -4725,12 +4734,8 @@ function TJVoltarLoginDireto(ev){
       }
 
       if (acao === "simular-anexo") {
-        // Agora é um seletor REAL de arquivos. No celular abre fotos/galeria ou vídeos.
-        if (window.TJAbrirSeletorAnexo) {
-          window.TJAbrirSeletorAnexo(id || "foto");
-        } else {
-          toast("Não foi possível abrir o seletor de arquivos.");
-        }
+        // Compatibilidade com versões antigas. Os seletores atuais são inputs nativos
+        // sobre os próprios botões para garantir funcionamento em Android e iOS.
         return;
       }
 
@@ -5866,10 +5871,9 @@ rodaTudo();
 
   window.TJAbrirSeletorAnexo = function(tipo){
     var input = document.getElementById(tipo === 'video' ? 'input-anexo-video' : 'input-anexo-foto');
-    if(!input) return;
-    // Zera o valor para permitir escolher novamente o mesmo arquivo.
-    input.value = '';
-    input.click();
+    if(input && typeof input.showPicker === 'function'){
+      try{ input.showPicker(); }catch(e){}
+    }
   };
 
   window.TJLimparAnexosNovoChamado = function(){
@@ -5881,6 +5885,14 @@ rodaTudo();
     if(video) video.value = '';
     renderizar();
   };
+
+  document.addEventListener('click',function(ev){
+    if(!ev.target) return;
+    if(ev.target.id === 'input-anexo-foto' || ev.target.id === 'input-anexo-video'){
+      // Não cancela o clique: ele precisa continuar até o seletor nativo do sistema.
+      ev.target.value = '';
+    }
+  },true);
 
   document.addEventListener('change',function(ev){
     if(!ev.target) return;
