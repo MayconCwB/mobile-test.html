@@ -2,9 +2,19 @@
 <html lang="pt-BR" data-theme="light">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#0B2A4A">
   <title>TJ Refrigeração — Plataforma do Cliente</title>
+  <!-- PWA TJ Refrigeração -->
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="64x64" href="./assets/favicon-64.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="./assets/apple-touch-icon.png">
+  <meta name="application-name" content="TJ Refrigeração">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="TJ Refrigeração">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
   <style>
 /* Skip artifact shell — fixed styles served beside every artifact.
    Complements basecoat; artifacts override --accent for their own identity. */
@@ -112,6 +122,18 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
   .shell-fade { animation: shell-fade 400ms ease both; }
   @keyframes shell-fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 }
+
+
+
+/* ===== Identidade visual + instalação PWA ===== */
+.tj-login-logo{width:min(250px,72vw);height:auto;margin:0 auto 10px;object-fit:contain}
+.tj-brand-icon{width:30px;height:30px;object-fit:cover;border-radius:8px;flex:0 0 auto;background:#fff}
+.pwa-install-box{margin-top:12px;padding-top:12px;border-top:1px solid #E2E8F0;text-align:center}
+.pwa-install-btn{width:100%;min-height:44px;background:#E0F2FE;color:#0B2A4A;border:1px solid #7DD3FC;border-radius:8px;font-weight:700;font-size:.84rem;cursor:pointer;padding:10px 14px}
+.pwa-install-btn:hover,.pwa-install-btn:active{background:#BAE6FD}
+.pwa-install-note{font-size:.71rem;color:#64748B;margin-top:6px;line-height:1.35}
+@media (max-width:480px){.tj-login-logo{width:min(220px,68vw)}.tj-brand-icon{width:28px;height:28px}}
+@media (display-mode: standalone){.pwa-install-box,.pwa-install-trigger{display:none!important}}
 
 </style>
   <style>
@@ -403,8 +425,8 @@ function TJVoltarLoginDireto(ev){
     <section id="tela-login" class="auth-bg">
       <div class="auth-card">
         <div style="text-align: center; margin-bottom: 22px;">
-          <div style="font-size: 2.2rem; margin-bottom: 4px;">❄️</div>
-          <h1 style="font-size: 1.4rem; font-weight: 800; color: #0B2A4A;">TJ REFRIGERAÇÃO</h1>
+          <img class="tj-login-logo" src="./assets/tj-logo.png" alt="TJ Refrigeração">
+          <h1 style="font-size: 1.1rem; font-weight: 800; color: #0B2A4A; letter-spacing:.04em;">PLATAFORMA DO CLIENTE</h1>
           <p style="font-size: 0.82rem; color: #64748B; margin-top: 4px;">Acesse sua plataforma de assistência industrial</p>
         </div>
         
@@ -443,6 +465,11 @@ function TJVoltarLoginDireto(ev){
             </button>
           </div>
           
+          <div class="pwa-install-box">
+            <button type="button" class="pwa-install-btn pwa-install-trigger">📲 INSTALAR APLICATIVO TJ</button>
+            <p class="pwa-install-note">Android e iPhone: instale o sistema na tela inicial para abrir como aplicativo.</p>
+          </div>
+
           <p style="font-size: 0.72rem; color: #94A3B8; text-align: center; margin-top: 6px;">
             Cada cliente tem seu acesso. O dono da empresa entra com o login dele.
           </p>
@@ -553,7 +580,7 @@ function TJVoltarLoginDireto(ev){
     <div class="drawer-panel">
       <div class="drawer-header">
         <div class="drawer-brand">
-          <span>❄️</span>
+          <img class="tj-brand-icon" src="./assets/icon-192.png" alt="">
           <span>TJ REFRIGERAÇÃO</span>
         </div>
         <button type="button" class="drawer-close-btn" data-action="fechar-menu" aria-label="Fechar menu">✕</button>
@@ -614,6 +641,14 @@ function TJVoltarLoginDireto(ev){
             <span class="drawer-card-content">
               <span class="drawer-card-title">Perfil</span>
               <span class="drawer-card-desc">Seus dados, contatos e endereços</span>
+            </span>
+            <span class="drawer-card-arrow">→</span>
+          </button>
+          <button type="button" class="drawer-card pwa-install-trigger">
+            <span class="drawer-card-icon">📲</span>
+            <span class="drawer-card-content">
+              <span class="drawer-card-title">Instalar aplicativo</span>
+              <span class="drawer-card-desc">Adicionar a TJ à tela inicial</span>
             </span>
             <span class="drawer-card-arrow">→</span>
           </button>
@@ -717,6 +752,14 @@ function TJVoltarLoginDireto(ev){
             </span>
             <span class="drawer-card-arrow">→</span>
           </button>
+          <button type="button" class="drawer-card pwa-install-trigger">
+            <span class="drawer-card-icon">📲</span>
+            <span class="drawer-card-content">
+              <span class="drawer-card-title">Instalar aplicativo</span>
+              <span class="drawer-card-desc">Adicionar a TJ à tela inicial</span>
+            </span>
+            <span class="drawer-card-arrow">→</span>
+          </button>
           <button type="button" class="drawer-card drawer-card-danger" data-action="sair-sistema">
             <span class="drawer-card-icon">🚪</span>
             <span class="drawer-card-content">
@@ -737,7 +780,7 @@ function TJVoltarLoginDireto(ev){
     <header id="app-mobile-topbar" class="mobile-topbar">
       <button type="button" class="mobile-topbar-btn" data-action="abrir-menu" aria-label="Menu de navegação">☰</button>
       <div class="mobile-topbar-brand">
-        <span>❄️</span>
+        <img class="tj-brand-icon" src="./assets/icon-192.png" alt="">
         <span>TJ REFRIGERAÇÃO</span>
       </div>
     </header>
@@ -6288,5 +6331,80 @@ auth.onAuthStateChanged(async function(user){
 })();
 </script>
 <!-- ===== FIM TJ FIREBASE ===== -->
+
+
+
+<!-- ===== PWA TJ REFRIGERAÇÃO ===== -->
+<script>
+(function(){
+  'use strict';
+  var deferredInstallPrompt = null;
+
+  function standalone(){
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  }
+  function isIOS(){
+    return /iphone|ipad|ipod/i.test(navigator.userAgent || '');
+  }
+  function mensagemInstalacao(){
+    if(standalone()) return 'O aplicativo TJ Refrigeração já está instalado neste aparelho.';
+    if(isIOS()) return 'Para instalar no iPhone/iPad:\n\n1. Abra este site no Safari.\n2. Toque no botão Compartilhar (quadrado com seta para cima).\n3. Role as opções e toque em “Adicionar à Tela de Início”.\n4. Confirme em “Adicionar”.\n\nO ícone da TJ Refrigeração aparecerá na sua tela inicial.';
+    return 'Para instalar no Android:\n\n1. Abra este site no Google Chrome.\n2. Toque no menu ⋮ do Chrome.\n3. Escolha “Instalar app” ou “Adicionar à tela inicial”.\n4. Confirme a instalação.\n\nSe o Chrome oferecer a instalação automaticamente, basta confirmar.';
+  }
+
+  function atualizarBotoes(){
+    var botoes=document.querySelectorAll('.pwa-install-trigger');
+    for(var i=0;i<botoes.length;i++){
+      botoes[i].style.display = standalone() ? 'none' : '';
+    }
+  }
+
+  window.addEventListener('beforeinstallprompt', function(ev){
+    ev.preventDefault();
+    deferredInstallPrompt = ev;
+    atualizarBotoes();
+  });
+
+  window.addEventListener('appinstalled', function(){
+    deferredInstallPrompt = null;
+    atualizarBotoes();
+    if(typeof toast === 'function') toast('TJ Refrigeração instalado com sucesso!');
+  });
+
+  document.addEventListener('click', async function(ev){
+    var btn = ev.target && ev.target.closest ? ev.target.closest('.pwa-install-trigger') : null;
+    if(!btn) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+
+    if(standalone()){
+      alert(mensagemInstalacao());
+      return;
+    }
+    if(deferredInstallPrompt){
+      try{
+        deferredInstallPrompt.prompt();
+        await deferredInstallPrompt.userChoice;
+        deferredInstallPrompt = null;
+        atualizarBotoes();
+      }catch(e){
+        console.warn('[TJPWA] instalação',e);
+      }
+      return;
+    }
+    alert(mensagemInstalacao());
+  }, true);
+
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('./sw.js', {scope:'./'})
+        .then(function(reg){ console.log('[TJPWA] Service Worker ativo:', reg.scope); })
+        .catch(function(err){ console.error('[TJPWA] Falha no Service Worker:', err); });
+    });
+  }
+  atualizarBotoes();
+})();
+</script>
+<!-- ===== FIM PWA TJ REFRIGERAÇÃO ===== -->
 
 </html>
