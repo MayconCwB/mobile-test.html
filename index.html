@@ -509,7 +509,7 @@ function TJVoltarLoginDireto(ev){
 .admin-action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.admin-card-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.admin-card-actions button{min-height:40px}.admin-muted{font-size:.78rem;color:#64748B}.list-item.admin-record{cursor:default}.list-item.admin-record .list-title{overflow-wrap:anywhere}.admin-empty{font-size:.88rem;color:#64748B;padding:8px 0}@media(max-width:520px){.admin-action-grid{grid-template-columns:1fr}.admin-card-actions{display:grid;grid-template-columns:1fr 1fr}.admin-card-actions .btn-tj-danger:last-child:nth-child(3){grid-column:1/-1}.card-title{gap:8px;flex-wrap:wrap}}
 </style>
 
-<style id="tj-landing-v17-css">
+<style id="tj-landing-v18-css">
   #tj-landing{width:100%;height:100dvh;min-height:0;background:#F6F9FC;color:#102A43;overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
   .tj-site-wrap{width:min(1180px,calc(100% - 40px));margin:0 auto}
   .tj-site-header{position:sticky;top:0;z-index:1200;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(203,213,225,.78)}
@@ -530,6 +530,7 @@ function TJVoltarLoginDireto(ev){
   .tj-hero{position:relative;overflow:hidden;background:linear-gradient(135deg,#061B2E 0%,#0A3154 52%,#0C5F8B 100%);color:#fff}
   .tj-hero:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.7),transparent 92%)}
   .tj-hero:after{content:"";position:absolute;width:620px;height:620px;border-radius:50%;right:-190px;top:-260px;background:radial-gradient(circle,rgba(73,189,236,.34) 0%,rgba(73,189,236,.05) 48%,transparent 70%)}
+  .tj-hero-watermark{position:absolute;z-index:0;width:clamp(460px,54vw,820px);height:auto;right:clamp(-190px,-8vw,-70px);top:50%;transform:translateY(-50%) rotate(-7deg);opacity:.075;filter:saturate(.7) brightness(1.65);pointer-events:none;user-select:none}
   .tj-hero-grid{min-height:640px;display:grid;grid-template-columns:1.08fr .92fr;align-items:center;gap:64px;position:relative;z-index:1;padding:74px 0 82px}
   .tj-eyebrow{display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:8px 13px;font-size:.79rem;font-weight:800;margin-bottom:20px;color:#E8F6FC}
   .tj-hero h1{font-size:clamp(2.4rem,5.5vw,4.45rem);line-height:.99;letter-spacing:-.045em;max-width:760px;margin:0 0 22px;color:#fff;text-wrap:balance}
@@ -541,7 +542,7 @@ function TJVoltarLoginDireto(ev){
   .tj-proof-dot{width:8px;height:8px;border-radius:50%;background:#5DC5EE;box-shadow:0 0 0 5px rgba(93,197,238,.12)}
 
   .tj-app-showcase{position:relative;min-height:500px;display:grid;place-items:center}
-  .tj-phone{width:min(360px,92%);background:#F8FBFD;border:9px solid rgba(255,255,255,.92);border-radius:38px;box-shadow:0 32px 74px rgba(0,0,0,.34);overflow:hidden;transform:rotate(2deg)}
+  .tj-phone{width:min(360px,92%);background:#F8FBFD;border:9px solid rgba(255,255,255,.92);border-radius:38px;box-shadow:0 32px 74px rgba(0,0,0,.34);overflow:hidden;transform:none;backdrop-filter:blur(8px)}
   .tj-phone-top{height:72px;background:#0B2A4A;color:#fff;display:flex;align-items:center;gap:10px;padding:0 18px;font-size:.84rem;font-weight:850;letter-spacing:.03em}
   .tj-phone-top img{width:36px;height:36px;border-radius:10px;background:#fff;object-fit:contain}
   .tj-phone-body{padding:18px;background:linear-gradient(#F8FBFD,#EEF6FA)}
@@ -592,7 +593,7 @@ function TJVoltarLoginDireto(ev){
     .tj-site-links{display:none}.tj-hero-grid{grid-template-columns:1fr;min-height:auto;gap:32px;padding:58px 0 68px}.tj-app-showcase{min-height:440px}.tj-phone{width:min(350px,90%)}.tj-floating-chip.one{left:8%}.tj-floating-chip.two{right:8%}.tj-service-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.tj-digital-grid{grid-template-columns:1fr}.tj-portal-band{grid-template-columns:1fr}.tj-portal-actions{grid-template-columns:1fr 1fr;min-width:0}.tj-trust-grid{grid-template-columns:1fr}.tj-trust-item{border-right:0;border-bottom:1px solid #E5EDF3}.tj-trust-item:last-child{border-bottom:0}
   }
   @media(max-width:600px){
-    .tj-site-wrap{width:min(100% - 24px,1180px)}.tj-site-nav{min-height:68px}.tj-site-brand span{font-size:.86rem}.tj-site-brand img{width:45px;height:45px}.tj-site-actions .pwa-install-trigger{display:none}.tj-site-btn{min-height:44px;padding:0 14px}.tj-site-actions .dark{font-size:.8rem}.tj-hero-grid{padding:44px 0 54px}.tj-hero h1{font-size:2.35rem}.tj-hero-actions{display:grid;grid-template-columns:1fr}.tj-hero-actions .tj-site-btn{width:100%}.tj-hero-proof{display:grid;gap:12px}.tj-app-showcase{min-height:390px}.tj-phone{width:88%;border-width:7px;border-radius:32px;transform:none}.tj-floating-chip{display:none}.tj-site-section{padding:62px 0}.tj-section-head{display:block;margin-bottom:26px}.tj-service-grid,.tj-process-grid{grid-template-columns:1fr}.tj-service-card{min-height:auto}.tj-digital-panel{padding:27px 22px;border-radius:23px}.tj-portal-band{padding:30px 22px;border-radius:24px}.tj-portal-actions{grid-template-columns:1fr}.tj-footer-row{flex-direction:column;align-items:flex-start}.tj-trust-item{padding:16px 4px}.tj-phone-body{padding:14px}.tj-phone-top{height:64px}
+    .tj-site-wrap{width:min(100% - 24px,1180px)}.tj-site-nav{min-height:68px}.tj-site-brand span{font-size:.86rem}.tj-site-brand img{width:45px;height:45px}.tj-site-actions .pwa-install-trigger{display:none}.tj-site-btn{min-height:44px;padding:0 14px}.tj-site-actions .dark{font-size:.8rem}.tj-hero-grid{padding:44px 0 54px}.tj-hero h1{font-size:2.35rem}.tj-hero-watermark{width:520px;right:-245px;top:39%;opacity:.055}.tj-hero-actions{display:grid;grid-template-columns:1fr}.tj-hero-actions .tj-site-btn{width:100%}.tj-hero-proof{display:grid;gap:12px}.tj-app-showcase{min-height:390px}.tj-phone{width:88%;border-width:7px;border-radius:32px;transform:none}.tj-floating-chip{display:none}.tj-site-section{padding:62px 0}.tj-section-head{display:block;margin-bottom:26px}.tj-service-grid,.tj-process-grid{grid-template-columns:1fr}.tj-service-card{min-height:auto}.tj-digital-panel{padding:27px 22px;border-radius:23px}.tj-portal-band{padding:30px 22px;border-radius:24px}.tj-portal-actions{grid-template-columns:1fr}.tj-footer-row{flex-direction:column;align-items:flex-start}.tj-trust-item{padding:16px 4px}.tj-phone-body{padding:14px}.tj-phone-top{height:64px}
   }
 </style>
 
@@ -601,6 +602,7 @@ function TJVoltarLoginDireto(ev){
 
 
   <!-- ===== LANDING PAGE PÚBLICA TJ REFRIGERAÇÃO — V17 ===== -->
+  <!-- ===== LANDING PAGE V18: CTAs SIMPLIFICADOS + MARCA D'ÁGUA ===== -->
   <div id="tj-landing">
     <header class="tj-site-header">
       <div class="tj-site-wrap tj-site-nav">
@@ -614,7 +616,6 @@ function TJVoltarLoginDireto(ev){
           <a href="#portal">Portal do Cliente</a>
         </nav>
         <div class="tj-site-actions">
-          <button type="button" class="tj-site-btn soft pwa-install-trigger">📲 Instalar</button>
           <button type="button" class="tj-site-btn dark" onclick="TJMostrarLogin()">Área do Cliente</button>
         </div>
       </div>
@@ -622,14 +623,15 @@ function TJVoltarLoginDireto(ev){
 
     <main>
       <section id="inicio" class="tj-hero">
+        <img class="tj-hero-watermark" src="./assets/tj-logo.png" alt="" aria-hidden="true">
         <div class="tj-site-wrap tj-hero-grid">
           <div>
             <div class="tj-eyebrow">❄️ Assistência técnica + acompanhamento digital</div>
             <h1>Refrigeração técnica com atendimento <span>claro do início ao fim.</span></h1>
-            <p>A TJ Refrigeração une atendimento técnico e organização digital para você solicitar assistência, acompanhar o andamento, receber orçamentos e consultar agendamentos em um só lugar.</p>
+            <p>A TJ Refrigeração reúne assistência técnica, orçamentos e acompanhamento digital em uma experiência simples, organizada e acessível pelo celular.</p>
             <div class="tj-hero-actions">
-              <button type="button" class="tj-site-btn primary" onclick="TJAbrirCadastroPublico()">Solicitar atendimento</button>
-              <a class="tj-site-btn ghost" href="#servicos">Conhecer os serviços</a>
+              <button type="button" class="tj-site-btn primary" onclick="TJAbrirCadastroPublico()">Solicitar orçamento</button>
+              <button type="button" class="tj-site-btn ghost" onclick="TJMostrarLogin()">Área do Cliente</button>
             </div>
             <div class="tj-hero-proof" aria-label="Recursos disponíveis">
               <div class="tj-proof-item"><span class="tj-proof-dot"></span> Chamados acompanhados</div>
@@ -657,7 +659,7 @@ function TJVoltarLoginDireto(ev){
 
       <section class="tj-trust-strip" aria-label="Destaques do atendimento">
         <div class="tj-site-wrap tj-trust-grid">
-          <div class="tj-trust-item"><div class="tj-trust-icon">🔧</div><div><strong>Atendimento técnico</strong><span>Solicitação e acompanhamento do serviço</span></div></div>
+          <div class="tj-trust-item"><div class="tj-trust-icon">🔧</div><div><strong>Atendimento técnico</strong><span>Atendimento organizado do início ao fim</span></div></div>
           <div class="tj-trust-item"><div class="tj-trust-icon">💬</div><div><strong>Informação centralizada</strong><span>Histórico e comunicação no mesmo ambiente</span></div></div>
           <div class="tj-trust-item"><div class="tj-trust-icon">📲</div><div><strong>Portal instalável</strong><span>Acesso fácil pelo Android, iPhone ou computador</span></div></div>
         </div>
@@ -673,7 +675,7 @@ function TJVoltarLoginDireto(ev){
             </div>
           </div>
           <div class="tj-service-grid">
-            <article class="tj-service-card"><div class="tj-service-icon">🔧</div><h3>Assistência técnica</h3><p>Abra uma solicitação, descreva o problema e acompanhe o atendimento até a conclusão.</p></article>
+            <article class="tj-service-card"><div class="tj-service-icon">🔧</div><h3>Assistência técnica</h3><p>Registre a necessidade do equipamento e acompanhe o atendimento até a conclusão.</p></article>
             <article class="tj-service-card"><div class="tj-service-icon">❄️</div><h3>Equipamentos</h3><p>Mantenha os equipamentos vinculados ao cliente e consulte ocorrências e atendimentos relacionados.</p></article>
             <article class="tj-service-card"><div class="tj-service-icon">💰</div><h3>Orçamentos</h3><p>Receba propostas pelo portal e acompanhe o status de aprovação com mais organização.</p></article>
             <article class="tj-service-card"><div class="tj-service-icon">📅</div><h3>Agendamentos</h3><p>Consulte visitas e compromissos relacionados ao atendimento diretamente pelo sistema.</p></article>
@@ -691,7 +693,7 @@ function TJVoltarLoginDireto(ev){
             </div>
           </div>
           <div class="tj-process-grid">
-            <article class="tj-process-card"><div class="tj-process-num">1</div><h3>Solicite</h3><p>Cadastre-se no portal e abra a solicitação informando equipamento, problema e detalhes do atendimento.</p></article>
+            <article class="tj-process-card"><div class="tj-process-num">1</div><h3>Solicite</h3><p>Solicite seu orçamento e informe os dados necessários para que a TJ organize o atendimento.</p></article>
             <article class="tj-process-card"><div class="tj-process-num">2</div><h3>Acompanhe</h3><p>Consulte status, mensagens, orçamento e agendamento conforme o atendimento evolui.</p></article>
             <article class="tj-process-card"><div class="tj-process-num">3</div><h3>Consulte o histórico</h3><p>Depois do serviço, as principais informações continuam organizadas para futuras consultas.</p></article>
           </div>
@@ -729,11 +731,10 @@ function TJVoltarLoginDireto(ev){
             <div>
               <div class="tj-section-kicker" style="color:#72D0F2">Portal TJ</div>
               <h2>Já é cliente? Acompanhe tudo pelo portal.</h2>
-              <p>Entre com sua conta para acessar chamados, orçamentos, equipamentos, histórico e agendamentos. Se ainda não possui cadastro, você pode iniciar agora.</p>
+              <p>Entre com sua conta para acessar chamados, orçamentos, equipamentos, histórico e agendamentos. Para uma nova solicitação comercial, use “Solicitar orçamento” no início da página.</p>
             </div>
             <div class="tj-portal-actions">
-              <button type="button" class="tj-site-btn primary" onclick="TJMostrarLogin()">Entrar no portal</button>
-              <button type="button" class="tj-site-btn ghost" onclick="TJAbrirCadastroPublico()">Criar conta</button>
+              <button type="button" class="tj-site-btn primary" onclick="TJMostrarLogin()">Área do Cliente</button>
               <button type="button" class="tj-site-btn soft pwa-install-trigger">📲 Instalar aplicativo</button>
             </div>
           </div>
