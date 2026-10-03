@@ -1,8 +1,9 @@
-const CACHE_NAME = 'tj-refrigeracao-pwa-v18-landing-pro';
+const CACHE_NAME = 'tj-refrigeracao-pwa-v20-whatsapp-contato';
 const APP_SHELL = [
   './index.html',
   './manifest.webmanifest',
   './assets/tj-logo.png',
+  './assets/tj-watermark.png',
   './assets/icon-192.png',
   './assets/icon-512.png',
   './assets/icon-maskable-192.png',
