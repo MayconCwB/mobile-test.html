@@ -462,6 +462,18 @@ function TJVoltarLoginDireto(ev){
   return false;
 }
 </script>
+
+<style id="tj-v11-ajustes">
+  /* Histórico do proprietário: não deixa badges esmagarem o texto no celular. */
+  #lista-emp-historico .timeline-content { min-width: 0; width: 100%; }
+  #lista-emp-historico .hist-emp-header { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; min-width:0; }
+  #lista-emp-historico .hist-emp-title { flex:1 1 auto; min-width:0; overflow-wrap:anywhere; }
+  #lista-emp-historico .hist-emp-header .badge { flex:0 0 auto; white-space:nowrap; word-break:normal; line-height:1.2; }
+  @media (max-width: 600px) {
+    #lista-emp-historico .hist-emp-header { flex-direction:column; gap:7px; }
+    #lista-emp-historico .hist-emp-header .badge { align-self:flex-start; max-width:100%; }
+  }
+</style>
 </head>
 <body>
 
@@ -489,8 +501,8 @@ function TJVoltarLoginDireto(ev){
       <div class="auth-card">
         <div style="text-align: center; margin-bottom: 22px;">
           <img class="tj-login-logo" src="./assets/tj-logo.png" alt="TJ Refrigeração">
-          <h1 style="font-size: 1.1rem; font-weight: 800; color: #0B2A4A; letter-spacing:.04em;">PLATAFORMA DO CLIENTE</h1>
-          <p style="font-size: 0.82rem; color: #64748B; margin-top: 4px;">Acesse sua plataforma de assistência industrial</p>
+          <h1 style="font-size: 1.1rem; font-weight: 800; color: #0B2A4A; letter-spacing:.04em;">PORTAL TJ REFRIGERAÇÃO</h1>
+          <p style="font-size: 0.82rem; color: #64748B; margin-top: 4px;">Clientes e proprietário acessam com e-mail e senha</p>
         </div>
         
         <form onsubmit="return false;" style="display: flex; flex-direction: column; gap: 12px;">
@@ -516,12 +528,6 @@ function TJVoltarLoginDireto(ev){
           
           <button type="button" class="btn-tj-dark" style="width: 100%; margin-top: 8px;" data-action="entrar-cliente">ENTRAR</button>
           
-          <div style="text-align: center; margin-top: 14px; padding-top: 14px; border-top: 1px solid #E2E8F0;">
-            <button type="button" class="btn-tj-outline" style="width: 100%; font-size: 0.82rem;" data-action="abrir-senha-empresa">
-              🔒 Acesso administrativo — Proprietário TJ
-            </button>
-          </div>
-          
           <div style="text-align: center; margin-top: 10px;">
             <button type="button" style="background: none; border: none; color: #2E9BD6; font-size: 0.85rem; font-weight: 600; cursor: pointer;" data-action="abrir-cadastro">
               Criar conta
@@ -534,7 +540,7 @@ function TJVoltarLoginDireto(ev){
           </div>
 
           <p style="font-size: 0.72rem; color: #94A3B8; text-align: center; margin-top: 6px;">
-            Cada cliente tem seu acesso. O dono da empresa entra com o login dele.
+            O sistema identifica automaticamente se o acesso é de cliente ou proprietário.
           </p>
         </form>
       </div>
@@ -1776,7 +1782,6 @@ function TJVoltarLoginDireto(ev){
           <div class="card-box">
             <div class="card-title">
               <span>Agendamentos</span>
-              <button type="button" class="btn-tj" data-action="novo-agendamento-empresa">+ NOVO AGENDAMENTO</button>
             </div>
             <p class="card-subtitle">Todas as visitas marcadas, de todos os clientes.</p>
             <div style="margin: 14px 0 18px;">
@@ -4142,7 +4147,7 @@ function TJVoltarLoginDireto(ev){
       }
       if (!ch) return;
 
-      var atendData = state.atendimentos[ch.num] || {endereco: "—", previsao: "—", diag: "", pecas: []};
+      var atendData = state.atendimentos[ch.num] || {endereco: "", previsao: "", diag: "", pecas: []};
 
       var tit = document.getElementById("atend-emp-titulo");
       if (tit) tit.textContent = "ATENDIMENTO #" + ch.num;
@@ -4154,13 +4159,26 @@ function TJVoltarLoginDireto(ev){
       }
 
       var elCli = document.getElementById("atend-emp-cliente");
-      if (elCli) elCli.textContent = ch.cliente;
+      if (elCli) elCli.textContent = ch.cliente || "Cliente não identificado";
 
       var elPrev = document.getElementById("atend-emp-previsao");
-      if (elPrev) elPrev.textContent = ch.agend || "A definir";
+      if (elPrev) elPrev.textContent = ch.agend || atendData.previsao || "Ainda não agendado";
 
       var elEnd = document.getElementById("atend-emp-endereco");
-      if (elEnd) elEnd.textContent = atendData.endereco || "Endereço cadastrado na matriz";
+      if (elEnd) {
+        var enderecoExibicao = atendData.endereco || "";
+        if (!enderecoExibicao) {
+          for (var eEnd = 0; eEnd < (state.enderecosCliente || []).length; eEnd++) {
+            var endCli = state.enderecosCliente[eEnd];
+            if ((ch.clienteUid && endCli.clienteUid === ch.clienteUid) || (!ch.clienteUid && endCli.cliente === ch.cliente)) {
+              enderecoExibicao = [endCli.rua, endCli.num].filter(Boolean).join(", ");
+              if (endCli.cidade) enderecoExibicao += (enderecoExibicao ? " — " : "") + endCli.cidade;
+              break;
+            }
+          }
+        }
+        elEnd.textContent = enderecoExibicao || "Endereço não informado";
+      }
 
       // Dados técnicos via busca no equipamento
       var eqInfo = document.getElementById("atend-emp-equip-info");
@@ -4176,7 +4194,7 @@ function TJVoltarLoginDireto(ev){
         if (eqAchado) {
           eqInfo.textContent = eqAchado.nome + " • Marca: " + eqAchado.marca + " • Modelo: " + eqAchado.modelo + " • S/N: " + eqAchado.sn + " • Local: " + eqAchado.local;
         } else {
-          eqInfo.textContent = ch.equip + " • Modelo e S/N em triagem técnica";
+          eqInfo.textContent = (ch.equip || "Equipamento não informado") + " • Dados técnicos ainda não cadastrados";
         }
       }
 
@@ -4292,13 +4310,17 @@ function TJVoltarLoginDireto(ev){
         cont.className = "timeline-content";
 
         var header = document.createElement("div");
-        header.style.display = "flex";
-        header.style.justifyContent = "space-between";
-        header.style.alignItems = "center";
+        header.className = "hist-emp-header";
 
         var tit = document.createElement("div");
-        tit.className = "timeline-title";
-        tit.textContent = h.data + " — " + h.cliente + " — " + h.titulo;
+        tit.className = "timeline-title hist-emp-title";
+        var nomeHistorico = h.cliente || "Cliente";
+        if (h.clienteUid && (!nomeHistorico || nomeHistorico === h.clienteUid)) {
+          for (var cH = 0; cH < (state.clientesFirebase || []).length; cH++) {
+            if (state.clientesFirebase[cH].uid === h.clienteUid) { nomeHistorico = state.clientesFirebase[cH].nome; break; }
+          }
+        }
+        tit.textContent = h.data + " — " + nomeHistorico + " — " + h.titulo;
 
         var bdg = criarBadge(h.status);
         header.appendChild(tit);
@@ -6169,17 +6191,17 @@ async function carregarDadosEmpresaFirebase(){
           historico=[], notificacoes=[], contatos=[], enderecos=[], agendamentos=[];
     snapData.forEach(function(doc){
       const d=doc.data()||{}, uid=doc.id, nome=nomes[uid]||uid;
-      (Array.isArray(d.chamados)?d.chamados:[]).forEach(function(x){ chamados.push(Object.assign({clienteUid:uid,cliente:nome},x)); });
+      (Array.isArray(d.chamados)?d.chamados:[]).forEach(function(x){ chamados.push(Object.assign({},x,{clienteUid:uid,cliente:nome})); });
       Object.keys(d.mensagens||{}).forEach(function(k){ mensagens[k]=d.mensagens[k]; });
-      Object.keys(d.atendimentos||{}).forEach(function(k){ atendimentos[k]=d.atendimentos[k]; });
-      (Array.isArray(d.orcamentos)?d.orcamentos:[]).forEach(function(x){ orcamentos.push(Object.assign({clienteUid:uid,cliente:nome},x)); });
-      (Array.isArray(d.equip)?d.equip:[]).forEach(function(x){ equip.push(Object.assign({clienteUid:uid,cliente:nome},x)); });
-      (Array.isArray(d.pedidos)?d.pedidos:[]).forEach(function(x){ pedidos.push(Object.assign({clienteUid:uid,cliente:nome},x)); });
-      (Array.isArray(d.historicoCliente)?d.historicoCliente:[]).forEach(function(x){ historico.push(Object.assign({clienteUid:uid,cliente:nome},x)); });
-      (Array.isArray(d.notificacoesCliente)?d.notificacoesCliente:[]).forEach(function(x){ notificacoes.push(Object.assign({clienteUid:uid,cliente:nome},x)); });
-      (Array.isArray(d.contatosCliente)?d.contatosCliente:[]).forEach(function(x){ contatos.push(Object.assign({clienteUid:uid,cliente:nome},x)); });
-      (Array.isArray(d.enderecosCliente)?d.enderecosCliente:[]).forEach(function(x){ enderecos.push(Object.assign({clienteUid:uid,cliente:nome},x)); });
-      (Array.isArray(d.agendamentos)?d.agendamentos:[]).forEach(function(x){ agendamentos.push(Object.assign({clienteUid:uid,cliente:nome},x)); });
+      Object.keys(d.atendimentos||{}).forEach(function(k){ atendimentos[k]=Object.assign({},d.atendimentos[k]||{},{clienteUid:uid,cliente:nome}); });
+      (Array.isArray(d.orcamentos)?d.orcamentos:[]).forEach(function(x){ orcamentos.push(Object.assign({},x,{clienteUid:uid,cliente:nome})); });
+      (Array.isArray(d.equip)?d.equip:[]).forEach(function(x){ equip.push(Object.assign({},x,{clienteUid:uid,cliente:nome})); });
+      (Array.isArray(d.pedidos)?d.pedidos:[]).forEach(function(x){ pedidos.push(Object.assign({},x,{clienteUid:uid,cliente:nome})); });
+      (Array.isArray(d.historicoCliente)?d.historicoCliente:[]).forEach(function(x){ historico.push(Object.assign({},x,{clienteUid:uid,cliente:nome})); });
+      (Array.isArray(d.notificacoesCliente)?d.notificacoesCliente:[]).forEach(function(x){ notificacoes.push(Object.assign({},x,{clienteUid:uid,cliente:nome})); });
+      (Array.isArray(d.contatosCliente)?d.contatosCliente:[]).forEach(function(x){ contatos.push(Object.assign({},x,{clienteUid:uid,cliente:nome})); });
+      (Array.isArray(d.enderecosCliente)?d.enderecosCliente:[]).forEach(function(x){ enderecos.push(Object.assign({},x,{clienteUid:uid,cliente:nome})); });
+      (Array.isArray(d.agendamentos)?d.agendamentos:[]).forEach(function(x){ agendamentos.push(Object.assign({},x,{clienteUid:uid,cliente:nome})); });
     });
 
     state.chamados=chamados;
@@ -6264,23 +6286,28 @@ async function fazerCadastro(){
 async function fazerLoginCliente(email,senha){
   if(!email||!senha){ aviso('Preencha e-mail e senha.'); return; }
   try{
-    try{ localStorage.setItem('tj_login_intencao','cliente'); }catch(e){}
+    try{ localStorage.removeItem('tj_login_intencao'); }catch(e){}
     const cred=await auth.signInWithEmailAndPassword(email,senha);
     const perfil=await carregarPerfil(cred.user);
+
+    // Login único: a role do Firestore decide automaticamente qual painel abrir.
     if(perfil.role==='owner'){
-      await auth.signOut();
-      aviso('Esta conta é do proprietário. Use o acesso da área da empresa.');
+      window.TJFB.perfilEmpresa=perfil;
+      guardaSessao(cred.user,'empresa');
+      await carregarDadosEmpresaFirebase();
+      telaApp('empresa');
+      aviso('Acesso do proprietário autorizado.');
       return;
     }
+
     clienteAtualNome=perfil.nome||perfil.empresa||email;
     window.TJFB.perfilCliente=perfil;
     atualizarIdentidadeCliente(perfil);
     guardaSessao(cred.user,'cliente');
     await carregarDadosCliente(cred.user,perfil);
     telaApp('cliente');
-    try{ localStorage.removeItem('tj_login_intencao'); }catch(e){}
     aviso('Login realizado com sucesso.');
-  }catch(e){ console.error('[TJFB] login cliente',e); aviso(msgErro(e)); }
+  }catch(e){ console.error('[TJFB] login',e); aviso(msgErro(e)); }
 }
 
 async function fazerLoginEmpresa(email,senha){
