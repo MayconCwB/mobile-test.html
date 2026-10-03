@@ -509,57 +509,90 @@ function TJVoltarLoginDireto(ev){
 .admin-action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.admin-card-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.admin-card-actions button{min-height:40px}.admin-muted{font-size:.78rem;color:#64748B}.list-item.admin-record{cursor:default}.list-item.admin-record .list-title{overflow-wrap:anywhere}.admin-empty{font-size:.88rem;color:#64748B;padding:8px 0}@media(max-width:520px){.admin-action-grid{grid-template-columns:1fr}.admin-card-actions{display:grid;grid-template-columns:1fr 1fr}.admin-card-actions .btn-tj-danger:last-child:nth-child(3){grid-column:1/-1}.card-title{gap:8px;flex-wrap:wrap}}
 </style>
 
-<style id="tj-landing-v16-css">
-  #tj-landing { width:100%; height:100dvh; min-height:0; background:#F7FAFC; color:#0F2740; overflow-x:hidden; overflow-y:auto; overscroll-behavior-y:contain; -webkit-overflow-scrolling:touch; }
-  .tj-site-wrap { width:min(1180px, calc(100% - 32px)); margin:0 auto; }
-  .tj-site-header { position:sticky; top:0; z-index:1200; background:rgba(255,255,255,.96); backdrop-filter:blur(12px); border-bottom:1px solid #E2E8F0; }
-  .tj-site-nav { min-height:76px; display:flex; align-items:center; justify-content:space-between; gap:18px; }
-  .tj-site-brand { display:flex; align-items:center; gap:12px; text-decoration:none; color:#0B2A4A; font-weight:850; letter-spacing:.03em; }
-  .tj-site-brand img { width:58px; height:58px; object-fit:contain; border-radius:14px; }
-  .tj-site-links { display:flex; align-items:center; gap:22px; }
-  .tj-site-links a { color:#334155; font-size:.92rem; font-weight:650; text-decoration:none; }
-  .tj-site-links a:hover { color:#168FD0; }
-  .tj-site-actions { display:flex; align-items:center; gap:10px; }
-  .tj-site-btn { border:0; border-radius:10px; min-height:44px; padding:0 18px; font-weight:750; font-size:.9rem; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; text-decoration:none; }
-  .tj-site-btn.primary { background:#118FCF; color:#fff; box-shadow:0 8px 20px rgba(17,143,207,.20); }
-  .tj-site-btn.dark { background:#0B2A4A; color:#fff; }
-  .tj-site-btn.ghost { background:#fff; border:1px solid #CBD5E1; color:#0B2A4A; }
-  .tj-hero { background:linear-gradient(135deg,#071F36 0%,#0B355C 56%,#0F6FA4 100%); color:#fff; position:relative; overflow:hidden; }
-  .tj-hero::after { content:""; position:absolute; width:560px; height:560px; border-radius:50%; right:-220px; top:-200px; background:radial-gradient(circle,rgba(88,195,239,.30),rgba(88,195,239,0) 68%); }
-  .tj-hero-grid { min-height:610px; display:grid; grid-template-columns:1.15fr .85fr; align-items:center; gap:56px; position:relative; z-index:1; padding:70px 0; }
-  .tj-eyebrow { display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.18); border-radius:999px; padding:8px 13px; font-size:.8rem; font-weight:750; margin-bottom:18px; }
-  .tj-hero h1 { font-size:clamp(2.15rem,5vw,4rem); line-height:1.02; letter-spacing:-.035em; max-width:760px; margin:0 0 20px; color:#fff; }
-  .tj-hero p { font-size:clamp(1rem,1.8vw,1.18rem); line-height:1.7; color:#D7E8F5; max-width:690px; margin:0 0 28px; }
-  .tj-hero-actions { display:flex; gap:12px; flex-wrap:wrap; }
-  .tj-hero-card { background:rgba(255,255,255,.96); border:1px solid rgba(255,255,255,.28); border-radius:28px; padding:24px; box-shadow:0 28px 70px rgba(0,0,0,.25); }
-  .tj-hero-card img { width:100%; max-width:410px; margin:auto; object-fit:contain; }
-  .tj-site-section { padding:78px 0; }
-  .tj-site-section.alt { background:#EEF6FB; }
-  .tj-section-kicker { color:#168FD0; text-transform:uppercase; letter-spacing:.12em; font-size:.76rem; font-weight:850; margin-bottom:8px; }
-  .tj-section-title { color:#0B2A4A; font-size:clamp(1.7rem,3vw,2.5rem); margin:0 0 12px; line-height:1.15; }
-  .tj-section-sub { color:#64748B; max-width:720px; font-size:1rem; line-height:1.65; margin:0 0 34px; }
-  .tj-service-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; }
-  .tj-service-card { background:#fff; border:1px solid #E2E8F0; border-radius:18px; padding:24px; box-shadow:0 8px 28px rgba(15,39,64,.06); }
-  .tj-service-icon { width:48px; height:48px; border-radius:14px; display:grid; place-items:center; font-size:1.45rem; background:#E6F5FC; margin-bottom:15px; }
-  .tj-service-card h3 { color:#0B2A4A; font-size:1.03rem; margin:0 0 8px; }
-  .tj-service-card p { color:#64748B; font-size:.9rem; line-height:1.55; margin:0; }
-  .tj-feature-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; }
-  .tj-feature { padding:22px 0; border-top:3px solid #2E9BD6; }
-  .tj-feature strong { display:block; color:#0B2A4A; font-size:1.05rem; margin-bottom:7px; }
-  .tj-feature span { color:#64748B; font-size:.92rem; line-height:1.55; }
-  .tj-portal-band { background:#0B2A4A; color:#fff; border-radius:28px; padding:42px; display:grid; grid-template-columns:1fr auto; align-items:center; gap:24px; box-shadow:0 20px 50px rgba(11,42,74,.18); }
-  .tj-portal-band h2 { margin:0 0 10px; color:#fff; font-size:clamp(1.5rem,3vw,2.2rem); }
-  .tj-portal-band p { margin:0; color:#C9DCEA; max-width:720px; line-height:1.6; }
-  .tj-site-footer { background:#071A2C; color:#BFD0DE; padding:34px 0; }
-  .tj-footer-row { display:flex; align-items:center; justify-content:space-between; gap:20px; }
-  .tj-footer-brand { display:flex; align-items:center; gap:10px; font-weight:750; color:#fff; }
-  .tj-footer-brand img { width:42px; height:42px; object-fit:contain; border-radius:10px; }
-  .tj-back-site { width:100%; margin-bottom:14px; }
-  @media (max-width:900px){
-    .tj-site-links{display:none}.tj-hero-grid{grid-template-columns:1fr;min-height:auto;gap:30px;padding:56px 0}.tj-hero-card{max-width:520px}.tj-service-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.tj-feature-grid{grid-template-columns:1fr}.tj-portal-band{grid-template-columns:1fr}.tj-portal-band .tj-site-btn{width:100%}
+<style id="tj-landing-v17-css">
+  #tj-landing{width:100%;height:100dvh;min-height:0;background:#F6F9FC;color:#102A43;overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
+  .tj-site-wrap{width:min(1180px,calc(100% - 40px));margin:0 auto}
+  .tj-site-header{position:sticky;top:0;z-index:1200;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(203,213,225,.78)}
+  .tj-site-nav{min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+  .tj-site-brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:#0B2A4A;font-weight:850;letter-spacing:.025em;white-space:nowrap}
+  .tj-site-brand img{width:52px;height:52px;object-fit:contain;border-radius:14px;background:#fff;box-shadow:0 5px 16px rgba(11,42,74,.10)}
+  .tj-site-links{display:flex;align-items:center;gap:26px}
+  .tj-site-links a{color:#486581;font-size:.9rem;font-weight:700;text-decoration:none;transition:.18s ease}
+  .tj-site-links a:hover{color:#168FD0}
+  .tj-site-actions{display:flex;align-items:center;gap:10px}
+  .tj-site-btn{border:0;border-radius:12px;min-height:46px;padding:0 19px;font-weight:780;font-size:.9rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;transition:transform .18s ease,box-shadow .18s ease,background .18s ease}
+  .tj-site-btn:hover{transform:translateY(-1px)}
+  .tj-site-btn.primary{background:linear-gradient(135deg,#159CDB,#1688C7);color:#fff;box-shadow:0 10px 24px rgba(21,156,219,.22)}
+  .tj-site-btn.dark{background:#0B2A4A;color:#fff;box-shadow:0 8px 20px rgba(11,42,74,.16)}
+  .tj-site-btn.ghost{background:#fff;border:1px solid #CBD5E1;color:#0B2A4A}
+  .tj-site-btn.soft{background:#EAF6FC;color:#0878B0;border:1px solid #CDECF9}
+
+  .tj-hero{position:relative;overflow:hidden;background:linear-gradient(135deg,#061B2E 0%,#0A3154 52%,#0C5F8B 100%);color:#fff}
+  .tj-hero:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.7),transparent 92%)}
+  .tj-hero:after{content:"";position:absolute;width:620px;height:620px;border-radius:50%;right:-190px;top:-260px;background:radial-gradient(circle,rgba(73,189,236,.34) 0%,rgba(73,189,236,.05) 48%,transparent 70%)}
+  .tj-hero-grid{min-height:640px;display:grid;grid-template-columns:1.08fr .92fr;align-items:center;gap:64px;position:relative;z-index:1;padding:74px 0 82px}
+  .tj-eyebrow{display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:8px 13px;font-size:.79rem;font-weight:800;margin-bottom:20px;color:#E8F6FC}
+  .tj-hero h1{font-size:clamp(2.4rem,5.5vw,4.45rem);line-height:.99;letter-spacing:-.045em;max-width:760px;margin:0 0 22px;color:#fff;text-wrap:balance}
+  .tj-hero h1 span{color:#67C8F0}
+  .tj-hero p{font-size:clamp(1rem,1.75vw,1.17rem);line-height:1.72;color:#D2E6F2;max-width:650px;margin:0 0 30px}
+  .tj-hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+  .tj-hero-proof{display:flex;gap:18px;flex-wrap:wrap;margin-top:28px;color:#CBE0EC;font-size:.84rem;font-weight:700}
+  .tj-proof-item{display:flex;align-items:center;gap:7px}
+  .tj-proof-dot{width:8px;height:8px;border-radius:50%;background:#5DC5EE;box-shadow:0 0 0 5px rgba(93,197,238,.12)}
+
+  .tj-app-showcase{position:relative;min-height:500px;display:grid;place-items:center}
+  .tj-phone{width:min(360px,92%);background:#F8FBFD;border:9px solid rgba(255,255,255,.92);border-radius:38px;box-shadow:0 32px 74px rgba(0,0,0,.34);overflow:hidden;transform:rotate(2deg)}
+  .tj-phone-top{height:72px;background:#0B2A4A;color:#fff;display:flex;align-items:center;gap:10px;padding:0 18px;font-size:.84rem;font-weight:850;letter-spacing:.03em}
+  .tj-phone-top img{width:36px;height:36px;border-radius:10px;background:#fff;object-fit:contain}
+  .tj-phone-body{padding:18px;background:linear-gradient(#F8FBFD,#EEF6FA)}
+  .tj-mini-kicker{font-size:.72rem;color:#168FD0;font-weight:850;text-transform:uppercase;letter-spacing:.09em}
+  .tj-mini-title{font-size:1.08rem;font-weight:850;color:#0B2A4A;margin:4px 0 14px}
+  .tj-mini-card{background:#fff;border:1px solid #DCE8F0;border-radius:16px;padding:14px;margin-bottom:11px;box-shadow:0 7px 18px rgba(15,39,64,.06)}
+  .tj-mini-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .tj-mini-card strong{font-size:.88rem;color:#163A59}.tj-mini-card small{display:block;color:#72869A;margin-top:5px;font-size:.72rem}
+  .tj-mini-status{border-radius:999px;padding:5px 9px;font-size:.66rem;font-weight:850;white-space:nowrap}
+  .tj-mini-status.blue{background:#E2F3FB;color:#0878B0}.tj-mini-status.green{background:#E7F8EE;color:#16834D}.tj-mini-status.yellow{background:#FFF4D6;color:#9A6410}
+  .tj-floating-chip{position:absolute;background:#fff;border:1px solid rgba(255,255,255,.9);border-radius:15px;padding:11px 14px;box-shadow:0 18px 44px rgba(0,0,0,.18);font-size:.78rem;font-weight:800;color:#0B2A4A;display:flex;align-items:center;gap:8px}
+  .tj-floating-chip.one{left:-8px;top:70px}.tj-floating-chip.two{right:-8px;bottom:78px}
+
+  .tj-trust-strip{background:#fff;border-bottom:1px solid #E5EDF3}
+  .tj-trust-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
+  .tj-trust-item{padding:19px 26px;display:flex;align-items:center;gap:12px;border-right:1px solid #E5EDF3}
+  .tj-trust-item:last-child{border-right:0}.tj-trust-icon{width:38px;height:38px;border-radius:12px;background:#E9F6FC;display:grid;place-items:center}.tj-trust-item strong{display:block;color:#0B2A4A;font-size:.9rem}.tj-trust-item span{display:block;color:#73869A;font-size:.76rem;margin-top:2px}
+
+  .tj-site-section{padding:84px 0}.tj-site-section.alt{background:#EDF6FB}.tj-site-section.white{background:#fff}
+  .tj-section-head{display:flex;justify-content:space-between;gap:30px;align-items:end;margin-bottom:34px}.tj-section-head>div:first-child{max-width:740px}
+  .tj-section-kicker{color:#168FD0;text-transform:uppercase;letter-spacing:.13em;font-size:.74rem;font-weight:900;margin-bottom:9px}
+  .tj-section-title{color:#0B2A4A;font-size:clamp(1.8rem,3vw,2.65rem);margin:0 0 12px;line-height:1.12;letter-spacing:-.025em;text-wrap:balance}
+  .tj-section-sub{color:#627D98;max-width:720px;font-size:1rem;line-height:1.68;margin:0}
+
+  .tj-service-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+  .tj-service-card{background:#fff;border:1px solid #DDE8F0;border-radius:20px;padding:25px;box-shadow:0 10px 28px rgba(15,39,64,.055);transition:.2s ease;min-height:210px}
+  .tj-service-card:hover{transform:translateY(-4px);box-shadow:0 18px 36px rgba(15,39,64,.10);border-color:#BFE3F5}
+  .tj-service-icon{width:50px;height:50px;border-radius:15px;display:grid;place-items:center;font-size:1.4rem;background:linear-gradient(145deg,#E8F7FD,#D9F0FA);margin-bottom:18px}
+  .tj-service-card h3{color:#0B2A4A;font-size:1.03rem;margin:0 0 9px}.tj-service-card p{color:#657E93;font-size:.9rem;line-height:1.58;margin:0}
+
+  .tj-process-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;position:relative}
+  .tj-process-card{background:#fff;border:1px solid #DCE8F0;border-radius:20px;padding:24px;position:relative}
+  .tj-process-num{width:38px;height:38px;border-radius:12px;background:#0B2A4A;color:#fff;display:grid;place-items:center;font-weight:900;margin-bottom:16px}.tj-process-card h3{margin:0 0 8px;color:#0B2A4A}.tj-process-card p{margin:0;color:#657E93;line-height:1.58;font-size:.9rem}
+
+  .tj-digital-grid{display:grid;grid-template-columns:.92fr 1.08fr;gap:58px;align-items:center}
+  .tj-digital-panel{background:#0B2A4A;border-radius:28px;padding:34px;color:#fff;box-shadow:0 24px 58px rgba(11,42,74,.18);position:relative;overflow:hidden}.tj-digital-panel:after{content:"";position:absolute;width:280px;height:280px;border-radius:50%;right:-100px;top:-100px;background:radial-gradient(circle,rgba(72,190,237,.28),transparent 70%)}
+  .tj-digital-panel h3{font-size:1.55rem;margin:0 0 12px;color:#fff;position:relative;z-index:1}.tj-digital-panel p{margin:0 0 20px;color:#CAE0EC;line-height:1.65;position:relative;z-index:1}
+  .tj-check-list{display:grid;gap:10px;position:relative;z-index:1}.tj-check{display:flex;align-items:flex-start;gap:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.11);border-radius:13px;padding:11px 13px;font-size:.88rem;color:#F2FAFD}.tj-check b{color:#65C8F0}
+  .tj-benefit-list{display:grid;gap:18px}.tj-benefit{display:grid;grid-template-columns:46px 1fr;gap:14px}.tj-benefit-icon{width:46px;height:46px;border-radius:14px;background:#E6F5FC;display:grid;place-items:center;font-size:1.25rem}.tj-benefit strong{display:block;color:#0B2A4A;margin-bottom:5px}.tj-benefit span{color:#657E93;line-height:1.56;font-size:.91rem}
+
+  .tj-portal-band{background:linear-gradient(135deg,#0A2642,#0D4F76);color:#fff;border-radius:30px;padding:46px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:34px;box-shadow:0 24px 56px rgba(11,42,74,.18);position:relative;overflow:hidden}.tj-portal-band:after{content:"";position:absolute;width:260px;height:260px;border-radius:50%;right:-80px;bottom:-140px;background:rgba(80,198,240,.16)}
+  .tj-portal-band h2{margin:0 0 10px;color:#fff;font-size:clamp(1.6rem,3vw,2.35rem);position:relative;z-index:1}.tj-portal-band p{margin:0;color:#C9DDEA;max-width:720px;line-height:1.65;position:relative;z-index:1}.tj-portal-actions{display:grid;gap:10px;min-width:220px;position:relative;z-index:1}
+
+  .tj-site-footer{background:#061827;color:#BFD0DE;padding:34px 0}.tj-footer-row{display:flex;align-items:center;justify-content:space-between;gap:20px}.tj-footer-brand{display:flex;align-items:center;gap:10px;font-weight:800;color:#fff}.tj-footer-brand img{width:40px;height:40px;object-fit:contain;border-radius:10px;background:#fff}.tj-footer-note{font-size:.8rem;color:#9FB6C7}
+  .tj-back-site{width:100%;margin-bottom:14px}
+
+  @media(max-width:960px){
+    .tj-site-links{display:none}.tj-hero-grid{grid-template-columns:1fr;min-height:auto;gap:32px;padding:58px 0 68px}.tj-app-showcase{min-height:440px}.tj-phone{width:min(350px,90%)}.tj-floating-chip.one{left:8%}.tj-floating-chip.two{right:8%}.tj-service-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.tj-digital-grid{grid-template-columns:1fr}.tj-portal-band{grid-template-columns:1fr}.tj-portal-actions{grid-template-columns:1fr 1fr;min-width:0}.tj-trust-grid{grid-template-columns:1fr}.tj-trust-item{border-right:0;border-bottom:1px solid #E5EDF3}.tj-trust-item:last-child{border-bottom:0}
   }
-  @media (max-width:560px){
-    .tj-site-wrap{width:min(100% - 24px,1180px)}.tj-site-nav{min-height:68px}.tj-site-brand span{font-size:.88rem}.tj-site-brand img{width:48px;height:48px}.tj-site-actions .pwa-install-trigger{display:none}.tj-site-btn{padding:0 14px}.tj-hero-grid{padding:42px 0}.tj-hero h1{font-size:2.25rem}.tj-hero-actions{display:grid;grid-template-columns:1fr}.tj-hero-actions .tj-site-btn{width:100%}.tj-service-grid{grid-template-columns:1fr}.tj-site-section{padding:58px 0}.tj-portal-band{padding:28px 22px;border-radius:22px}.tj-footer-row{flex-direction:column;align-items:flex-start}.tj-hero-card{border-radius:22px;padding:16px}
+  @media(max-width:600px){
+    .tj-site-wrap{width:min(100% - 24px,1180px)}.tj-site-nav{min-height:68px}.tj-site-brand span{font-size:.86rem}.tj-site-brand img{width:45px;height:45px}.tj-site-actions .pwa-install-trigger{display:none}.tj-site-btn{min-height:44px;padding:0 14px}.tj-site-actions .dark{font-size:.8rem}.tj-hero-grid{padding:44px 0 54px}.tj-hero h1{font-size:2.35rem}.tj-hero-actions{display:grid;grid-template-columns:1fr}.tj-hero-actions .tj-site-btn{width:100%}.tj-hero-proof{display:grid;gap:12px}.tj-app-showcase{min-height:390px}.tj-phone{width:88%;border-width:7px;border-radius:32px;transform:none}.tj-floating-chip{display:none}.tj-site-section{padding:62px 0}.tj-section-head{display:block;margin-bottom:26px}.tj-service-grid,.tj-process-grid{grid-template-columns:1fr}.tj-service-card{min-height:auto}.tj-digital-panel{padding:27px 22px;border-radius:23px}.tj-portal-band{padding:30px 22px;border-radius:24px}.tj-portal-actions{grid-template-columns:1fr}.tj-footer-row{flex-direction:column;align-items:flex-start}.tj-trust-item{padding:16px 4px}.tj-phone-body{padding:14px}.tj-phone-top{height:64px}
   }
 </style>
 
@@ -567,7 +600,7 @@ function TJVoltarLoginDireto(ev){
 <body>
 
 
-  <!-- ===== LANDING PAGE PÚBLICA TJ REFRIGERAÇÃO — V16 ===== -->
+  <!-- ===== LANDING PAGE PÚBLICA TJ REFRIGERAÇÃO — V17 ===== -->
   <div id="tj-landing">
     <header class="tj-site-header">
       <div class="tj-site-wrap tj-site-nav">
@@ -576,13 +609,12 @@ function TJVoltarLoginDireto(ev){
           <span>TJ REFRIGERAÇÃO</span>
         </a>
         <nav class="tj-site-links" aria-label="Navegação principal">
-          <a href="#inicio">Início</a>
           <a href="#servicos">Serviços</a>
-          <a href="#empresa">A TJ</a>
+          <a href="#como-funciona">Como funciona</a>
           <a href="#portal">Portal do Cliente</a>
         </nav>
         <div class="tj-site-actions">
-          <button type="button" class="tj-site-btn ghost pwa-install-trigger">📲 Instalar app</button>
+          <button type="button" class="tj-site-btn soft pwa-install-trigger">📲 Instalar</button>
           <button type="button" class="tj-site-btn dark" onclick="TJMostrarLogin()">Área do Cliente</button>
         </div>
       </div>
@@ -592,43 +624,101 @@ function TJVoltarLoginDireto(ev){
       <section id="inicio" class="tj-hero">
         <div class="tj-site-wrap tj-hero-grid">
           <div>
-            <div class="tj-eyebrow">❄️ Assistência técnica em refrigeração</div>
-            <h1>Refrigeração com atendimento organizado do chamado à conclusão.</h1>
-            <p>A TJ Refrigeração reúne assistência técnica, orçamentos, agendamentos e acompanhamento do atendimento em uma experiência simples para clientes residenciais e empresariais.</p>
+            <div class="tj-eyebrow">❄️ Assistência técnica + acompanhamento digital</div>
+            <h1>Refrigeração técnica com atendimento <span>claro do início ao fim.</span></h1>
+            <p>A TJ Refrigeração une atendimento técnico e organização digital para você solicitar assistência, acompanhar o andamento, receber orçamentos e consultar agendamentos em um só lugar.</p>
             <div class="tj-hero-actions">
               <button type="button" class="tj-site-btn primary" onclick="TJAbrirCadastroPublico()">Solicitar atendimento</button>
-              <button type="button" class="tj-site-btn ghost" onclick="TJMostrarLogin()">Já sou cliente</button>
+              <a class="tj-site-btn ghost" href="#servicos">Conhecer os serviços</a>
+            </div>
+            <div class="tj-hero-proof" aria-label="Recursos disponíveis">
+              <div class="tj-proof-item"><span class="tj-proof-dot"></span> Chamados acompanhados</div>
+              <div class="tj-proof-item"><span class="tj-proof-dot"></span> Orçamentos no portal</div>
+              <div class="tj-proof-item"><span class="tj-proof-dot"></span> Agendamentos organizados</div>
             </div>
           </div>
-          <div class="tj-hero-card" aria-label="Identidade visual TJ Refrigeração">
-            <img src="./assets/tj-logo.png" alt="TJ Refrigeração">
+
+          <div class="tj-app-showcase" aria-label="Prévia do portal TJ Refrigeração">
+            <div class="tj-floating-chip one">🔧 Chamado acompanhado</div>
+            <div class="tj-phone">
+              <div class="tj-phone-top"><img src="./assets/tj-logo.png" alt=""><span>TJ REFRIGERAÇÃO</span></div>
+              <div class="tj-phone-body">
+                <div class="tj-mini-kicker">Portal do cliente</div>
+                <div class="tj-mini-title">Acompanhe seu atendimento</div>
+                <div class="tj-mini-card"><div class="tj-mini-row"><strong>Chamado #00482</strong><span class="tj-mini-status blue">Em atendimento</span></div><small>Câmara Frigorífica • acompanhamento atualizado</small></div>
+                <div class="tj-mini-card"><div class="tj-mini-row"><strong>Orçamento</strong><span class="tj-mini-status yellow">Aguardando aprovação</span></div><small>Consulte os itens e responda pelo portal</small></div>
+                <div class="tj-mini-card"><div class="tj-mini-row"><strong>Próxima visita</strong><span class="tj-mini-status green">Agendado</span></div><small>Data e horário disponíveis no aplicativo</small></div>
+              </div>
+            </div>
+            <div class="tj-floating-chip two">📱 Acesso pelo celular</div>
           </div>
         </div>
       </section>
 
-      <section id="servicos" class="tj-site-section">
+      <section class="tj-trust-strip" aria-label="Destaques do atendimento">
+        <div class="tj-site-wrap tj-trust-grid">
+          <div class="tj-trust-item"><div class="tj-trust-icon">🔧</div><div><strong>Atendimento técnico</strong><span>Solicitação e acompanhamento do serviço</span></div></div>
+          <div class="tj-trust-item"><div class="tj-trust-icon">💬</div><div><strong>Informação centralizada</strong><span>Histórico e comunicação no mesmo ambiente</span></div></div>
+          <div class="tj-trust-item"><div class="tj-trust-icon">📲</div><div><strong>Portal instalável</strong><span>Acesso fácil pelo Android, iPhone ou computador</span></div></div>
+        </div>
+      </section>
+
+      <section id="servicos" class="tj-site-section white">
         <div class="tj-site-wrap">
-          <div class="tj-section-kicker">Serviços</div>
-          <h2 class="tj-section-title">Atendimento técnico com informação centralizada</h2>
-          <p class="tj-section-sub">O portal foi pensado para organizar cada etapa do relacionamento com a TJ Refrigeração, mantendo cliente e empresa acompanhando a mesma solicitação.</p>
+          <div class="tj-section-head">
+            <div>
+              <div class="tj-section-kicker">Serviços e organização</div>
+              <h2 class="tj-section-title">Tudo o que envolve o atendimento em um fluxo mais simples.</h2>
+              <p class="tj-section-sub">A proposta é reduzir ruído e deixar cada etapa visível para quem solicita o serviço e para quem administra o atendimento.</p>
+            </div>
+          </div>
           <div class="tj-service-grid">
-            <article class="tj-service-card"><div class="tj-service-icon">🔧</div><h3>Assistência técnica</h3><p>Abertura e acompanhamento de chamados de refrigeração com histórico do atendimento.</p></article>
-            <article class="tj-service-card"><div class="tj-service-icon">🧊</div><h3>Equipamentos</h3><p>Cadastro dos equipamentos atendidos para concentrar informações e ocorrências em um só lugar.</p></article>
-            <article class="tj-service-card"><div class="tj-service-icon">💰</div><h3>Orçamentos</h3><p>Envio e acompanhamento de propostas para que o cliente possa consultar e responder pelo portal.</p></article>
-            <article class="tj-service-card"><div class="tj-service-icon">📅</div><h3>Agendamentos</h3><p>Organização de visitas e atendimentos com consulta dos compromissos pela área do cliente.</p></article>
+            <article class="tj-service-card"><div class="tj-service-icon">🔧</div><h3>Assistência técnica</h3><p>Abra uma solicitação, descreva o problema e acompanhe o atendimento até a conclusão.</p></article>
+            <article class="tj-service-card"><div class="tj-service-icon">❄️</div><h3>Equipamentos</h3><p>Mantenha os equipamentos vinculados ao cliente e consulte ocorrências e atendimentos relacionados.</p></article>
+            <article class="tj-service-card"><div class="tj-service-icon">💰</div><h3>Orçamentos</h3><p>Receba propostas pelo portal e acompanhe o status de aprovação com mais organização.</p></article>
+            <article class="tj-service-card"><div class="tj-service-icon">📅</div><h3>Agendamentos</h3><p>Consulte visitas e compromissos relacionados ao atendimento diretamente pelo sistema.</p></article>
           </div>
         </div>
       </section>
 
-      <section id="empresa" class="tj-site-section alt">
+      <section id="como-funciona" class="tj-site-section alt">
         <div class="tj-site-wrap">
-          <div class="tj-section-kicker">TJ Refrigeração</div>
-          <h2 class="tj-section-title">Atendimento profissional também no digital</h2>
-          <p class="tj-section-sub">Além do serviço técnico, a plataforma ajuda a manter cada cliente informado e dá à TJ uma visão administrativa dos chamados, equipamentos, orçamentos, pedidos e agendamentos.</p>
-          <div class="tj-feature-grid">
-            <div class="tj-feature"><strong>Acompanhamento claro</strong><span>Cliente consulta o andamento das solicitações, histórico e informações relacionadas ao próprio atendimento.</span></div>
-            <div class="tj-feature"><strong>Gestão centralizada</strong><span>O proprietário administra clientes e os principais registros operacionais diretamente pelo sistema.</span></div>
-            <div class="tj-feature"><strong>Acesso pelo celular</strong><span>O portal pode ser instalado no Android e no iPhone como aplicativo PWA, mantendo a identidade da TJ.</span></div>
+          <div class="tj-section-head">
+            <div>
+              <div class="tj-section-kicker">Como funciona</div>
+              <h2 class="tj-section-title">Um atendimento fácil de entender.</h2>
+              <p class="tj-section-sub">Do primeiro contato ao histórico final, o cliente acompanha o que está acontecendo sem depender de informações espalhadas.</p>
+            </div>
+          </div>
+          <div class="tj-process-grid">
+            <article class="tj-process-card"><div class="tj-process-num">1</div><h3>Solicite</h3><p>Cadastre-se no portal e abra a solicitação informando equipamento, problema e detalhes do atendimento.</p></article>
+            <article class="tj-process-card"><div class="tj-process-num">2</div><h3>Acompanhe</h3><p>Consulte status, mensagens, orçamento e agendamento conforme o atendimento evolui.</p></article>
+            <article class="tj-process-card"><div class="tj-process-num">3</div><h3>Consulte o histórico</h3><p>Depois do serviço, as principais informações continuam organizadas para futuras consultas.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="tj-site-section white">
+        <div class="tj-site-wrap tj-digital-grid">
+          <div>
+            <div class="tj-section-kicker">TJ Refrigeração</div>
+            <h2 class="tj-section-title">Atendimento técnico com uma experiência mais organizada.</h2>
+            <p class="tj-section-sub" style="margin-bottom:26px">O sistema não substitui o atendimento humano. Ele organiza as informações para que cliente e TJ tenham uma visão clara do que foi solicitado, aprovado, agendado e realizado.</p>
+            <div class="tj-benefit-list">
+              <div class="tj-benefit"><div class="tj-benefit-icon">✓</div><div><strong>Menos informação perdida</strong><span>Chamados, orçamentos e registros ficam reunidos em um único fluxo.</span></div></div>
+              <div class="tj-benefit"><div class="tj-benefit-icon">✓</div><div><strong>Mais clareza para o cliente</strong><span>O andamento pode ser consultado sem depender apenas de mensagens soltas.</span></div></div>
+              <div class="tj-benefit"><div class="tj-benefit-icon">✓</div><div><strong>Acesso rápido pelo celular</strong><span>O portal pode ser instalado na tela inicial e aberto como aplicativo.</span></div></div>
+            </div>
+          </div>
+          <div class="tj-digital-panel">
+            <h3>Seu atendimento, organizado em um só lugar.</h3>
+            <p>O portal da TJ foi criado para tornar as principais etapas do atendimento fáceis de localizar e acompanhar.</p>
+            <div class="tj-check-list">
+              <div class="tj-check"><b>01</b> Chamados e atualizações</div>
+              <div class="tj-check"><b>02</b> Orçamentos e aprovações</div>
+              <div class="tj-check"><b>03</b> Equipamentos e histórico</div>
+              <div class="tj-check"><b>04</b> Agendamentos e comunicação</div>
+            </div>
           </div>
         </div>
       </section>
@@ -637,12 +727,14 @@ function TJVoltarLoginDireto(ev){
         <div class="tj-site-wrap">
           <div class="tj-portal-band">
             <div>
-              <h2>Já possui cadastro na TJ Refrigeração?</h2>
-              <p>Acesse o portal para acompanhar chamados, orçamentos, equipamentos, histórico e agendamentos. Se ainda não possui conta, você também pode iniciar seu cadastro.</p>
+              <div class="tj-section-kicker" style="color:#72D0F2">Portal TJ</div>
+              <h2>Já é cliente? Acompanhe tudo pelo portal.</h2>
+              <p>Entre com sua conta para acessar chamados, orçamentos, equipamentos, histórico e agendamentos. Se ainda não possui cadastro, você pode iniciar agora.</p>
             </div>
-            <div style="display:grid;gap:10px;min-width:210px;">
+            <div class="tj-portal-actions">
               <button type="button" class="tj-site-btn primary" onclick="TJMostrarLogin()">Entrar no portal</button>
               <button type="button" class="tj-site-btn ghost" onclick="TJAbrirCadastroPublico()">Criar conta</button>
+              <button type="button" class="tj-site-btn soft pwa-install-trigger">📲 Instalar aplicativo</button>
             </div>
           </div>
         </div>
@@ -652,7 +744,7 @@ function TJVoltarLoginDireto(ev){
     <footer class="tj-site-footer">
       <div class="tj-site-wrap tj-footer-row">
         <div class="tj-footer-brand"><img src="./assets/tj-logo.png" alt=""><span>TJ Refrigeração</span></div>
-        <div style="font-size:.82rem;">Assistência técnica • Portal do Cliente • Aplicativo PWA</div>
+        <div class="tj-footer-note">Assistência técnica • Portal do Cliente • Aplicativo PWA</div>
       </div>
     </footer>
   </div>
