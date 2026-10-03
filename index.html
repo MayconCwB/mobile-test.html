@@ -16,20 +16,39 @@
   <meta name="apple-mobile-web-app-title" content="TJ Refrigeração">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <script>
-  /* TJ v22 — tema automático seguindo o sistema */
+  /* TJ v23 — tema Claro / Escuro / Sistema com preferência local */
   (function(){
-    var mq = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
-    function aplicarTema(escuro){
-      var tema = escuro ? 'dark' : 'light';
-      document.documentElement.setAttribute('data-theme', tema);
-      var meta = document.querySelector('meta[name="theme-color"]');
-      if(meta) meta.setAttribute('content', escuro ? '#071521' : '#0B2A4A');
+    var CHAVE='tj-theme-mode';
+    var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+    function modoValido(m){ return m==='light'||m==='dark'||m==='system'; }
+    function lerModo(){
+      try{ var m=localStorage.getItem(CHAVE); return modoValido(m)?m:'system'; }
+      catch(e){ return 'system'; }
     }
-    aplicarTema(!!(mq && mq.matches));
+    function resolver(modo){ return modo==='dark'||(modo==='system'&&!!(mq&&mq.matches))?'dark':'light'; }
+    function aplicar(modo){
+      modo=modoValido(modo)?modo:'system';
+      var tema=resolver(modo);
+      document.documentElement.setAttribute('data-theme-mode',modo);
+      document.documentElement.setAttribute('data-theme',tema);
+      var meta=document.querySelector('meta[name="theme-color"]');
+      if(meta) meta.setAttribute('content',tema==='dark'?'#071521':'#0B2A4A');
+      return tema;
+    }
+    function salvar(modo){
+      modo=modoValido(modo)?modo:'system';
+      try{ localStorage.setItem(CHAVE,modo); }catch(e){}
+      aplicar(modo);
+      var sels=document.querySelectorAll('[data-tj-theme-select]');
+      for(var i=0;i<sels.length;i++) sels[i].value=modo;
+    }
+    var atual=lerModo(); aplicar(atual);
     if(mq){
-      if(mq.addEventListener) mq.addEventListener('change', function(e){ aplicarTema(e.matches); });
-      else if(mq.addListener) mq.addListener(function(e){ aplicarTema(e.matches); });
+      var onChange=function(){ if(lerModo()==='system') aplicar('system'); };
+      if(mq.addEventListener) mq.addEventListener('change',onChange);
+      else if(mq.addListener) mq.addListener(onChange);
     }
+    window.TJTheme={getMode:lerModo,setMode:salvar,apply:aplicar};
   })();
   </script>
 
@@ -976,10 +995,7 @@ function TJVoltarLoginDireto(ev){
   <div id="drawer-overlay" class="drawer-overlay hidden" data-action="fechar-menu">
     <div class="drawer-panel">
       <div class="drawer-header">
-        <div class="drawer-brand">
-          <img class="tj-brand-icon" src="./assets/icon-192.png" alt="">
-          <span>TJ REFRIGERAÇÃO</span>
-        </div>
+        <div class="drawer-menu-title">Menu principal</div>
         <button type="button" class="drawer-close-btn" data-action="fechar-menu" aria-label="Fechar menu">✕</button>
       </div>
       <div class="drawer-body">
@@ -1548,6 +1564,19 @@ function TJVoltarLoginDireto(ev){
             <button type="button" class="btn-tj" data-action="salvar-dados-cli">Salvar Dados Cadastrais</button>
           </div>
 
+          <div class="card-box">
+            <div class="card-title">Aparência</div>
+            <p class="card-subtitle">Escolha como o portal deve aparecer neste aparelho.</p>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label" for="cfg-tema-cli">Tema</label>
+              <select id="cfg-tema-cli" class="form-select" data-tj-theme-select>
+                <option value="system">📱 Usar tema do sistema</option>
+                <option value="light">☀️ Claro</option>
+                <option value="dark">🌙 Escuro</option>
+              </select>
+            </div>
+          </div>
+
           <!-- CONTATOS DO CLIENTE -->
           <div class="card-box">
             <div class="card-title">
@@ -1674,20 +1703,11 @@ function TJVoltarLoginDireto(ev){
             </div>
           </div>
 
-          <!-- CARD PRÓXIMO ATENDIMENTO -->
+          <!-- CARD PRÓXIMO ATENDIMENTO — somente dados reais -->
           <div class="card-box">
             <div class="card-title">Próximo Atendimento</div>
-            <div style="background: #F8FAFC; border: 1px solid var(--border); border-radius: 8px; padding: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-              <div>
-                <span class="badge badge-yellow">Em atendimento</span>
-                <p style="font-weight: 700; color: var(--accent-dark); margin-top: 6px; font-size: 0.95rem;">
-                  #00482 — Câmara Frigorífica 1
-                </p>
-                <p style="font-size: 0.8rem; color: var(--text-muted);">Empresa XYZ • Hoje — 14:00</p>
-              </div>
-              <button type="button" class="btn-tj" data-action="abrir-atend" data-id="00482">
-                Abrir atendimento
-              </button>
+            <div id="dash-emp-proximo-atendimento" class="tj-proximo-atendimento">
+              <p class="tj-proximo-vazio">Nenhum atendimento agendado no momento.</p>
             </div>
           </div>
 
@@ -2500,6 +2520,17 @@ function TJVoltarLoginDireto(ev){
           <button type="button" class="btn-voltar" data-action="voltar">‹ Voltar</button>
           <div class="card-box">
             <div class="card-title">Configurações</div>
+
+            <p class="card-title" style="font-size: 0.95rem; margin-top: 10px;">APARÊNCIA</p>
+            <div class="form-group">
+              <label class="form-label" for="cfg-tema-emp">Tema deste aparelho</label>
+              <select id="cfg-tema-emp" class="form-select" data-tj-theme-select>
+                <option value="system">📱 Usar tema do sistema</option>
+                <option value="light">☀️ Claro</option>
+                <option value="dark">🌙 Escuro</option>
+              </select>
+              <span style="font-size:.75rem;color:var(--text-muted);">A preferência fica salva neste celular ou computador.</span>
+            </div>
             
             <p class="card-title" style="font-size: 0.95rem; margin-top: 10px;">ATENDIMENTO</p>
             <div class="form-group">
@@ -4505,6 +4536,8 @@ function TJVoltarLoginDireto(ev){
 
     // 6. CONFIGURAÇÕES EMPRESA
     function renderizarConfigEmpresa() {
+      var temaEmp = document.getElementById("cfg-tema-emp");
+      if (temaEmp && window.TJTheme) temaEmp.value = window.TJTheme.getMode();
       var inpHora = document.getElementById("cfg-horario");
       if (inpHora) inpHora.value = state.configEmpresa.horario;
 
@@ -4519,6 +4552,55 @@ function TJVoltarLoginDireto(ev){
       if (sNova) sNova.value = "";
       var sConf = document.getElementById("cfg-senha-conf");
       if (sConf) sConf.value = "";
+    }
+
+    // Próximo atendimento do painel: usa somente agendamentos reais carregados do Firebase.
+    function renderizarProximoAtendimentoEmpresa() {
+      var box = document.getElementById("dash-emp-proximo-atendimento");
+      if (!box) return;
+      box.innerHTML = "";
+      var lista = Array.isArray(state.agendamentos) ? state.agendamentos.slice() : [];
+      var agora = new Date();
+      var inicioHoje = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate()).getTime();
+      function dataHora(ag) {
+        var d = String(ag.data || "");
+        var h = String(ag.hora || "00:00");
+        var m = d.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        var hm = h.match(/^(\d{1,2}):(\d{2})/);
+        if (!m) return null;
+        return new Date(Number(m[1]), Number(m[2])-1, Number(m[3]), hm?Number(hm[1]):0, hm?Number(hm[2]):0);
+      }
+      var candidatos = lista.filter(function(ag){
+        var st = String(ag.status || "").toLowerCase();
+        if (st === "cancelado" || st === "concluído" || st === "concluido") return false;
+        var dt = dataHora(ag);
+        if (!dt) return false;
+        return dt.getTime() >= inicioHoje || st === "em atendimento";
+      }).sort(function(a,b){ return dataHora(a).getTime() - dataHora(b).getTime(); });
+      if (!candidatos.length) {
+        var vazio=document.createElement("p");
+        vazio.className="tj-proximo-vazio";
+        vazio.textContent="Nenhum atendimento agendado no momento.";
+        box.appendChild(vazio);
+        return;
+      }
+      var ag=candidatos[0], ch=null;
+      if(ag.chamado){
+        ch=(state.chamados||[]).find(function(x){return String(x.num)===String(ag.chamado);})||null;
+      }
+      var card=document.createElement("div");
+      card.className="tj-proximo-card";
+      var info=document.createElement("div"); info.className="tj-proximo-info";
+      info.appendChild(criarBadge(ag.status||"Agendado"));
+      var titulo=document.createElement("p"); titulo.className="tj-proximo-titulo";
+      titulo.textContent=ch ? ("#"+ch.num+" — "+(ch.equip||ag.tipo||"Atendimento")) : (ag.tipo||"Atendimento agendado");
+      var meta=document.createElement("p"); meta.className="tj-proximo-meta";
+      meta.textContent=(ag.cliente||"Cliente")+" • "+(ag.agend||formatarDataAgendamento(ag.data,ag.hora));
+      info.appendChild(titulo); info.appendChild(meta); card.appendChild(info);
+      var btn=document.createElement("button"); btn.type="button"; btn.className="btn-tj";
+      if(ch){ btn.textContent="Abrir atendimento"; btn.setAttribute("data-action","abrir-atend"); btn.setAttribute("data-id",ch.num); }
+      else { btn.textContent="Ver agendamento"; btn.setAttribute("data-action","nav-tela"); btn.setAttribute("data-id","tela-emp-agendamentos"); }
+      card.appendChild(btn); box.appendChild(card);
     }
 
     // DASHBOARD EMPRESA (TJ)
@@ -4551,6 +4633,7 @@ function TJVoltarLoginDireto(ev){
       if (elAg) elAg.textContent = String(agendAtivos);
       var elEq = document.getElementById("kpi-emp-equip");
       if (elEq) elEq.textContent = String(state.equip.length);
+      renderizarProximoAtendimentoEmpresa();
 
       // Chamados recebidos de todos os clientes
       var box = document.getElementById("dash-emp-chamados");
@@ -5969,6 +6052,8 @@ function TJVoltarLoginDireto(ev){
 
       // Módulo Configurações
       if (acao === "salvar-config" || acao === "salvar-config-emp") {
+        var temaCfg = document.getElementById("cfg-tema-emp");
+        if (temaCfg && window.TJTheme) window.TJTheme.setMode(temaCfg.value);
         var hInp = document.getElementById("cfg-horario");
         if (hInp) state.configEmpresa.horario = hInp.value.trim() || state.configEmpresa.horario;
 
@@ -6304,6 +6389,26 @@ html[data-theme="dark"] .tj-service-card,html[data-theme="dark"] .tj-contact-ban
 html[data-theme="dark"] .tj-service-card h3,html[data-theme="dark"] .tj-contact-copy h2,html[data-theme="dark"] .tj-contact-item strong{color:#EAF7FC}
 html[data-theme="dark"] .tj-service-card p,html[data-theme="dark"] .tj-contact-copy p,html[data-theme="dark"] .tj-contact-item a,html[data-theme="dark"] .tj-contact-item span{color:#A7BECC}
 html[data-theme="dark"] .tj-contact-item{border-bottom-color:#24445A}
+
+/* TJ v23 — alinhamento iOS, menu limpo e próximo atendimento real */
+.drawer-menu-title{font-weight:800;font-size:1rem;letter-spacing:.01em;color:#fff}
+.form-row>.form-group{min-width:0}
+.form-input,.form-select,.form-textarea{max-width:100%;min-width:0;box-sizing:border-box}
+input.form-input[type="date"],input.form-input[type="time"]{display:block;width:100%;max-width:100%;min-width:0;-webkit-min-logical-width:0}
+.tj-proximo-atendimento{margin-top:10px}
+.tj-proximo-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.tj-proximo-info{min-width:0;flex:1 1 240px}
+.tj-proximo-titulo{font-weight:700;color:var(--accent-dark);margin:8px 0 2px;font-size:.95rem;overflow-wrap:anywhere}
+.tj-proximo-meta{font-size:.8rem;color:var(--text-muted);margin:0}
+.tj-proximo-vazio{margin:8px 0 0;padding:14px;border:1px dashed var(--border);border-radius:10px;color:var(--text-muted);background:var(--surface)}
+html[data-theme="dark"] .tj-proximo-card,html[data-theme="dark"] .tj-proximo-vazio{background:#0D2030;border-color:#24445A}
+html[data-theme="dark"] .tj-proximo-titulo{color:#EAF7FC}
+@media(max-width:599px){
+  #tela-emp-novo-agendamento .form-row{display:block;width:100%}
+  #tela-emp-novo-agendamento .form-row>.form-group{width:100%;max-width:100%}
+  #tela-emp-novo-agendamento input[type="date"],#tela-emp-novo-agendamento input[type="time"]{width:100%!important;max-width:100%!important;min-width:0!important}
+  .tj-proximo-card>.btn-tj{width:100%}
+}
 </style>
 <script>
 (function(){
@@ -7546,6 +7651,24 @@ async function persistirChamadoAtualV13(){
   var ch=(state.chamados||[]).find(function(x){return String(x.num)===String(chamadoAtualNum);});if(!ch)return;var uid=uidRegistro(ch);if(!uid)return;var d=await lerDados(uid),arr=Array.isArray(d.chamados)?d.chamados:[],idx=arr.findIndex(function(x){return String(x.num)===String(ch.num);});var limpo=Object.assign({},ch);delete limpo.clienteUid;if(idx>=0)arr[idx]=limpo;else arr.unshift(limpo);var msgs=Object.assign({},d.mensagens||{});if(state.mensagens&&state.mensagens[ch.num])msgs[ch.num]=state.mensagens[ch.num];var ats=Object.assign({},d.atendimentos||{});if(state.atendimentos&&state.atendimentos[ch.num]){var av=Object.assign({},state.atendimentos[ch.num]);delete av.clienteUid;delete av.cliente;ats[ch.num]=av;}var pedidos=(state.pedidos||[]).filter(function(p){return uidRegistro(p)===uid||p.cliente===ch.cliente;}).map(function(p){var q=Object.assign({},p);delete q.clienteUid;return q;});await gravarDados(uid,{chamados:arr,mensagens:msgs,atendimentos:ats,pedidos:pedidos});
 }
 document.addEventListener('click',function(ev){var a=ev.target&&ev.target.closest?ev.target.closest('[data-action]'):null;if(!a||state.perfilSessao!=='empresa')return;var ac=a.dataset.action||'';if(['iniciar-atend','iniciar-atend-emp','salvar-diagnostico','salvar-peca','finalizar-atend','finalizar-atend-emp','enviar-msg-emp','entregar-pedido'].indexOf(ac)<0)return;setTimeout(function(){persistirChamadoAtualV13().catch(function(e){console.warn('[TJ V13 persist atendimento]',e);});},250);},false);
+
+// TJ v23 — troca de tema imediata em qualquer seletor de aparência.
+document.addEventListener('change',function(ev){
+  var sel=ev.target&&ev.target.matches&&ev.target.matches('[data-tj-theme-select]')?ev.target:null;
+  if(!sel||!window.TJTheme)return;
+  window.TJTheme.setMode(sel.value);
+},true);
+
+// Mantém os seletores sincronizados ao abrir Perfil/Configurações.
+var abrirTelaV23=abrirTela;
+abrirTela=function(idTela,registrarHistorico){
+  var r=abrirTelaV23(idTela,registrarHistorico);
+  if((idTela==='tela-cli-perfil'||idTela==='tela-emp-config')&&window.TJTheme){
+    var modo=window.TJTheme.getMode(), sels=document.querySelectorAll('[data-tj-theme-select]');
+    for(var i=0;i<sels.length;i++) sels[i].value=modo;
+  }
+  return r;
+};
 
 // Disponibiliza para depuração/testes.
 window.TJV13={recarregar:recarregarV13};
