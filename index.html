@@ -474,6 +474,10 @@ function TJVoltarLoginDireto(ev){
     #lista-emp-historico .hist-emp-header .badge { align-self:flex-start; max-width:100%; }
   }
 </style>
+
+<style id="tj-admin-v13-css">
+.admin-action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.admin-card-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.admin-card-actions button{min-height:40px}.admin-muted{font-size:.78rem;color:#64748B}.list-item.admin-record{cursor:default}.list-item.admin-record .list-title{overflow-wrap:anywhere}.admin-empty{font-size:.88rem;color:#64748B;padding:8px 0}@media(max-width:520px){.admin-action-grid{grid-template-columns:1fr}.admin-card-actions{display:grid;grid-template-columns:1fr 1fr}.admin-card-actions .btn-tj-danger:last-child:nth-child(3){grid-column:1/-1}.card-title{gap:8px;flex-wrap:wrap}}
+</style>
 </head>
 <body>
 
@@ -1374,9 +1378,52 @@ function TJVoltarLoginDireto(ev){
           <div class="card-box">
             <div class="card-title">Gestão de Chamados</div>
             <p class="card-subtitle">Todos os chamados técnicos dos clientes em atendimento ou fila.</p>
+            <button type="button" class="btn-tj" style="width:100%; margin-bottom:16px;" data-action="admin-novo-chamado">🔧 + CADASTRAR CHAMADO</button>
             <div id="lista-emp-chamados" class="list-container">
               <!-- Dinâmico -->
             </div>
+          </div>
+        </section>
+
+        <!-- 12.0 CADASTRAR / EDITAR CHAMADO PELO PROPRIETÁRIO -->
+        <section id="tela-emp-form-chamado" class="hidden">
+          <button type="button" class="btn-voltar" data-action="admin-cancelar-chamado">‹ Voltar</button>
+          <div class="card-box">
+            <div class="card-title" id="admin-chamado-titulo">Cadastrar Chamado</div>
+            <p class="card-subtitle">O proprietário pode abrir e atualizar chamados em nome de qualquer cliente.</p>
+            <input type="hidden" id="admin-chamado-id" value="">
+            <input type="hidden" id="admin-chamado-uid-original" value="">
+            <div class="form-group">
+              <label class="form-label" for="admin-chamado-cliente">Cliente *</label>
+              <select id="admin-chamado-cliente" class="form-select"></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="admin-chamado-equip">Equipamento *</label>
+              <select id="admin-chamado-equip" class="form-select"></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="admin-chamado-problema">Descrição do problema *</label>
+              <textarea id="admin-chamado-problema" class="form-textarea" rows="3" placeholder="Descreva o problema informado pelo cliente"></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="admin-chamado-prioridade">Prioridade</label>
+                <select id="admin-chamado-prioridade" class="form-select"><option>Normal</option><option>Urgente</option></select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="admin-chamado-status">Status</label>
+                <select id="admin-chamado-status" class="form-select">
+                  <option>Aguardando início</option><option>Em atendimento</option><option>Aguardando aprovação</option><option>Concluído</option><option>Cancelado</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label" for="admin-chamado-agend">Previsão / Agendamento</label><input type="text" id="admin-chamado-agend" class="form-input" placeholder="Ex: 05/10 — 14:00"></div>
+              <div class="form-group"><label class="form-label" for="admin-chamado-endereco">Endereço / local</label><input type="text" id="admin-chamado-endereco" class="form-input" placeholder="Local do atendimento"></div>
+            </div>
+            <div class="form-group"><label class="form-label" for="admin-chamado-obs">Observações</label><textarea id="admin-chamado-obs" class="form-textarea" rows="2"></textarea></div>
+            <button type="button" class="btn-tj" style="width:100%;" data-action="admin-salvar-chamado">SALVAR CHAMADO</button>
+            <button type="button" class="btn-tj-secondary" style="width:100%; margin-top:8px;" data-action="admin-cancelar-chamado">CANCELAR</button>
           </div>
         </section>
 
@@ -1690,7 +1737,9 @@ function TJVoltarLoginDireto(ev){
         <section id="tela-form-novo-orcamento" class="hidden">
           <button type="button" class="btn-voltar" data-action="voltar">‹ Voltar</button>
           <div class="card-box">
-            <div class="card-title">Emitir Novo Orçamento</div>
+            <div class="card-title" id="admin-orc-titulo">Emitir Novo Orçamento</div>
+            <input type="hidden" id="novo-orc-id" value="">
+            <input type="hidden" id="novo-orc-uid-original" value="">
             <form onsubmit="return false;">
               <div class="form-group">
                 <label class="form-label" for="novo-orc-cli">Cliente</label>
@@ -1708,6 +1757,16 @@ function TJVoltarLoginDireto(ev){
               <div class="form-group">
                 <label class="form-label" for="novo-orc-valor">Valor Total (R$)</label>
                 <input type="text" id="novo-orc-valor" class="form-input" placeholder="R$ 1.450,00">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="novo-orc-status">Status</label>
+                <select id="novo-orc-status" class="form-select">
+                  <option value="Aguardando aprovação">Aguardando aprovação</option>
+                  <option value="Aprovado">Aprovado</option>
+                  <option value="Recusado">Recusado</option>
+                  <option value="Cancelado">Cancelado</option>
+                </select>
               </div>
 
               <button type="button" class="btn-tj" style="width: 100%; margin-top: 10px;" data-action="salvar-novo-orcamento">
@@ -1865,19 +1924,56 @@ function TJVoltarLoginDireto(ev){
           </div>
         </section>
 
-        <!-- 18. CLIENTES DA EMPRESA (TELA NOVA) -->
+        <!-- 18. CLIENTES DA EMPRESA -->
         <section id="tela-emp-clientes" class="hidden">
           <button type="button" class="btn-voltar" data-action="voltar">‹ Voltar</button>
           <div class="card-box">
             <div class="card-title">Clientes</div>
             <p class="card-subtitle">Carteira de clientes atendidos pela TJ Refrigeração.</p>
+            <button type="button" class="btn-tj" style="width:100%; margin-bottom:16px;" data-action="abrir-novo-cliente-empresa">👤 + CADASTRAR CLIENTE</button>
             <div id="lista-emp-clientes" class="list-container">
               <!-- Dinâmico -->
             </div>
           </div>
         </section>
 
-        <!-- 18.1 FICHA DO CLIENTE (TELA NOVA) -->
+        <!-- 18.1 CADASTRAR CLIENTE PELO PROPRIETÁRIO -->
+        <section id="tela-emp-novo-cliente" class="hidden">
+          <button type="button" class="btn-voltar" data-action="cancelar-novo-cliente-empresa">‹ Voltar</button>
+          <div class="card-box">
+            <div class="card-title" id="emp-cli-form-titulo">Cadastrar Cliente</div>
+            <p class="card-subtitle" id="emp-cli-form-subtitulo">Crie o acesso do cliente. Ele receberá um e-mail para definir a própria senha.</p>
+            <input type="hidden" id="emp-cli-uid" value="">
+            <form onsubmit="return false;">
+              <div class="form-group">
+                <label class="form-label" for="emp-cli-tipo">Tipo de cadastro *</label>
+                <select id="emp-cli-tipo" class="form-select">
+                  <option value="PF">Pessoa Física (PF)</option>
+                  <option value="PJ">Pessoa Jurídica (PJ)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="emp-cli-nome">Nome completo / Razão Social *</label>
+                <input type="text" id="emp-cli-nome" class="form-input" autocomplete="name" placeholder="Nome do cliente ou empresa">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="emp-cli-tel">Telefone *</label>
+                <input type="tel" id="emp-cli-tel" class="form-input" inputmode="tel" autocomplete="tel" placeholder="(00) 00000-0000" maxlength="15">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="emp-cli-email">E-mail *</label>
+                <input type="email" id="emp-cli-email" class="form-input" inputmode="email" autocomplete="email" placeholder="cliente@email.com">
+              </div>
+              <div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:8px; padding:12px; margin:8px 0 16px; font-size:0.8rem; color:#1E3A5F; line-height:1.45;">
+                O sistema cria a conta sem encerrar o acesso do proprietário. Depois, o cliente recebe um e-mail do Firebase para definir uma senha própria.
+              </div>
+              <button type="button" id="btn-salvar-cliente-empresa" class="btn-tj" style="width:100%;" data-action="salvar-cliente-empresa">CADASTRAR CLIENTE</button>
+              <button type="button" class="btn-tj-secondary" style="width:100%; margin-top:8px;" data-action="cancelar-novo-cliente-empresa">CANCELAR</button>
+            </form>
+          </div>
+        </section>
+
+        <!-- 18.2 FICHA DO CLIENTE -->
         <section id="tela-emp-cliente-detalhe" class="hidden">
           <button type="button" class="btn-voltar" data-action="voltar">‹ Voltar</button>
           
@@ -1902,6 +1998,16 @@ function TJVoltarLoginDireto(ev){
                 <p class="form-label">Telefone</p>
                 <p id="cli-ficha-tel" style="font-size: 0.9rem; font-weight: 600;">—</p>
               </div>
+            </div>
+          </div>
+
+          <div class="card-box">
+            <div class="card-title">AÇÕES DO PROPRIETÁRIO</div>
+            <div class="admin-action-grid">
+              <button type="button" class="btn-tj" data-action="admin-chamado-cliente-atual">🔧 Novo chamado</button>
+              <button type="button" class="btn-tj" data-action="admin-equip-cliente-atual">❄️ Novo equipamento</button>
+              <button type="button" class="btn-tj" data-action="admin-orc-cliente-atual">💰 Novo orçamento</button>
+              <button type="button" class="btn-tj-secondary" data-action="admin-editar-cliente-atual">✏️ Editar cliente</button>
             </div>
           </div>
 
@@ -1933,9 +2039,28 @@ function TJVoltarLoginDireto(ev){
           <div class="card-box">
             <div class="card-title">Pedidos</div>
             <p class="card-subtitle">Pedidos de peças para os atendimentos.</p>
+            <button type="button" class="btn-tj" style="width:100%; margin-bottom:16px;" data-action="admin-novo-pedido">📦 + CADASTRAR PEDIDO</button>
             <div id="lista-emp-pedidos" class="list-container">
               <!-- Dinâmico -->
             </div>
+          </div>
+        </section>
+
+        <!-- 19.0 CADASTRAR / EDITAR PEDIDO -->
+        <section id="tela-emp-form-pedido" class="hidden">
+          <button type="button" class="btn-voltar" data-action="admin-cancelar-pedido">‹ Voltar</button>
+          <div class="card-box">
+            <div class="card-title" id="admin-pedido-titulo">Cadastrar Pedido</div>
+            <input type="hidden" id="admin-pedido-id" value="">
+            <input type="hidden" id="admin-pedido-uid-original" value="">
+            <div class="form-group"><label class="form-label" for="admin-pedido-cliente">Cliente *</label><select id="admin-pedido-cliente" class="form-select"></select></div>
+            <div class="form-group"><label class="form-label" for="admin-pedido-peca">Peça / Insumo *</label><input id="admin-pedido-peca" class="form-input" type="text" placeholder="Ex: Compressor Tecumseh"></div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label" for="admin-pedido-status">Status</label><select id="admin-pedido-status" class="form-select"><option>Solicitado</option><option>A caminho</option><option>Entregue</option><option>Cancelado</option></select></div>
+              <div class="form-group"><label class="form-label" for="admin-pedido-data">Data</label><input id="admin-pedido-data" class="form-input" type="text" placeholder="Ex: 03/10"></div>
+            </div>
+            <button type="button" class="btn-tj" style="width:100%;" data-action="admin-salvar-pedido">SALVAR PEDIDO</button>
+            <button type="button" class="btn-tj-secondary" style="width:100%; margin-top:8px;" data-action="admin-cancelar-pedido">CANCELAR</button>
           </div>
         </section>
 
@@ -2488,6 +2613,8 @@ function TJVoltarLoginDireto(ev){
       } else if (idTela === "tela-emp-clientes") {
         atualizarBreadcrumb([{label: "Clientes"}]);
         renderizarClientesEmpresa();
+      } else if (idTela === "tela-emp-novo-cliente") {
+        atualizarBreadcrumb([{label: "Clientes", action: "nav-tela", id: "tela-emp-clientes"}, {label: "Cadastrar Cliente"}]);
       } else if (idTela === "tela-emp-cliente-detalhe") {
         atualizarBreadcrumb([{label: "Clientes", action: "nav-tela", id: "tela-emp-clientes"}, {label: clienteAtualNome}]);
         renderizarFichaCliente();
@@ -4799,6 +4926,21 @@ function TJVoltarLoginDireto(ev){
         return;
       }
 
+      if (acao === "abrir-novo-cliente-empresa") {
+        if (state.perfilSessao !== "empresa") { toast("Acesso restrito ao proprietário."); return; }
+        var tipoCli=document.getElementById("emp-cli-tipo"); if(tipoCli) tipoCli.value="PF";
+        var nomeCli=document.getElementById("emp-cli-nome"); if(nomeCli) nomeCli.value="";
+        var telCli=document.getElementById("emp-cli-tel"); if(telCli) telCli.value="";
+        var emailCli=document.getElementById("emp-cli-email"); if(emailCli) emailCli.value="";
+        abrirTela("tela-emp-novo-cliente");
+        return;
+      }
+
+      if (acao === "cancelar-novo-cliente-empresa") {
+        abrirTela("tela-emp-clientes");
+        return;
+      }
+
       if (acao === "abrir-pedidos") {
         abrirTela("tela-emp-pedidos");
         return;
@@ -6283,6 +6425,78 @@ async function fazerCadastro(){
   }catch(e){ console.error('[TJFB] cadastro',e); aviso(msgErro(e)); }
 }
 
+async function cadastrarClientePeloProprietario(){
+  if(!auth.currentUser || !window.TJFB || !window.TJFB.perfilEmpresa || window.TJFB.perfilEmpresa.role!=='owner'){
+    aviso('Acesso restrito ao proprietário.');
+    return;
+  }
+
+  const tipo=(document.getElementById('emp-cli-tipo')?.value||'PF').toUpperCase()==='PJ'?'PJ':'PF';
+  const nome=(document.getElementById('emp-cli-nome')?.value||'').trim();
+  const telefone=(document.getElementById('emp-cli-tel')?.value||'').trim();
+  const email=(document.getElementById('emp-cli-email')?.value||'').trim().toLowerCase();
+  const btn=document.getElementById('btn-salvar-cliente-empresa');
+
+  if(!nome||!telefone||!email){ aviso('Preencha nome, telefone e e-mail.'); return; }
+  if(!email.includes('@')){ aviso('Informe um e-mail válido.'); return; }
+
+  var appSec=null;
+  try{
+    if(btn){ btn.disabled=true; btn.textContent='CADASTRANDO...'; }
+
+    // App Firebase secundário: cria a conta do cliente sem trocar a sessão do proprietário.
+    appSec=firebase.apps.find(function(a){ return a.name==='TJ_OWNER_CLIENT_CREATE'; }) || firebase.initializeApp(firebaseConfig,'TJ_OWNER_CLIENT_CREATE');
+    const authSec=appSec.auth();
+    const dbSec=appSec.firestore();
+    try{ await authSec.signOut(); }catch(e){}
+
+    var bytes=new Uint32Array(4);
+    if(window.crypto && window.crypto.getRandomValues) window.crypto.getRandomValues(bytes);
+    else { for(var b=0;b<bytes.length;b++) bytes[b]=Math.floor(Math.random()*4294967295); }
+    const senhaTemp='Tj!'+Array.from(bytes).map(function(n){return n.toString(36);}).join('').slice(0,18)+'9a';
+
+    const cred=await authSec.createUserWithEmailAndPassword(email,senhaTemp);
+    const uid=cred.user.uid;
+    const dadosCliente={
+      uid:uid,
+      email:email,
+      tipoPessoa:tipo,
+      nome:nome,
+      telefone:telefone,
+      criadoPor:'proprietario',
+      criadoEm:firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    await dbSec.collection('clients').doc(uid).set(dadosCliente,{merge:true});
+    await dbSec.collection('users').doc(uid).set({
+      uid:uid,
+      email:email,
+      role:'cliente',
+      nome:nome,
+      tipoPessoa:tipo,
+      criadoPor:'proprietario',
+      criadoEm:firebase.firestore.FieldValue.serverTimestamp()
+    },{merge:true});
+
+    var emailSenhaEnviado=true;
+    try{ await authSec.sendPasswordResetEmail(email); }
+    catch(mailErr){ emailSenhaEnviado=false; console.warn('[TJFB] reset novo cliente',mailErr); }
+    try{ await authSec.signOut(); }catch(e){}
+
+    await carregarDadosEmpresaFirebase();
+    await carregarClientesEmpresaFirebase();
+    abrirTela('tela-emp-clientes',false);
+    if(emailSenhaEnviado) aviso('Cliente cadastrado. Enviamos um e-mail para ele definir a senha.');
+    else aviso('Cliente cadastrado. O e-mail de senha não foi enviado; peça para usar “Esqueci minha senha” no login.');
+  }catch(e){
+    console.error('[TJFB] cadastro pelo proprietário',e);
+    aviso(msgErro(e));
+  }finally{
+    if(btn){ btn.disabled=false; btn.textContent='CADASTRAR CLIENTE'; }
+  }
+}
+window.TJFB.cadastrarClientePeloProprietario=cadastrarClientePeloProprietario;
+
 async function fazerLoginCliente(email,senha){
   if(!email||!senha){ aviso('Preencha e-mail e senha.'); return; }
   try{
@@ -6350,6 +6564,9 @@ document.addEventListener('click',function(ev){
   if(acao==='abrir-cadastro') return;
   if(acao==='concluir-cadastro'){
     ev.preventDefault(); ev.stopImmediatePropagation(); fazerCadastro(); return;
+  }
+  if(acao==='salvar-cliente-empresa' && !(document.getElementById('emp-cli-uid') && document.getElementById('emp-cli-uid').value)){
+    ev.preventDefault(); ev.stopImmediatePropagation(); cadastrarClientePeloProprietario(); return;
   }
   if(acao==='entrar-cliente'){
     ev.preventDefault(); ev.stopImmediatePropagation();
@@ -6496,5 +6713,186 @@ auth.onAuthStateChanged(async function(user){
 })();
 </script>
 <!-- ===== FIM PWA TJ REFRIGERAÇÃO ===== -->
+
+
+<!-- ===== TJ V13: ADMINISTRADOR TOTAL / CRUD OPERACIONAL ===== -->
+<script>
+(function(){
+'use strict';
+function $v(id){return document.getElementById(id);}
+function ownerOk(){return state && state.perfilSessao==='empresa' && window.TJFB && window.TJFB.db && window.TJFB.auth && window.TJFB.auth.currentUser;}
+function avisoV13(msg){if(typeof toast==='function') toast(msg); else alert(msg);}
+function clientesV13(){return (state.clientesFirebase||[]).slice();}
+function clientePorUid(uid){return clientesV13().find(function(c){return c.uid===uid;})||null;}
+function clientePorNome(nome){return clientesV13().find(function(c){return c.nome===nome;})||null;}
+function uidRegistro(obj){return (obj&&obj.clienteUid)||((obj&&obj.cliente)?((clientePorNome(obj.cliente)||{}).uid||''):'');}
+function limparCampos(ids){ids.forEach(function(id){var e=$v(id);if(e)e.value='';});}
+function gerarNumero(prefix, arr, prop){var max=0;(arr||[]).forEach(function(x){var n=parseInt(String(x[prop]||'').replace(/\D/g,''),10);if(!isNaN(n)&&n>max)max=n;});return prefix+String(max+1).padStart(5,'0');}
+function hoje(){return new Date().toLocaleDateString('pt-BR');}
+
+async function recarregarV13(){
+  if(window.TJFB&&window.TJFB.carregarDadosEmpresaFirebase) await window.TJFB.carregarDadosEmpresaFirebase();
+}
+async function lerDados(uid){var snap=await window.TJFB.db.collection('clientData').doc(uid).get();return snap.exists?(snap.data()||{}):{};}
+async function gravarDados(uid, patch){patch=patch||{};patch.atualizadoEm=firebase.firestore.FieldValue.serverTimestamp();await window.TJFB.db.collection('clientData').doc(uid).set(patch,{merge:true});}
+async function removerRegistro(uid,campo,predicado){var d=await lerDados(uid),arr=Array.isArray(d[campo])?d[campo]:[];arr=arr.filter(function(x){return !predicado(x);});var p={};p[campo]=arr;await gravarDados(uid,p);}
+
+function preencherSelectClientes(id, selecionado){
+  var sel=$v(id);if(!sel)return;sel.innerHTML='';
+  var cs=clientesV13();
+  if(!cs.length){var op=document.createElement('option');op.value='';op.textContent='Nenhum cliente cadastrado';sel.appendChild(op);return;}
+  cs.forEach(function(c){var op=document.createElement('option');op.value=c.uid;op.textContent=c.nome+' — '+c.tipo;sel.appendChild(op);});
+  if(selecionado) sel.value=selecionado;
+}
+function preencherEquipChamado(uid, selecionado){
+  var sel=$v('admin-chamado-equip');if(!sel)return;sel.innerHTML='';
+  var lista=(state.equip||[]).filter(function(e){return uidRegistro(e)===uid;});
+  if(!lista.length){var op=document.createElement('option');op.value='Equipamento não cadastrado';op.textContent='Equipamento não cadastrado';sel.appendChild(op);return;}
+  lista.forEach(function(e){var op=document.createElement('option');op.value=e.nome;op.textContent=e.nome+(e.marca?' — '+e.marca:'');sel.appendChild(op);});
+  if(selecionado) sel.value=selecionado;
+}
+
+function abrirFormChamado(obj, uidPreferido){
+  var uid=uidPreferido||uidRegistro(obj)||((clientesV13()[0]||{}).uid||'');
+  preencherSelectClientes('admin-chamado-cliente',uid);
+  preencherEquipChamado(uid,obj&&obj.equip);
+  $v('admin-chamado-id').value=obj?obj.num:'';$v('admin-chamado-uid-original').value=obj?uid:'';
+  $v('admin-chamado-titulo').textContent=obj?'Editar Chamado #'+obj.num:'Cadastrar Chamado';
+  $v('admin-chamado-problema').value=(obj&&(obj.problema||obj.desc))||'';
+  $v('admin-chamado-prioridade').value=(obj&&obj.prioridade)||'Normal';
+  $v('admin-chamado-status').value=(obj&&obj.status)||'Aguardando início';
+  $v('admin-chamado-agend').value=(obj&&obj.agend)||'';
+  var at=obj&&state.atendimentos?state.atendimentos[obj.num]:null;
+  $v('admin-chamado-endereco').value=(at&&at.endereco)||'';
+  $v('admin-chamado-obs').value=(obj&&obj.observacoes)||'';
+  abrirTela('tela-emp-form-chamado');
+}
+async function salvarChamado(){
+  if(!ownerOk())return avisoV13('Acesso restrito ao proprietário.');
+  var id=$v('admin-chamado-id').value, uid=$v('admin-chamado-cliente').value, oldUid=$v('admin-chamado-uid-original').value;
+  var cli=clientePorUid(uid), equip=$v('admin-chamado-equip').value, problema=$v('admin-chamado-problema').value.trim();
+  if(!uid||!cli||!equip||!problema)return avisoV13('Selecione o cliente, o equipamento e descreva o problema.');
+  var novo=!id;if(novo)id=gerarNumero('',state.chamados,'num');
+  if(!novo&&oldUid&&oldUid!==uid){
+    var od=await lerDados(oldUid), oa=Array.isArray(od.chamados)?od.chamados:[];oa=oa.filter(function(x){return String(x.num)!==String(id);});
+    var om=Object.assign({},od.mensagens||{}), ot=Object.assign({},od.atendimentos||{});delete om[id];delete ot[id];await gravarDados(oldUid,{chamados:oa,mensagens:om,atendimentos:ot});
+  }
+  var d=await lerDados(uid), arr=Array.isArray(d.chamados)?d.chamados:[], existente=arr.find(function(x){return String(x.num)===String(id);});
+  var rec=Object.assign({},existente||{}, {num:id,equip:equip,cliente:cli.nome,clienteUid:uid,status:$v('admin-chamado-status').value,agend:$v('admin-chamado-agend').value,problema:problema,prioridade:$v('admin-chamado-prioridade').value,observacoes:$v('admin-chamado-obs').value});
+  var idx=arr.findIndex(function(x){return String(x.num)===String(id);});if(idx>=0)arr[idx]=rec;else arr.unshift(rec);
+  var msgs=Object.assign({},d.mensagens||{});if(!msgs[id])msgs[id]=[{autor:'empresa',texto:'Chamado cadastrado pela TJ: '+problema,hora:'Agora'}];
+  var ats=Object.assign({},d.atendimentos||{}), at=Object.assign({},ats[id]||{});at.endereco=$v('admin-chamado-endereco').value.trim();at.previsao=rec.agend;at.diag=at.diag||'';at.pecas=Array.isArray(at.pecas)?at.pecas:[];ats[id]=at;
+  var hist=Array.isArray(d.historicoCliente)?d.historicoCliente:[];hist.unshift({data:hoje(),tipo:'chamado',titulo:(novo?'Chamado #'+id+' cadastrado pela TJ':'Chamado #'+id+' atualizado pela TJ'),desc:equip+' — '+problema,status:rec.status});
+  await gravarDados(uid,{chamados:arr,mensagens:msgs,atendimentos:ats,historicoCliente:hist});await recarregarV13();avisoV13(novo?'Chamado cadastrado com sucesso.':'Chamado atualizado com sucesso.');abrirTela('tela-emp-chamados');
+}
+async function excluirChamado(id){
+  var ch=(state.chamados||[]).find(function(x){return String(x.num)===String(id);});if(!ch)return;var uid=uidRegistro(ch);if(!uid)return avisoV13('Cliente do chamado não identificado.');
+  if(!confirm('Excluir o chamado #'+id+'? Esta ação remove o chamado dos dados do cliente.'))return;
+  var d=await lerDados(uid), arr=(Array.isArray(d.chamados)?d.chamados:[]).filter(function(x){return String(x.num)!==String(id);}), msgs=Object.assign({},d.mensagens||{}), ats=Object.assign({},d.atendimentos||{});delete msgs[id];delete ats[id];
+  var hist=Array.isArray(d.historicoCliente)?d.historicoCliente:[];hist.unshift({data:hoje(),tipo:'chamado',titulo:'Chamado #'+id+' excluído pelo proprietário',desc:ch.equip||'Chamado removido',status:'Excluído'});
+  await gravarDados(uid,{chamados:arr,mensagens:msgs,atendimentos:ats,historicoCliente:hist});await recarregarV13();renderizarChamadosEmpresa();avisoV13('Chamado excluído.');
+}
+
+function renderChamadosAdmin(){
+  var box=$v('lista-emp-chamados');if(!box)return;box.innerHTML='';
+  if(!(state.chamados||[]).length){box.innerHTML='<p class="admin-empty">Nenhum chamado cadastrado.</p>';return;}
+  (state.chamados||[]).forEach(function(ch){var item=document.createElement('div');item.className='list-item admin-record';
+    var top=document.createElement('div');top.className='list-header';var t=document.createElement('span');t.className='list-title';t.textContent='#'+ch.num+' — '+(ch.equip||'Equipamento');top.appendChild(t);top.appendChild(criarBadge(ch.status||'Aguardando início'));
+    var m=document.createElement('div');m.className='list-meta';m.textContent='Cliente: '+(ch.cliente||'Não informado')+' • Previsão: '+(ch.agend||'A definir');
+    if(ch.problema){var p=document.createElement('div');p.className='admin-muted';p.textContent=ch.problema;item.appendChild(top);item.appendChild(m);item.appendChild(p);}else{item.appendChild(top);item.appendChild(m);}
+    var a=document.createElement('div');a.className='admin-card-actions';[['Abrir','btn-tj-secondary','abrir-atend'],['✏️ Editar','btn-tj','admin-editar-chamado'],['🗑️ Excluir','btn-tj-danger','admin-excluir-chamado']].forEach(function(b){var bt=document.createElement('button');bt.type='button';bt.className=b[1];bt.textContent=b[0];bt.dataset.action=b[2];bt.dataset.id=ch.num;a.appendChild(bt);});item.appendChild(a);box.appendChild(item);});
+}
+renderizarChamadosEmpresa=renderChamadosAdmin;
+
+function renderClientesAdmin(){
+  var box=$v('lista-emp-clientes');if(!box)return;box.innerHTML='';var cs=clientesV13();if(!cs.length){box.innerHTML='<p class="admin-empty">Nenhum cliente cadastrado ainda.</p>';return;}
+  cs.forEach(function(c){var item=document.createElement('div');item.className='list-item admin-record';var top=document.createElement('div');top.className='list-header';var t=document.createElement('span');t.className='list-title';t.textContent='🧑 '+c.nome+' — '+c.tipo;top.appendChild(t);var bd=document.createElement('span');bd.className='badge badge-blue';var n=(state.chamados||[]).filter(function(x){return uidRegistro(x)===c.uid;}).length;bd.textContent=n+(n===1?' chamado':' chamados');top.appendChild(bd);var m=document.createElement('div');m.className='list-meta';m.textContent='Telefone: '+c.tel+' • E-mail: '+c.email;item.appendChild(top);item.appendChild(m);var a=document.createElement('div');a.className='admin-card-actions';[['Abrir ficha','btn-tj-secondary','admin-abrir-cliente'],['✏️ Editar','btn-tj','admin-editar-cliente']].forEach(function(b){var bt=document.createElement('button');bt.type='button';bt.className=b[1];bt.textContent=b[0];bt.dataset.action=b[2];bt.dataset.uid=c.uid;bt.dataset.id=c.nome;a.appendChild(bt);});item.appendChild(a);box.appendChild(item);});
+}
+renderizarClientesEmpresa=async function(){await carregarClientesEmpresaFirebase();renderClientesAdmin();};
+function abrirEditarCliente(uid){var c=clientePorUid(uid);if(!c)return;$v('emp-cli-uid').value=uid;$v('emp-cli-form-titulo').textContent='Editar Cliente';$v('emp-cli-form-subtitulo').textContent='Altere os dados cadastrais do cliente. O e-mail de acesso não é alterado por segurança.';$v('emp-cli-tipo').value=c.tipo;$v('emp-cli-nome').value=c.nome;$v('emp-cli-tel').value=c.tel==='Não informado'?'':c.tel;$v('emp-cli-email').value=c.email;$v('emp-cli-email').readOnly=true;$v('btn-salvar-cliente-empresa').textContent='SALVAR ALTERAÇÕES';abrirTela('tela-emp-novo-cliente');}
+async function salvarEdicaoCliente(){var uid=$v('emp-cli-uid').value;if(!uid)return false;var tipo=$v('emp-cli-tipo').value,nome=$v('emp-cli-nome').value.trim(),tel=$v('emp-cli-tel').value.trim();if(!nome||!tel){avisoV13('Preencha nome e telefone.');return true;}await Promise.all([window.TJFB.db.collection('clients').doc(uid).set({nome:nome,telefone:tel,tipoPessoa:tipo,atualizadoEm:firebase.firestore.FieldValue.serverTimestamp()},{merge:true}),window.TJFB.db.collection('users').doc(uid).set({nome:nome,tipoPessoa:tipo,atualizadoEm:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})]);await recarregarV13();avisoV13('Cliente atualizado.');abrirTela('tela-emp-clientes');return true;}
+function resetFormCliente(){if($v('emp-cli-uid'))$v('emp-cli-uid').value='';if($v('emp-cli-form-titulo'))$v('emp-cli-form-titulo').textContent='Cadastrar Cliente';if($v('emp-cli-form-subtitulo'))$v('emp-cli-form-subtitulo').textContent='Crie o acesso do cliente. Ele receberá um e-mail para definir a própria senha.';if($v('emp-cli-email'))$v('emp-cli-email').readOnly=false;if($v('btn-salvar-cliente-empresa'))$v('btn-salvar-cliente-empresa').textContent='CADASTRAR CLIENTE';}
+
+function popularFormEquip(uidSelecionado){preencherSelectClientes('form-equip-cliente',uidSelecionado);}
+async function salvarEquipAdmin(){
+  var id=$v('form-equip-id').value, uid=$v('form-equip-cliente').value, cli=clientePorUid(uid);if(!uid||!cli)return avisoV13('Selecione um cliente.');var old=(state.equip||[]).find(function(x){return x.id===id;}), oldUid=uidRegistro(old), novo=!id;if(novo)id='EQ-'+Date.now();
+  var rec={id:id,nome:$v('form-equip-nome').value.trim()||'Equipamento',marca:$v('form-equip-marca').value.trim()||'Não informada',modelo:$v('form-equip-modelo').value.trim()||'Não informado',sn:$v('form-equip-sn').value.trim()||'Não informado',cliente:cli.nome,clienteUid:uid,local:$v('form-equip-local').value.trim()||'Não informado',status:$v('form-equip-status').value,ncham:old&&old.ncham?old.ncham:0};
+  if(oldUid&&oldUid!==uid)await removerRegistro(oldUid,'equip',function(x){return x.id===id;});var d=await lerDados(uid),arr=Array.isArray(d.equip)?d.equip:[],idx=arr.findIndex(function(x){return x.id===id;});if(idx>=0)arr[idx]=rec;else arr.unshift(rec);var hist=Array.isArray(d.historicoCliente)?d.historicoCliente:[];hist.unshift({data:hoje(),tipo:'equip',titulo:(novo?'Equipamento cadastrado':'Equipamento atualizado')+' — '+rec.nome,desc:rec.marca+' '+rec.modelo+' — S/N '+rec.sn,status:rec.status});await gravarDados(uid,{equip:arr,historicoCliente:hist});await recarregarV13();equipAtualId=id;avisoV13(novo?'Equipamento cadastrado.':'Equipamento atualizado.');abrirTela('tela-detalhe-equipamento');
+}
+async function excluirEquipAdmin(id){var e=(state.equip||[]).find(function(x){return x.id===id;});if(!e)return;var uid=uidRegistro(e);if(!uid)return avisoV13('Cliente do equipamento não identificado.');if(!confirm('Excluir permanentemente este equipamento?'))return;await removerRegistro(uid,'equip',function(x){return x.id===id;});await recarregarV13();abrirTela('tela-emp-equipamentos');avisoV13('Equipamento excluído.');}
+
+function abrirFormOrc(obj,uidPreferido){var uid=uidPreferido||uidRegistro(obj)||((clientesV13()[0]||{}).uid||'');preencherSelectClientes('novo-orc-cli',uid);$v('novo-orc-id').value=obj?obj.num:'';$v('novo-orc-uid-original').value=obj?uid:'';$v('admin-orc-titulo').textContent=obj?'Editar Orçamento #'+obj.num:'Emitir Novo Orçamento';$v('novo-orc-servico').value=(obj&&obj.servico)||'';$v('novo-orc-valor').value=(obj&&obj.total)||'';$v('novo-orc-status').value=(obj&&obj.status)||'Aguardando aprovação';abrirTela('tela-form-novo-orcamento');}
+async function salvarOrcAdmin(){var id=$v('novo-orc-id').value,uid=$v('novo-orc-cli').value,oldUid=$v('novo-orc-uid-original').value,cli=clientePorUid(uid),serv=$v('novo-orc-servico').value.trim(),val=$v('novo-orc-valor').value.trim();if(!uid||!cli||!serv||!val)return avisoV13('Preencha cliente, serviço e valor.');var novo=!id;if(novo)id=gerarNumero('',state.orcamentos,'num');if(oldUid&&oldUid!==uid)await removerRegistro(oldUid,'orcamentos',function(x){return String(x.num)===String(id);});var d=await lerDados(uid),arr=Array.isArray(d.orcamentos)?d.orcamentos:[],old=arr.find(function(x){return String(x.num)===String(id);});var rec=Object.assign({},old||{},{num:id,servico:serv,cliente:cli.nome,clienteUid:uid,status:$v('novo-orc-status').value,total:val,itens:(old&&old.itens)||[[serv,'1',val]],hist:(old&&old.hist)||[]});rec.hist=Array.isArray(rec.hist)?rec.hist:[];rec.hist.push([hoje(),novo?'Orçamento emitido pela TJ':'Orçamento atualizado pela TJ']);var idx=arr.findIndex(function(x){return String(x.num)===String(id);});if(idx>=0)arr[idx]=rec;else arr.unshift(rec);var hist=Array.isArray(d.historicoCliente)?d.historicoCliente:[];hist.unshift({data:hoje(),tipo:'orcamento',titulo:'Orçamento #'+id+(novo?' emitido':' atualizado'),desc:serv+' — '+val,status:rec.status});var nots=Array.isArray(d.notificacoesCliente)?d.notificacoesCliente:[];if(novo)nots.unshift({data:hoje(),titulo:'Novo orçamento disponível',desc:'Orçamento #'+id+' aguarda sua análise.',lida:false});await gravarDados(uid,{orcamentos:arr,historicoCliente:hist,notificacoesCliente:nots});await recarregarV13();orcamentoAtualNum=id;avisoV13(novo?'Orçamento criado.':'Orçamento atualizado.');abrirTela('tela-emp-orcamentos');}
+async function excluirOrcAdmin(id){var o=(state.orcamentos||[]).find(function(x){return String(x.num)===String(id);});if(!o)return;var uid=uidRegistro(o);if(!uid)return avisoV13('Cliente do orçamento não identificado.');if(!confirm('Excluir o orçamento #'+id+'?'))return;await removerRegistro(uid,'orcamentos',function(x){return String(x.num)===String(id);});await recarregarV13();renderizarOrcamentosEmpresa();avisoV13('Orçamento excluído.');}
+renderizarOrcamentosEmpresa=function(){var box=$v('lista-emp-orcamentos');if(!box)return;box.innerHTML='';if(!(state.orcamentos||[]).length){box.innerHTML='<p class="admin-empty">Nenhum orçamento cadastrado.</p>';return;}(state.orcamentos||[]).forEach(function(o){var item=document.createElement('div');item.className='list-item admin-record';var top=document.createElement('div');top.className='list-header';var t=document.createElement('span');t.className='list-title';t.textContent='Orçamento #'+o.num+' — '+o.servico;top.appendChild(t);top.appendChild(criarBadge(o.status));var m=document.createElement('div');m.className='list-meta';m.textContent='Cliente: '+o.cliente+' • Total: '+o.total;item.appendChild(top);item.appendChild(m);var a=document.createElement('div');a.className='admin-card-actions';[['Ver','btn-tj-secondary','abrir-orc'],['✏️ Editar','btn-tj','admin-editar-orc'],['🗑️ Excluir','btn-tj-danger','admin-excluir-orc']].forEach(function(b){var bt=document.createElement('button');bt.type='button';bt.className=b[1];bt.textContent=b[0];bt.dataset.action=b[2];bt.dataset.id=o.num;a.appendChild(bt);});item.appendChild(a);box.appendChild(item);});};
+
+function abrirFormPedido(obj,uidPreferido){var uid=uidPreferido||uidRegistro(obj)||((clientesV13()[0]||{}).uid||'');preencherSelectClientes('admin-pedido-cliente',uid);$v('admin-pedido-id').value=obj?obj.num:'';$v('admin-pedido-uid-original').value=obj?uid:'';$v('admin-pedido-titulo').textContent=obj?'Editar Pedido #'+obj.num:'Cadastrar Pedido';$v('admin-pedido-peca').value=(obj&&obj.peca)||'';$v('admin-pedido-status').value=(obj&&obj.status)||'Solicitado';$v('admin-pedido-data').value=(obj&&obj.data)||hoje();abrirTela('tela-emp-form-pedido');}
+async function salvarPedido(){var id=$v('admin-pedido-id').value,uid=$v('admin-pedido-cliente').value,oldUid=$v('admin-pedido-uid-original').value,cli=clientePorUid(uid),peca=$v('admin-pedido-peca').value.trim();if(!uid||!cli||!peca)return avisoV13('Selecione o cliente e informe a peça.');var novo=!id;if(novo)id='PED-'+String(Date.now()).slice(-6);if(oldUid&&oldUid!==uid)await removerRegistro(oldUid,'pedidos',function(x){return x.num===id;});var d=await lerDados(uid),arr=Array.isArray(d.pedidos)?d.pedidos:[],rec={num:id,peca:peca,cliente:cli.nome,clienteUid:uid,status:$v('admin-pedido-status').value,data:$v('admin-pedido-data').value.trim()||hoje()},idx=arr.findIndex(function(x){return x.num===id;});if(idx>=0)arr[idx]=rec;else arr.unshift(rec);await gravarDados(uid,{pedidos:arr});await recarregarV13();avisoV13(novo?'Pedido cadastrado.':'Pedido atualizado.');abrirTela('tela-emp-pedidos');}
+async function excluirPedido(id){var p=(state.pedidos||[]).find(function(x){return x.num===id;});if(!p)return;var uid=uidRegistro(p);if(!uid)return avisoV13('Cliente do pedido não identificado.');if(!confirm('Excluir o pedido '+id+'?'))return;await removerRegistro(uid,'pedidos',function(x){return x.num===id;});await recarregarV13();renderizarPedidosEmpresa();avisoV13('Pedido excluído.');}
+var renderPedidosOriginal=renderizarPedidosEmpresa;renderizarPedidosEmpresa=function(){var box=$v('lista-emp-pedidos');if(!box)return;box.innerHTML='';if(!(state.pedidos||[]).length){box.innerHTML='<p class="admin-empty">Nenhum pedido cadastrado.</p>';return;}(state.pedidos||[]).forEach(function(p){var item=document.createElement('div');item.className='list-item admin-record';var top=document.createElement('div');top.className='list-header';var t=document.createElement('span');t.className='list-title';t.textContent=p.num+' — '+p.peca;top.appendChild(t);top.appendChild(criarBadge(p.status));var m=document.createElement('div');m.className='list-meta';m.textContent='Cliente: '+p.cliente+' • Data: '+p.data;item.appendChild(top);item.appendChild(m);var a=document.createElement('div');a.className='admin-card-actions';[['Abrir','btn-tj-secondary','abrir-pedido'],['✏️ Editar','btn-tj','admin-editar-pedido'],['🗑️ Excluir','btn-tj-danger','admin-excluir-pedido']].forEach(function(b){var bt=document.createElement('button');bt.type='button';bt.className=b[1];bt.textContent=b[0];bt.dataset.action=b[2];bt.dataset.id=p.num;a.appendChild(bt);});item.appendChild(a);box.appendChild(item);});};
+
+// Popula selects e evita valores de demonstração.
+var abrirTelaAnterior=abrirTela;abrirTela=function(idTela,registrarHistorico){
+  if(idTela==='tela-form-equipamento' && ownerOk()){var atual=(state.equip||[]).find(function(x){return x.id===($v('form-equip-id')?$v('form-equip-id').value:'');});popularFormEquip(uidRegistro(atual)||clienteAtualUid||'');}
+  if(idTela==='tela-form-novo-orcamento' && ownerOk() && $v('novo-orc-cli') && !$v('novo-orc-cli').options.length) preencherSelectClientes('novo-orc-cli','');
+  return abrirTelaAnterior(idTela,registrarHistorico);
+};
+
+// Intercepta CRUD do proprietário antes do despachante legado.
+document.addEventListener('click',function(ev){
+  var alvo=ev.target&&ev.target.closest?ev.target.closest('[data-action]'):null;if(!alvo)return;var acao=alvo.dataset.action||'',id=alvo.dataset.id||'',uid=alvo.dataset.uid||'';
+  var intercept=['admin-novo-chamado','admin-editar-chamado','admin-excluir-chamado','admin-salvar-chamado','admin-cancelar-chamado','admin-abrir-cliente','admin-editar-cliente','admin-editar-cliente-atual','admin-chamado-cliente-atual','admin-equip-cliente-atual','admin-orc-cliente-atual','salvar-cliente-empresa','criar-equip','abrir-novo-equip','editar-equip','abrir-editar-equip','salvar-equipamento','excluir-equip','excluir-equip-modal','criar-orcamento','abrir-novo-orcamento','salvar-novo-orcamento','admin-editar-orc','admin-excluir-orc','admin-novo-pedido','admin-editar-pedido','admin-excluir-pedido','admin-salvar-pedido','admin-cancelar-pedido'];
+  if(intercept.indexOf(acao)<0)return;
+  if(state.perfilSessao!=='empresa' && acao!=='salvar-cliente-empresa')return;
+  ev.preventDefault();ev.stopImmediatePropagation();
+  (async function(){
+    try{
+      if(acao==='admin-novo-chamado'){abrirFormChamado(null,'');return;}
+      if(acao==='admin-editar-chamado'){abrirFormChamado((state.chamados||[]).find(function(x){return String(x.num)===String(id);}),null);return;}
+      if(acao==='admin-excluir-chamado'){await excluirChamado(id);return;}
+      if(acao==='admin-salvar-chamado'){await salvarChamado();return;}
+      if(acao==='admin-cancelar-chamado'){abrirTela('tela-emp-chamados');return;}
+      if(acao==='admin-abrir-cliente'){clienteAtualUid=uid;clienteAtualNome=id;abrirTela('tela-emp-cliente-detalhe');return;}
+      if(acao==='admin-editar-cliente'){abrirEditarCliente(uid);return;}
+      if(acao==='admin-editar-cliente-atual'){abrirEditarCliente(clienteAtualUid);return;}
+      if(acao==='admin-chamado-cliente-atual'){abrirFormChamado(null,clienteAtualUid);return;}
+      if(acao==='admin-equip-cliente-atual'){equipAtualId='';$v('form-equip-id').value='';limparCampos(['form-equip-nome','form-equip-marca','form-equip-modelo','form-equip-sn','form-equip-local']);popularFormEquip(clienteAtualUid);abrirTela('tela-form-equipamento');return;}
+      if(acao==='admin-orc-cliente-atual'){abrirFormOrc(null,clienteAtualUid);return;}
+      if(acao==='salvar-cliente-empresa' && $v('emp-cli-uid') && $v('emp-cli-uid').value){await salvarEdicaoCliente();return;}
+      if(acao==='salvar-cliente-empresa'){window.TJFB.cadastrarClientePeloProprietario();return;}
+      if(acao==='criar-equip'||acao==='abrir-novo-equip'){equipAtualId='';$v('form-equip-id').value='';limparCampos(['form-equip-nome','form-equip-marca','form-equip-modelo','form-equip-sn','form-equip-local']);popularFormEquip('');$v('titulo-form-equip').textContent='Cadastrar Novo Equipamento';abrirTela('tela-form-equipamento');return;}
+      if(acao==='editar-equip'||acao==='abrir-editar-equip'){var e=(state.equip||[]).find(function(x){return x.id===(id||equipAtualId);});if(!e)return;equipAtualId=e.id;$v('form-equip-id').value=e.id;popularFormEquip(uidRegistro(e));$v('form-equip-nome').value=e.nome||'';$v('form-equip-marca').value=e.marca||'';$v('form-equip-modelo').value=e.modelo||'';$v('form-equip-sn').value=e.sn||'';$v('form-equip-local').value=e.local||'';$v('form-equip-status').value=e.status||'Operando';$v('titulo-form-equip').textContent='Editar Equipamento';abrirTela('tela-form-equipamento');return;}
+      if(acao==='salvar-equipamento'){await salvarEquipAdmin();return;}
+      if(acao==='excluir-equip'||acao==='excluir-equip-modal'){await excluirEquipAdmin(id||equipAtualId);return;}
+      if(acao==='criar-orcamento'||acao==='abrir-novo-orcamento'){abrirFormOrc(null,'');return;}
+      if(acao==='admin-editar-orc'){abrirFormOrc((state.orcamentos||[]).find(function(x){return String(x.num)===String(id);}),null);return;}
+      if(acao==='admin-excluir-orc'){await excluirOrcAdmin(id);return;}
+      if(acao==='salvar-novo-orcamento'){await salvarOrcAdmin();return;}
+      if(acao==='admin-novo-pedido'){abrirFormPedido(null,'');return;}
+      if(acao==='admin-editar-pedido'){abrirFormPedido((state.pedidos||[]).find(function(x){return x.num===id;}),null);return;}
+      if(acao==='admin-excluir-pedido'){await excluirPedido(id);return;}
+      if(acao==='admin-salvar-pedido'){await salvarPedido();return;}
+      if(acao==='admin-cancelar-pedido'){abrirTela('tela-emp-pedidos');return;}
+    }catch(e){console.error('[TJ V13]',acao,e);avisoV13('Não foi possível concluir esta ação: '+((e&&e.message)||'erro inesperado'));}
+  })();
+},true);
+
+// Atualiza equipamentos do formulário de chamado quando o cliente muda.
+document.addEventListener('change',function(ev){if(ev.target&&ev.target.id==='admin-chamado-cliente')preencherEquipChamado(ev.target.value,'');},true);
+
+// Ao abrir cadastro novo, restaura o modo criação.
+document.addEventListener('click',function(ev){var a=ev.target&&ev.target.closest?ev.target.closest('[data-action="abrir-novo-cliente-empresa"]'):null;if(!a)return;resetFormCliente();},true);
+
+// Persistência dos atos de atendimento existentes do proprietário.
+async function persistirChamadoAtualV13(){
+  var ch=(state.chamados||[]).find(function(x){return String(x.num)===String(chamadoAtualNum);});if(!ch)return;var uid=uidRegistro(ch);if(!uid)return;var d=await lerDados(uid),arr=Array.isArray(d.chamados)?d.chamados:[],idx=arr.findIndex(function(x){return String(x.num)===String(ch.num);});var limpo=Object.assign({},ch);delete limpo.clienteUid;if(idx>=0)arr[idx]=limpo;else arr.unshift(limpo);var msgs=Object.assign({},d.mensagens||{});if(state.mensagens&&state.mensagens[ch.num])msgs[ch.num]=state.mensagens[ch.num];var ats=Object.assign({},d.atendimentos||{});if(state.atendimentos&&state.atendimentos[ch.num]){var av=Object.assign({},state.atendimentos[ch.num]);delete av.clienteUid;delete av.cliente;ats[ch.num]=av;}var pedidos=(state.pedidos||[]).filter(function(p){return uidRegistro(p)===uid||p.cliente===ch.cliente;}).map(function(p){var q=Object.assign({},p);delete q.clienteUid;return q;});await gravarDados(uid,{chamados:arr,mensagens:msgs,atendimentos:ats,pedidos:pedidos});
+}
+document.addEventListener('click',function(ev){var a=ev.target&&ev.target.closest?ev.target.closest('[data-action]'):null;if(!a||state.perfilSessao!=='empresa')return;var ac=a.dataset.action||'';if(['iniciar-atend','iniciar-atend-emp','salvar-diagnostico','salvar-peca','finalizar-atend','finalizar-atend-emp','enviar-msg-emp','entregar-pedido'].indexOf(ac)<0)return;setTimeout(function(){persistirChamadoAtualV13().catch(function(e){console.warn('[TJ V13 persist atendimento]',e);});},250);},false);
+
+// Disponibiliza para depuração/testes.
+window.TJV13={recarregar:recarregarV13};
+})();
+</script>
+<!-- ===== FIM TJ V13 ===== -->
 
 </html>
