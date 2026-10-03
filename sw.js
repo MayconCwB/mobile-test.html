@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tj-refrigeracao-pwa-v26-ui-responsiva';
+const CACHE_NAME = 'tj-refrigeracao-pwa-v27-correcao-orcamentos';
 const APP_SHELL = [
   './index.html',
   './manifest.webmanifest',
@@ -21,7 +21,7 @@ self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys => Promise.all(
       keys.filter(key => key.startsWith('tj-refrigeracao-pwa-') && key !== CACHE_NAME)
-          .map(key => caches.delete(key))
+        .map(key => caches.delete(key))
     )).then(() => self.clients.claim())
   );
 });
@@ -30,8 +30,6 @@ self.addEventListener('fetch', event => {
   const request = event.request;
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
-
-  // Firebase/CDN requests keep their normal network behavior.
   if (url.origin !== self.location.origin) return;
 
   if (request.mode === 'navigate') {
