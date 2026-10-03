@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="light">
+<html lang="pt-BR" data-theme="light" data-theme-mode="system">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -15,6 +15,23 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="TJ Refrigeração">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <script>
+  /* TJ v22 — tema automático seguindo o sistema */
+  (function(){
+    var mq = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+    function aplicarTema(escuro){
+      var tema = escuro ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', tema);
+      var meta = document.querySelector('meta[name="theme-color"]');
+      if(meta) meta.setAttribute('content', escuro ? '#071521' : '#0B2A4A');
+    }
+    aplicarTema(!!(mq && mq.matches));
+    if(mq){
+      if(mq.addEventListener) mq.addEventListener('change', function(e){ aplicarTema(e.matches); });
+      else if(mq.addListener) mq.addListener(function(e){ aplicarTema(e.matches); });
+    }
+  })();
+  </script>
 
   <style>
 /* Skip artifact shell — fixed styles served beside every artifact.
@@ -1629,26 +1646,31 @@ function TJVoltarLoginDireto(ev){
             <p style="font-size: 0.85rem; color: #CBD5E1; margin-top: 4px;">Chamados, equipamentos e orçamentos do seu negócio em um só lugar.</p>
           </div>
 
-          <div class="kpi-row">
-            <div class="kpi-card">
+          <div class="kpi-row kpi-row-atalhos">
+            <div class="kpi-card kpi-atalho" role="button" tabindex="0" data-action="nav-tela" data-id="tela-emp-chamados" aria-label="Abrir chamados">
               <span class="kpi-tag">🔧 Chamados abertos</span>
               <div id="kpi-emp-abertos" class="kpi-num">0</div>
-              <span style="font-size: 0.72rem; color: var(--text-muted);">Fila geral</span>
+              <span class="kpi-destino">Fila geral <b>→</b></span>
             </div>
-            <div class="kpi-card">
+            <div class="kpi-card kpi-atalho" role="button" tabindex="0" data-action="nav-tela" data-id="tela-emp-chamados" aria-label="Abrir chamados em andamento">
               <span class="kpi-tag">🟡 Em andamento</span>
               <div id="kpi-emp-andamento" class="kpi-num">0</div>
-              <span style="font-size: 0.72rem; color: var(--text-muted);">Atendimentos ativos</span>
+              <span class="kpi-destino">Atendimentos ativos <b>→</b></span>
             </div>
-            <div class="kpi-card">
+            <div class="kpi-card kpi-atalho" role="button" tabindex="0" data-action="nav-tela" data-id="tela-emp-orcamentos" aria-label="Abrir orçamentos">
               <span class="kpi-tag">💰 Orçamentos aguardando</span>
               <div id="kpi-emp-orc" class="kpi-num">0</div>
-              <span style="font-size: 0.72rem; color: var(--text-muted);">Aguardando aprovação</span>
+              <span class="kpi-destino">Aguardando aprovação <b>→</b></span>
             </div>
-            <div class="kpi-card">
+            <div class="kpi-card kpi-atalho" role="button" tabindex="0" data-action="nav-tela" data-id="tela-emp-agendamentos" aria-label="Abrir agendamentos">
+              <span class="kpi-tag">📅 Agendamentos</span>
+              <div id="kpi-emp-agend" class="kpi-num">0</div>
+              <span class="kpi-destino">Próximos atendimentos <b>→</b></span>
+            </div>
+            <div class="kpi-card kpi-atalho" role="button" tabindex="0" data-action="nav-tela" data-id="tela-emp-equipamentos" aria-label="Abrir equipamentos">
               <span class="kpi-tag">❄️ Equipamentos</span>
               <div id="kpi-emp-equip" class="kpi-num">0</div>
-              <span style="font-size: 0.72rem; color: var(--text-muted);">Parque instalado</span>
+              <span class="kpi-destino">Parque instalado <b>→</b></span>
             </div>
           </div>
 
@@ -1725,8 +1747,18 @@ function TJVoltarLoginDireto(ev){
               </div>
             </div>
             <div class="form-row">
-              <div class="form-group"><label class="form-label" for="admin-chamado-agend">Previsão / Agendamento</label><input type="text" id="admin-chamado-agend" class="form-input" placeholder="Ex: 05/10 — 14:00"></div>
-              <div class="form-group"><label class="form-label" for="admin-chamado-endereco">Endereço / local</label><input type="text" id="admin-chamado-endereco" class="form-input" placeholder="Local do atendimento"></div>
+              <div class="form-group">
+                <label class="form-label" for="admin-chamado-data">Data da previsão / agendamento</label>
+                <input type="date" id="admin-chamado-data" class="form-input">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="admin-chamado-hora">Horário</label>
+                <input type="time" id="admin-chamado-hora" class="form-input" step="300">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="admin-chamado-endereco">Endereço / local</label>
+              <input type="text" id="admin-chamado-endereco" class="form-input" placeholder="Local do atendimento">
             </div>
             <div class="form-group"><label class="form-label" for="admin-chamado-obs">Observações</label><textarea id="admin-chamado-obs" class="form-textarea" rows="2"></textarea></div>
             <button type="button" class="btn-tj" style="width:100%;" data-action="admin-salvar-chamado">SALVAR CHAMADO</button>
@@ -2315,6 +2347,7 @@ function TJVoltarLoginDireto(ev){
               <button type="button" class="btn-tj" data-action="admin-equip-cliente-atual">❄️ Novo equipamento</button>
               <button type="button" class="btn-tj" data-action="admin-orc-cliente-atual">💰 Novo orçamento</button>
               <button type="button" class="btn-tj-secondary" data-action="admin-editar-cliente-atual">✏️ Editar cliente</button>
+              <button type="button" class="btn-tj-danger" data-action="admin-excluir-cliente-atual">🗑️ Excluir cliente</button>
             </div>
           </div>
 
@@ -4508,6 +4541,14 @@ function TJVoltarLoginDireto(ev){
       if (elAnd) elAnd.textContent = String(andamento);
       var elOrc = document.getElementById("kpi-emp-orc");
       if (elOrc) elOrc.textContent = String(orcAguardando);
+      var agendAtivos = 0;
+      var listaAg = Array.isArray(state.agendamentos) ? state.agendamentos : [];
+      for (var a = 0; a < listaAg.length; a++) {
+        var stAg = String(listaAg[a].status || '').toLowerCase();
+        if (stAg !== 'cancelado' && stAg !== 'concluído' && stAg !== 'concluido') agendAtivos++;
+      }
+      var elAg = document.getElementById("kpi-emp-agend");
+      if (elAg) elAg.textContent = String(agendAtivos);
       var elEq = document.getElementById("kpi-emp-equip");
       if (elEq) elEq.textContent = String(state.equip.length);
 
@@ -6214,13 +6255,55 @@ function TJVoltarLoginDireto(ev){
 .tj-chip-esclarecimento{background:#e0e7ff;color:#3730a3}
 .tj-box-esclarecimento{width:100%;margin-top:4px;padding:12px;border:1px dashed #cbd5e1;border-radius:10px}
 .tj-box-esclarecimento textarea{width:100%;min-height:70px;border:1px solid #e2e8f0;border-radius:8px;padding:8px;font:inherit;resize:vertical}
-.tj-editor-itens{margin:14px 0;padding:14px;border:1px solid #e2e8f0;border-radius:12px;background:#f8fafc}
+.tj-editor-itens{margin:16px 0;padding:16px;border:1px solid var(--border);border-radius:14px;background:#f8fafc}
 .tj-editor-itens h4{margin:0 0 10px;font-size:.8rem;text-transform:uppercase;letter-spacing:.4px;opacity:.65}
-.tj-linha-item{display:grid;grid-template-columns:1fr 70px 110px 34px;gap:8px;margin-bottom:8px;align-items:center}
-.tj-linha-item input{border:1px solid #e2e8f0;border-radius:8px;padding:8px;font:inherit;width:100%;box-sizing:border-box}
+.tj-linha-item{display:grid;grid-template-columns:minmax(220px,1fr) 88px 140px 38px;gap:10px;margin-bottom:10px;align-items:end}
+.tj-linha-item input{border:1px solid var(--border);border-radius:9px;padding:11px 12px;font:inherit;width:100%;box-sizing:border-box;background:#fff;color:var(--text);min-height:44px}.tj-linha-item input:first-child{font-weight:600}
 .tj-linha-cab{font-size:.7rem;font-weight:700;text-transform:uppercase;opacity:.55}
 .tj-link-add{background:none;border:0;color:#2563eb;font-weight:700;cursor:pointer;font-size:.85rem;padding:0}
-.tj-total-itens{font-weight:800;margin:8px 0 0}
+.tj-total-itens{font-weight:800;margin:10px 0 0}
+
+/* TJ v22 — itens de orçamento legíveis no celular */
+@media (max-width:640px){
+  .tj-editor-itens{padding:14px 12px}
+  .tj-linha-cab{display:none}
+  .tj-linha-item:not(.tj-linha-cab){grid-template-columns:92px minmax(0,1fr) 40px;gap:9px;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--surface);margin-bottom:12px}
+  .tj-linha-item:not(.tj-linha-cab) input:nth-of-type(1){grid-column:1 / -1;font-size:1rem;min-height:48px}
+  .tj-linha-item:not(.tj-linha-cab) input:nth-of-type(2){grid-column:1}
+  .tj-linha-item:not(.tj-linha-cab) input:nth-of-type(3){grid-column:2}
+  .tj-linha-item:not(.tj-linha-cab) > button{grid-column:3;grid-row:2;min-width:40px;min-height:44px;font-size:1rem}
+}
+
+/* TJ v22 — KPIs do painel funcionam como atalhos */
+.kpi-atalho{cursor:pointer;position:relative;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
+.kpi-atalho:hover,.kpi-atalho:focus-visible{transform:translateY(-2px);border-color:var(--accent);box-shadow:0 8px 22px rgba(11,42,74,.10);outline:none}
+.kpi-destino{font-size:.72rem;color:var(--text-muted);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.kpi-destino b{color:var(--accent);font-size:1rem}
+
+/* TJ v22 — modo escuro automático, mantendo a identidade TJ */
+html[data-theme="dark"]{--bg:#071521;--surface:#0D2030;--border:#24445A;--text:#ECF6FB;--text-muted:#9CB5C5;--accent:#42B5EB}
+html[data-theme="dark"] body,html[data-theme="dark"] .main-wrapper{background:#071521;color:var(--text)}
+html[data-theme="dark"] .topbar,html[data-theme="dark"] .card-box,html[data-theme="dark"] .list-item,html[data-theme="dark"] .drawer-panel,html[data-theme="dark"] .drawer-card{background:#0D2030;border-color:#24445A}
+html[data-theme="dark"] .drawer-body{background:#091A28}
+html[data-theme="dark"] .drawer-card:hover,html[data-theme="dark"] .drawer-card:active{background:#122A3C}
+html[data-theme="dark"] .card-title,html[data-theme="dark"] .list-title,html[data-theme="dark"] .kpi-num,html[data-theme="dark"] .drawer-card-title,html[data-theme="dark"] .timeline-title,html[data-theme="dark"] .form-label{color:#E9F6FC}
+html[data-theme="dark"] .form-input,html[data-theme="dark"] .form-select,html[data-theme="dark"] .form-textarea,html[data-theme="dark"] .tj-linha-item input,html[data-theme="dark"] textarea{background:#10283A;color:#ECF6FB;border-color:#31546B}
+html[data-theme="dark"] .form-input::placeholder,html[data-theme="dark"] .form-textarea::placeholder,html[data-theme="dark"] .tj-linha-item input::placeholder{color:#7894A6}
+html[data-theme="dark"] .btn-tj-secondary,html[data-theme="dark"] .btn-voltar{background:#183247;color:#E8F5FB;border-color:#31546B}
+html[data-theme="dark"] .btn-tj-outline{color:#7ED2F5;border-color:#4BBBEA}
+html[data-theme="dark"] .tj-editor-itens{background:#091B29;border-color:#24445A}
+html[data-theme="dark"] .tj-linha-item:not(.tj-linha-cab){background:#0D2030}
+html[data-theme="dark"] #tela-emp-dash .card-box > div[style*="background: #F8FAFC"]{background:#10283A!important}
+html[data-theme="dark"] .tj-site-header{background:rgba(7,21,33,.94);border-bottom-color:#1E3D52}
+html[data-theme="dark"] .tj-site-brand{color:#EAF7FC}
+html[data-theme="dark"] .tj-site-links a{color:#A9C3D2}
+html[data-theme="dark"] .tj-site-btn.ghost{background:#0D2030;border-color:#31546B;color:#EAF7FC}
+html[data-theme="dark"] .tj-site-section.alt{background:#091B29}
+html[data-theme="dark"] .tj-site-section.white{background:#071521}
+html[data-theme="dark"] .tj-service-card,html[data-theme="dark"] .tj-contact-band{background:#0D2030;border-color:#24445A;box-shadow:none}
+html[data-theme="dark"] .tj-service-card h3,html[data-theme="dark"] .tj-contact-copy h2,html[data-theme="dark"] .tj-contact-item strong{color:#EAF7FC}
+html[data-theme="dark"] .tj-service-card p,html[data-theme="dark"] .tj-contact-copy p,html[data-theme="dark"] .tj-contact-item a,html[data-theme="dark"] .tj-contact-item span{color:#A7BECC}
+html[data-theme="dark"] .tj-contact-item{border-bottom-color:#24445A}
 </style>
 <script>
 (function(){
@@ -6369,34 +6452,60 @@ function injetaEditorItens(){
     if(alvo.previousElementSibling&&alvo.previousElementSibling.classList.contains('tj-editor-itens'))return;
     var editor=document.createElement('div');editor.className='tj-editor-itens';
     editor.innerHTML='<h4>Itens do orçamento (peça, mão de obra, serviço)</h4>'
-      +'<div class="tj-linha-item tj-linha-cab"><span>Descrição</span><span>Qtd</span><span>Valor (R$)</span><span></span></div>'
+      +'<div class="tj-linha-item tj-linha-cab"><span>Descrição</span><span>Qtd</span><span>Valor unitário (R$)</span><span></span></div>'
       +'<div class="tj-corpo-itens"></div>'
-      +'<button type="button" class="tj-link-add">+ Adicionar item</button>'
+      +'<button type="button" class="tj-link-add tj-add-item">+ Adicionar item</button>'
       +'<div class="tj-total-itens">Total dos itens: R$ 0,00</div>';
     alvo.parentElement.insertBefore(editor,alvo);
     var corpo=editor.querySelector('.tj-corpo-itens');
     var campoTotal=alvo.querySelector('input');
-    function linha(){
+    function linha(item){
+      item=item||{};
       var l=document.createElement('div');l.className='tj-linha-item';
-      l.innerHTML='<input type="text" placeholder="Ex.: Troca de compressor">'
-        +'<input type="number" min="1" value="1">'
-        +'<input type="number" step="0.01" min="0" placeholder="0,00">'
-        +'<button type="button" class="tj-link-add" title="Remover">✕</button>';
-      l.querySelector('button').addEventListener('click',function(){l.remove();total();});
-      l.querySelectorAll('input').forEach(function(i){i.addEventListener('input',total);});
+      l.innerHTML='<input type="text" class="tj-item-desc" autocomplete="off" placeholder="Descrição completa do item ou serviço">'
+        +'<input type="number" class="tj-item-qtd" inputmode="numeric" min="1" step="1" value="1" aria-label="Quantidade">'
+        +'<input type="number" class="tj-item-valor" inputmode="decimal" step="0.01" min="0" placeholder="0,00" aria-label="Valor unitário">'
+        +'<button type="button" class="tj-link-add tj-remover-item" title="Remover item" aria-label="Remover item">✕</button>';
+      var ins=l.querySelectorAll('input');
+      ins[0].value=item.descricao||item.desc||'';
+      ins[1].value=item.qtd||item.quantidade||'1';
+      ins[2].value=item.valor||item.preco||'';
+      l.querySelector('button').addEventListener('click',function(){l.remove();if(!corpo.children.length)linha({});total();});
+      ins.forEach(function(i){i.addEventListener('input',total);});
       corpo.appendChild(l);
+      return l;
     }
     function total(){
-      var s=0;corpo.querySelectorAll('.tj-linha-item').forEach(function(l){
-        var q=parseFloat(l.children[1].value)||0,v=parseFloat(l.children[2].value)||0;s+=q*v;
+      var soma=0;
+      corpo.querySelectorAll('.tj-linha-item').forEach(function(l){
+        var ins=l.querySelectorAll('input');
+        var q=parseFloat((ins[1]&&ins[1].value)||0)||0;
+        var v=parseFloat(String((ins[2]&&ins[2].value)||0).replace(',','.'))||0;
+        soma+=q*v;
       });
-      editor.querySelector('.tj-total-itens').textContent='Total dos itens: R$ '+s.toFixed(2).replace('.',',');
-      if(campoTotal)campoTotal.value=s?s.toFixed(2):'';
+      editor.querySelector('.tj-total-itens').textContent='Total dos itens: R$ '+soma.toFixed(2).replace('.',',');
+      if(campoTotal)campoTotal.value=soma?soma.toFixed(2):'';
     }
-    editor.querySelector('.tj-link-add').addEventListener('click',linha);
-    linha();linha();
+    function definirItens(itens){
+      corpo.innerHTML='';
+      var lista=Array.isArray(itens)?itens:[];
+      if(!lista.length)linha({}); else lista.forEach(function(it){linha(it||{});});
+      total();
+    }
+    editor.querySelector('.tj-add-item').addEventListener('click',function(){linha({});total();});
+    editor._tjDefinirItens=definirItens;
+    editor._tjTotal=total;
+    definirItens([]);
   });
 }
+
+window.TJOrcamentoItens={
+  definir:function(itens){
+    var editor=document.querySelector('#tela-form-novo-orcamento .tj-editor-itens');
+    if(editor&&typeof editor._tjDefinirItens==='function')editor._tjDefinirItens(itens||[]);
+  },
+  limpar:function(){this.definir([]);}
+};
 
 function rodaTudo(){
   try{injetaTrilha();injetaAcoesOrcamento();injetaEditorItens();injetaChips();}catch(e){}
@@ -6837,9 +6946,9 @@ async function fazerCadastro(){
   try{
     const cred=await auth.createUserWithEmailAndPassword(email,senha);
     const tipoPessoa=(typeof tipoCadastroSelecionado!=='undefined'&&tipoCadastroSelecionado==='pj')?'PJ':'PF';
-    const dados={uid:cred.user.uid,email:email,tipoPessoa:tipoPessoa,nome:nome,telefone:telefone,criadoEm:firebase.firestore.FieldValue.serverTimestamp()};
+    const dados={uid:cred.user.uid,email:email,tipoPessoa:tipoPessoa,nome:nome,telefone:telefone,active:true,criadoEm:firebase.firestore.FieldValue.serverTimestamp()};
     await clientRef(cred.user.uid).set(dados,{merge:true});
-    await profileRef(cred.user.uid).set({uid:cred.user.uid,email:email,role:'cliente',nome:nome,tipoPessoa:tipoPessoa,criadoEm:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+    await profileRef(cred.user.uid).set({uid:cred.user.uid,email:email,role:'cliente',nome:nome,tipoPessoa:tipoPessoa,active:true,criadoEm:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
     clienteAtualNome=nome;
     window.TJFB.perfilCliente=dados;
     atualizarIdentidadeCliente(dados);
@@ -6888,6 +6997,7 @@ async function cadastrarClientePeloProprietario(){
       tipoPessoa:tipo,
       nome:nome,
       telefone:telefone,
+      active:true,
       criadoPor:'proprietario',
       criadoEm:firebase.firestore.FieldValue.serverTimestamp()
     };
@@ -6899,6 +7009,7 @@ async function cadastrarClientePeloProprietario(){
       role:'cliente',
       nome:nome,
       tipoPessoa:tipo,
+      active:true,
       criadoPor:'proprietario',
       criadoEm:firebase.firestore.FieldValue.serverTimestamp()
     },{merge:true});
@@ -6928,6 +7039,11 @@ async function fazerLoginCliente(email,senha){
     try{ localStorage.removeItem('tj_login_intencao'); }catch(e){}
     const cred=await auth.signInWithEmailAndPassword(email,senha);
     const perfil=await carregarPerfil(cred.user);
+    if(perfil && perfil.active===false){
+      await auth.signOut();
+      aviso('Este acesso foi desativado pela TJ Refrigeração.');
+      return;
+    }
 
     // Login único: a role do Firestore decide automaticamente qual painel abrir.
     if(perfil.role==='owner'){
@@ -7027,6 +7143,12 @@ auth.onAuthStateChanged(async function(user){
     const sessao=JSON.parse(localStorage.getItem('tj_sessao')||'null');
     const intencao=localStorage.getItem('tj_login_intencao') || (sessao&&sessao.tipo) || '';
     const perfil=await carregarPerfil(user);
+    if(perfil && perfil.active===false){
+      try{ localStorage.removeItem('tj_sessao'); localStorage.removeItem('tj_login_intencao'); }catch(e){}
+      await auth.signOut();
+      aviso('Este acesso foi desativado pela TJ Refrigeração.');
+      return;
+    }
 
     // Se o login foi iniciado pela área administrativa, nunca deixar o app
     // cair silenciosamente no painel do cliente.
@@ -7154,6 +7276,24 @@ function uidRegistro(obj){return (obj&&obj.clienteUid)||((obj&&obj.cliente)?((cl
 function limparCampos(ids){ids.forEach(function(id){var e=$v(id);if(e)e.value='';});}
 function gerarNumero(prefix, arr, prop){var max=0;(arr||[]).forEach(function(x){var n=parseInt(String(x[prop]||'').replace(/\D/g,''),10);if(!isNaN(n)&&n>max)max=n;});return prefix+String(max+1).padStart(5,'0');}
 function hoje(){return new Date().toLocaleDateString('pt-BR');}
+function camposAgendamento(valor){
+  var r={data:'',hora:''},v=String(valor||'').trim();
+  if(!v)return r;
+  var m=v.match(/(\d{2})\/(\d{2})\/(\d{4}).*?(\d{2}):(\d{2})/);
+  if(m){r.data=m[3]+'-'+m[2]+'-'+m[1];r.hora=m[4]+':'+m[5];return r;}
+  m=v.match(/(\d{2})\/(\d{2}).*?(\d{2}):(\d{2})/);
+  if(m){r.data=String(new Date().getFullYear())+'-'+m[2]+'-'+m[1];r.hora=m[3]+':'+m[4];}
+  return r;
+}
+function valorAgendamento(){
+  var data=($v('admin-chamado-data')&&$v('admin-chamado-data').value)||'';
+  var hora=($v('admin-chamado-hora')&&$v('admin-chamado-hora').value)||'';
+  if(!data&&!hora)return '';
+  if(!data||!hora)return null;
+  var p=data.split('-');
+  if(p.length!==3)return null;
+  return p[2]+'/'+p[1]+'/'+p[0]+' — '+hora;
+}
 
 async function recarregarV13(){
   if(window.TJFB&&window.TJFB.carregarDadosEmpresaFirebase) await window.TJFB.carregarDadosEmpresaFirebase();
@@ -7186,7 +7326,9 @@ function abrirFormChamado(obj, uidPreferido){
   $v('admin-chamado-problema').value=(obj&&(obj.problema||obj.desc))||'';
   $v('admin-chamado-prioridade').value=(obj&&obj.prioridade)||'Normal';
   $v('admin-chamado-status').value=(obj&&obj.status)||'Aguardando início';
-  $v('admin-chamado-agend').value=(obj&&obj.agend)||'';
+  var agCampos=camposAgendamento(obj&&obj.agend);
+  if($v('admin-chamado-data'))$v('admin-chamado-data').value=agCampos.data;
+  if($v('admin-chamado-hora'))$v('admin-chamado-hora').value=agCampos.hora;
   var at=obj&&state.atendimentos?state.atendimentos[obj.num]:null;
   $v('admin-chamado-endereco').value=(at&&at.endereco)||'';
   $v('admin-chamado-obs').value=(obj&&obj.observacoes)||'';
@@ -7197,13 +7339,15 @@ async function salvarChamado(){
   var id=$v('admin-chamado-id').value, uid=$v('admin-chamado-cliente').value, oldUid=$v('admin-chamado-uid-original').value;
   var cli=clientePorUid(uid), equip=$v('admin-chamado-equip').value, problema=$v('admin-chamado-problema').value.trim();
   if(!uid||!cli||!equip||!problema)return avisoV13('Selecione o cliente, o equipamento e descreva o problema.');
+  var agendamento=valorAgendamento();
+  if(agendamento===null)return avisoV13('Preencha a data e o horário do agendamento juntos.');
   var novo=!id;if(novo)id=gerarNumero('',state.chamados,'num');
   if(!novo&&oldUid&&oldUid!==uid){
     var od=await lerDados(oldUid), oa=Array.isArray(od.chamados)?od.chamados:[];oa=oa.filter(function(x){return String(x.num)!==String(id);});
     var om=Object.assign({},od.mensagens||{}), ot=Object.assign({},od.atendimentos||{});delete om[id];delete ot[id];await gravarDados(oldUid,{chamados:oa,mensagens:om,atendimentos:ot});
   }
   var d=await lerDados(uid), arr=Array.isArray(d.chamados)?d.chamados:[], existente=arr.find(function(x){return String(x.num)===String(id);});
-  var rec=Object.assign({},existente||{}, {num:id,equip:equip,cliente:cli.nome,clienteUid:uid,status:$v('admin-chamado-status').value,agend:$v('admin-chamado-agend').value,problema:problema,prioridade:$v('admin-chamado-prioridade').value,observacoes:$v('admin-chamado-obs').value});
+  var rec=Object.assign({},existente||{}, {num:id,equip:equip,cliente:cli.nome,clienteUid:uid,status:$v('admin-chamado-status').value,agend:agendamento,problema:problema,prioridade:$v('admin-chamado-prioridade').value,observacoes:$v('admin-chamado-obs').value});
   var idx=arr.findIndex(function(x){return String(x.num)===String(id);});if(idx>=0)arr[idx]=rec;else arr.unshift(rec);
   var msgs=Object.assign({},d.mensagens||{});if(!msgs[id])msgs[id]=[{autor:'empresa',texto:'Chamado cadastrado pela TJ: '+problema,hora:'Agora'}];
   var ats=Object.assign({},d.atendimentos||{}), at=Object.assign({},ats[id]||{});at.endereco=$v('admin-chamado-endereco').value.trim();at.previsao=rec.agend;at.diag=at.diag||'';at.pecas=Array.isArray(at.pecas)?at.pecas:[];ats[id]=at;
@@ -7231,11 +7375,38 @@ renderizarChamadosEmpresa=renderChamadosAdmin;
 
 function renderClientesAdmin(){
   var box=$v('lista-emp-clientes');if(!box)return;box.innerHTML='';var cs=clientesV13();if(!cs.length){box.innerHTML='<p class="admin-empty">Nenhum cliente cadastrado ainda.</p>';return;}
-  cs.forEach(function(c){var item=document.createElement('div');item.className='list-item admin-record';var top=document.createElement('div');top.className='list-header';var t=document.createElement('span');t.className='list-title';t.textContent='🧑 '+c.nome+' — '+c.tipo;top.appendChild(t);var bd=document.createElement('span');bd.className='badge badge-blue';var n=(state.chamados||[]).filter(function(x){return uidRegistro(x)===c.uid;}).length;bd.textContent=n+(n===1?' chamado':' chamados');top.appendChild(bd);var m=document.createElement('div');m.className='list-meta';m.textContent='Telefone: '+c.tel+' • E-mail: '+c.email;item.appendChild(top);item.appendChild(m);var a=document.createElement('div');a.className='admin-card-actions';[['Abrir ficha','btn-tj-secondary','admin-abrir-cliente'],['✏️ Editar','btn-tj','admin-editar-cliente']].forEach(function(b){var bt=document.createElement('button');bt.type='button';bt.className=b[1];bt.textContent=b[0];bt.dataset.action=b[2];bt.dataset.uid=c.uid;bt.dataset.id=c.nome;a.appendChild(bt);});item.appendChild(a);box.appendChild(item);});
+  cs.forEach(function(c){var item=document.createElement('div');item.className='list-item admin-record';var top=document.createElement('div');top.className='list-header';var t=document.createElement('span');t.className='list-title';t.textContent='🧑 '+c.nome+' — '+c.tipo;top.appendChild(t);var bd=document.createElement('span');bd.className='badge badge-blue';var n=(state.chamados||[]).filter(function(x){return uidRegistro(x)===c.uid;}).length;bd.textContent=n+(n===1?' chamado':' chamados');top.appendChild(bd);var m=document.createElement('div');m.className='list-meta';m.textContent='Telefone: '+c.tel+' • E-mail: '+c.email;item.appendChild(top);item.appendChild(m);var a=document.createElement('div');a.className='admin-card-actions';[['Abrir ficha','btn-tj-secondary','admin-abrir-cliente'],['✏️ Editar','btn-tj','admin-editar-cliente'],['🗑️ Excluir','btn-tj-danger','admin-excluir-cliente']].forEach(function(b){var bt=document.createElement('button');bt.type='button';bt.className=b[1];bt.textContent=b[0];bt.dataset.action=b[2];bt.dataset.uid=c.uid;bt.dataset.id=c.nome;a.appendChild(bt);});item.appendChild(a);box.appendChild(item);});
 }
 renderizarClientesEmpresa=async function(){await carregarClientesEmpresaFirebase();renderClientesAdmin();};
 function abrirEditarCliente(uid){var c=clientePorUid(uid);if(!c)return;$v('emp-cli-uid').value=uid;$v('emp-cli-form-titulo').textContent='Editar Cliente';$v('emp-cli-form-subtitulo').textContent='Altere os dados cadastrais do cliente. O e-mail de acesso não é alterado por segurança.';$v('emp-cli-tipo').value=c.tipo;$v('emp-cli-nome').value=c.nome;$v('emp-cli-tel').value=c.tel==='Não informado'?'':c.tel;$v('emp-cli-email').value=c.email;$v('emp-cli-email').readOnly=true;$v('btn-salvar-cliente-empresa').textContent='SALVAR ALTERAÇÕES';abrirTela('tela-emp-novo-cliente');}
 async function salvarEdicaoCliente(){var uid=$v('emp-cli-uid').value;if(!uid)return false;var tipo=$v('emp-cli-tipo').value,nome=$v('emp-cli-nome').value.trim(),tel=$v('emp-cli-tel').value.trim();if(!nome||!tel){avisoV13('Preencha nome e telefone.');return true;}await Promise.all([window.TJFB.db.collection('clients').doc(uid).set({nome:nome,telefone:tel,tipoPessoa:tipo,atualizadoEm:firebase.firestore.FieldValue.serverTimestamp()},{merge:true}),window.TJFB.db.collection('users').doc(uid).set({nome:nome,tipoPessoa:tipo,atualizadoEm:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})]);await recarregarV13();avisoV13('Cliente atualizado.');abrirTela('tela-emp-clientes');return true;}
+async function excluirClienteAdmin(uid){
+  if(!ownerOk())return avisoV13('Acesso restrito ao proprietário.');
+  var c=clientePorUid(uid);
+  if(!c)return avisoV13('Cliente não encontrado.');
+  var msg='Excluir o cliente “'+c.nome+'”?\n\nSerão removidos os dados operacionais dele (chamados, equipamentos, orçamentos, pedidos, histórico e agendamentos). O acesso do cliente ao portal ficará desativado.';
+  if(!window.confirm(msg))return;
+  var dbv=window.TJFB.db, batch=dbv.batch();
+  var refCli=dbv.collection('clients').doc(uid);
+  var refData=dbv.collection('clientData').doc(uid);
+  var refUser=dbv.collection('users').doc(uid);
+  batch.delete(refCli);
+  batch.delete(refData);
+  batch.set(refUser,{
+    role:'cliente',
+    active:false,
+    nome:c.nome||'Cliente',
+    email:c.email||'',
+    excluidoPor:'proprietario',
+    excluidoEm:firebase.firestore.FieldValue.serverTimestamp()
+  },{merge:true});
+  await batch.commit();
+  if(clienteAtualUid===uid){clienteAtualUid='';clienteAtualNome='';}
+  await recarregarV13();
+  await carregarClientesEmpresaFirebase();
+  abrirTela('tela-emp-clientes');
+  avisoV13('Cliente excluído e acesso desativado.');
+}
 function resetFormCliente(){if($v('emp-cli-uid'))$v('emp-cli-uid').value='';if($v('emp-cli-form-titulo'))$v('emp-cli-form-titulo').textContent='Cadastrar Cliente';if($v('emp-cli-form-subtitulo'))$v('emp-cli-form-subtitulo').textContent='Crie o acesso do cliente. Ele receberá um e-mail para definir a própria senha.';if($v('emp-cli-email'))$v('emp-cli-email').readOnly=false;if($v('btn-salvar-cliente-empresa'))$v('btn-salvar-cliente-empresa').textContent='CADASTRAR CLIENTE';}
 
 function popularFormEquip(uidSelecionado){preencherSelectClientes('form-equip-cliente',uidSelecionado);}
@@ -7246,7 +7417,29 @@ async function salvarEquipAdmin(){
 }
 async function excluirEquipAdmin(id){var e=(state.equip||[]).find(function(x){return x.id===id;});if(!e)return;var uid=uidRegistro(e);if(!uid)return avisoV13('Cliente do equipamento não identificado.');if(!confirm('Excluir permanentemente este equipamento?'))return;await removerRegistro(uid,'equip',function(x){return x.id===id;});await recarregarV13();abrirTela('tela-emp-equipamentos');avisoV13('Equipamento excluído.');}
 
-function abrirFormOrc(obj,uidPreferido){var uid=uidPreferido||uidRegistro(obj)||((clientesV13()[0]||{}).uid||'');preencherSelectClientes('novo-orc-cli',uid);$v('novo-orc-id').value=obj?obj.num:'';$v('novo-orc-uid-original').value=obj?uid:'';$v('admin-orc-titulo').textContent=obj?'Editar Orçamento #'+obj.num:'Emitir Novo Orçamento';$v('novo-orc-servico').value=(obj&&obj.servico)||'';$v('novo-orc-valor').value=(obj&&obj.total)||'';$v('novo-orc-status').value=(obj&&obj.status)||'Aguardando aprovação';abrirTela('tela-form-novo-orcamento');}
+function abrirFormOrc(obj,uidPreferido){
+  var uid=uidPreferido||uidRegistro(obj)||'';
+  preencherSelectClientes('novo-orc-cli',uid);
+  var sel=$v('novo-orc-cli');
+  if(sel && !obj && !uidPreferido){
+    var ph=document.createElement('option');ph.value='';ph.textContent='Selecione um cliente';
+    sel.insertBefore(ph,sel.firstChild);sel.value='';
+  }
+  $v('novo-orc-id').value=obj?obj.num:'';
+  $v('novo-orc-uid-original').value=obj?uid:'';
+  $v('admin-orc-titulo').textContent=obj?'Editar Orçamento #'+obj.num:'Emitir Novo Orçamento';
+  $v('novo-orc-servico').value=(obj&&obj.servico)||'';
+  $v('novo-orc-valor').value=(obj&&obj.total)||'';
+  $v('novo-orc-status').value=(obj&&obj.status)||'Aguardando aprovação';
+  abrirTela('tela-form-novo-orcamento');
+  setTimeout(function(){
+    if(window.TJOrcamentoItens){
+      if(obj) window.TJOrcamentoItens.definir(normalizarItensOrcamento(obj.itens));
+      else window.TJOrcamentoItens.limpar();
+    }
+    if(!obj && $v('novo-orc-valor'))$v('novo-orc-valor').value='';
+  },0);
+}
 function lerItensOrcamentoTela(){
   var itens=[];
   var linhas=document.querySelectorAll('#tela-form-novo-orcamento .tj-corpo-itens .tj-linha-item');
@@ -7297,7 +7490,7 @@ var abrirTelaAnterior=abrirTela;abrirTela=function(idTela,registrarHistorico){
 // Intercepta CRUD do proprietário antes do despachante legado.
 document.addEventListener('click',function(ev){
   var alvo=ev.target&&ev.target.closest?ev.target.closest('[data-action]'):null;if(!alvo)return;var acao=alvo.dataset.action||'',id=alvo.dataset.id||'',uid=alvo.dataset.uid||'';
-  var intercept=['admin-novo-chamado','admin-editar-chamado','admin-excluir-chamado','admin-salvar-chamado','admin-cancelar-chamado','admin-abrir-cliente','admin-editar-cliente','admin-editar-cliente-atual','admin-chamado-cliente-atual','admin-equip-cliente-atual','admin-orc-cliente-atual','salvar-cliente-empresa','criar-equip','abrir-novo-equip','editar-equip','abrir-editar-equip','salvar-equipamento','excluir-equip','excluir-equip-modal','criar-orcamento','abrir-novo-orcamento','salvar-novo-orcamento','admin-editar-orc','admin-excluir-orc','admin-novo-pedido','admin-editar-pedido','admin-excluir-pedido','admin-salvar-pedido','admin-cancelar-pedido'];
+  var intercept=['admin-novo-chamado','admin-editar-chamado','admin-excluir-chamado','admin-salvar-chamado','admin-cancelar-chamado','admin-abrir-cliente','admin-editar-cliente','admin-editar-cliente-atual','admin-excluir-cliente','admin-excluir-cliente-atual','admin-chamado-cliente-atual','admin-equip-cliente-atual','admin-orc-cliente-atual','salvar-cliente-empresa','criar-equip','abrir-novo-equip','editar-equip','abrir-editar-equip','salvar-equipamento','excluir-equip','excluir-equip-modal','criar-orcamento','abrir-novo-orcamento','salvar-novo-orcamento','admin-editar-orc','admin-excluir-orc','admin-novo-pedido','admin-editar-pedido','admin-excluir-pedido','admin-salvar-pedido','admin-cancelar-pedido'];
   if(intercept.indexOf(acao)<0)return;
   if(state.perfilSessao!=='empresa' && acao!=='salvar-cliente-empresa')return;
   ev.preventDefault();ev.stopImmediatePropagation();
@@ -7311,6 +7504,8 @@ document.addEventListener('click',function(ev){
       if(acao==='admin-abrir-cliente'){clienteAtualUid=uid;clienteAtualNome=id;abrirTela('tela-emp-cliente-detalhe');return;}
       if(acao==='admin-editar-cliente'){abrirEditarCliente(uid);return;}
       if(acao==='admin-editar-cliente-atual'){abrirEditarCliente(clienteAtualUid);return;}
+      if(acao==='admin-excluir-cliente'){await excluirClienteAdmin(uid);return;}
+      if(acao==='admin-excluir-cliente-atual'){await excluirClienteAdmin(clienteAtualUid);return;}
       if(acao==='admin-chamado-cliente-atual'){abrirFormChamado(null,clienteAtualUid);return;}
       if(acao==='admin-equip-cliente-atual'){equipAtualId='';$v('form-equip-id').value='';limparCampos(['form-equip-nome','form-equip-marca','form-equip-modelo','form-equip-sn','form-equip-local']);popularFormEquip(clienteAtualUid);abrirTela('tela-form-equipamento');return;}
       if(acao==='admin-orc-cliente-atual'){abrirFormOrc(null,clienteAtualUid);return;}
@@ -7331,6 +7526,13 @@ document.addEventListener('click',function(ev){
       if(acao==='admin-cancelar-pedido'){abrirTela('tela-emp-pedidos');return;}
     }catch(e){console.error('[TJ V13]',acao,e);avisoV13('Não foi possível concluir esta ação: '+((e&&e.message)||'erro inesperado'));}
   })();
+},true);
+
+// TJ v22 — atalhos do dashboard também funcionam com teclado.
+document.addEventListener('keydown',function(ev){
+  var alvo=ev.target&&ev.target.closest?ev.target.closest('.kpi-atalho[data-action]'):null;
+  if(!alvo)return;
+  if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();alvo.click();}
 },true);
 
 // Atualiza equipamentos do formulário de chamado quando o cliente muda.
