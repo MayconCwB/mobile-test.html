@@ -477,6 +477,11 @@ function TJAbrirCadastroPublico(){
   TJMostrarLogin();
   setTimeout(function(){ var b=document.querySelector('[data-action="abrir-cadastro"]'); if(b) b.click(); },0);
 }
+function TJAbrirWhatsAppOrcamento(){
+  var mensagem = 'Olá! Vim pelo site da TJ Refrigeração e gostaria de solicitar um orçamento.';
+  var url = 'https://wa.me/5541997497054?text=' + encodeURIComponent(mensagem);
+  window.open(url, '_blank', 'noopener,noreferrer');
+}
 function TJVoltarLoginDireto(ev){
   if(ev){ ev.preventDefault(); ev.stopPropagation(); ev.stopImmediatePropagation(); }
   var auth=document.getElementById('auth-container');
@@ -509,7 +514,7 @@ function TJVoltarLoginDireto(ev){
 .admin-action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.admin-card-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.admin-card-actions button{min-height:40px}.admin-muted{font-size:.78rem;color:#64748B}.list-item.admin-record{cursor:default}.list-item.admin-record .list-title{overflow-wrap:anywhere}.admin-empty{font-size:.88rem;color:#64748B;padding:8px 0}@media(max-width:520px){.admin-action-grid{grid-template-columns:1fr}.admin-card-actions{display:grid;grid-template-columns:1fr 1fr}.admin-card-actions .btn-tj-danger:last-child:nth-child(3){grid-column:1/-1}.card-title{gap:8px;flex-wrap:wrap}}
 </style>
 
-<style id="tj-landing-v18-css">
+<style id="tj-landing-v20-css">
   #tj-landing{width:100%;height:100dvh;min-height:0;background:#F6F9FC;color:#102A43;overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
   .tj-site-wrap{width:min(1180px,calc(100% - 40px));margin:0 auto}
   .tj-site-header{position:sticky;top:0;z-index:1200;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(203,213,225,.78)}
@@ -530,7 +535,7 @@ function TJVoltarLoginDireto(ev){
   .tj-hero{position:relative;overflow:hidden;background:linear-gradient(135deg,#061B2E 0%,#0A3154 52%,#0C5F8B 100%);color:#fff}
   .tj-hero:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.7),transparent 92%)}
   .tj-hero:after{content:"";position:absolute;width:620px;height:620px;border-radius:50%;right:-190px;top:-260px;background:radial-gradient(circle,rgba(73,189,236,.34) 0%,rgba(73,189,236,.05) 48%,transparent 70%)}
-  .tj-hero-watermark{position:absolute;z-index:0;width:clamp(460px,54vw,820px);height:auto;right:clamp(-190px,-8vw,-70px);top:50%;transform:translateY(-50%) rotate(-7deg);opacity:.075;filter:saturate(.7) brightness(1.65);pointer-events:none;user-select:none}
+  .tj-hero-watermark{position:absolute;z-index:0;width:clamp(500px,58vw,860px);height:auto;right:clamp(-120px,-4vw,-40px);top:50%;transform:translateY(-50%);opacity:.16;filter:none;pointer-events:none;user-select:none}
   .tj-hero-grid{min-height:640px;display:grid;grid-template-columns:1.08fr .92fr;align-items:center;gap:64px;position:relative;z-index:1;padding:74px 0 82px}
   .tj-eyebrow{display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:8px 13px;font-size:.79rem;font-weight:800;margin-bottom:20px;color:#E8F6FC}
   .tj-hero h1{font-size:clamp(2.4rem,5.5vw,4.45rem);line-height:.99;letter-spacing:-.045em;max-width:760px;margin:0 0 22px;color:#fff;text-wrap:balance}
@@ -586,14 +591,19 @@ function TJVoltarLoginDireto(ev){
   .tj-portal-band{background:linear-gradient(135deg,#0A2642,#0D4F76);color:#fff;border-radius:30px;padding:46px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:34px;box-shadow:0 24px 56px rgba(11,42,74,.18);position:relative;overflow:hidden}.tj-portal-band:after{content:"";position:absolute;width:260px;height:260px;border-radius:50%;right:-80px;bottom:-140px;background:rgba(80,198,240,.16)}
   .tj-portal-band h2{margin:0 0 10px;color:#fff;font-size:clamp(1.6rem,3vw,2.35rem);position:relative;z-index:1}.tj-portal-band p{margin:0;color:#C9DDEA;max-width:720px;line-height:1.65;position:relative;z-index:1}.tj-portal-actions{display:grid;gap:10px;min-width:220px;position:relative;z-index:1}
 
+  .tj-contact-band{display:grid;grid-template-columns:1.05fr .95fr;gap:34px;align-items:stretch;background:#fff;border:1px solid #DFEAF1;border-radius:28px;padding:34px;box-shadow:0 18px 50px rgba(12,49,84,.08)}
+  .tj-contact-copy h2{margin:8px 0 14px;font-size:clamp(1.8rem,4vw,2.8rem);line-height:1.08;color:#0B2A4A;letter-spacing:-.035em}.tj-contact-copy p{margin:0;color:#5C7082;line-height:1.72;max-width:62ch}
+  .tj-contact-list{display:grid;gap:12px;margin-top:24px}.tj-contact-item{display:flex;gap:13px;align-items:flex-start;padding:14px 0;border-bottom:1px solid #E7EEF3}.tj-contact-item:last-child{border-bottom:0}.tj-contact-icon{width:38px;height:38px;border-radius:12px;background:#EAF7FD;display:grid;place-items:center;flex:0 0 auto}.tj-contact-item strong{display:block;color:#173B57;font-size:.9rem;margin-bottom:3px}.tj-contact-item a,.tj-contact-item span{color:#5C7082;text-decoration:none;font-size:.92rem;line-height:1.45}.tj-contact-item a:hover{color:#167DB2}
+  .tj-contact-card{background:linear-gradient(145deg,#08233A,#0B436B);color:#fff;border-radius:24px;padding:28px;display:flex;flex-direction:column;justify-content:space-between;min-height:100%}.tj-contact-card .tj-section-kicker{color:#76D3F3}.tj-contact-card h3{font-size:1.65rem;line-height:1.12;margin:8px 0 12px}.tj-contact-card p{color:#CBE0EC;line-height:1.65;margin:0 0 24px}.tj-wa-btn{width:100%;min-height:52px;border:0;border-radius:14px;background:#fff;color:#0A3154;font-weight:800;cursor:pointer;padding:0 18px;display:flex;align-items:center;justify-content:center;gap:9px}.tj-wa-btn:hover{transform:translateY(-1px)}
+  .tj-company-legal{margin-top:18px;font-size:.76rem;line-height:1.55;color:#AFC6D5}
   .tj-site-footer{background:#061827;color:#BFD0DE;padding:34px 0}.tj-footer-row{display:flex;align-items:center;justify-content:space-between;gap:20px}.tj-footer-brand{display:flex;align-items:center;gap:10px;font-weight:800;color:#fff}.tj-footer-brand img{width:40px;height:40px;object-fit:contain;border-radius:10px;background:#fff}.tj-footer-note{font-size:.8rem;color:#9FB6C7}
   .tj-back-site{width:100%;margin-bottom:14px}
 
   @media(max-width:960px){
-    .tj-site-links{display:none}.tj-hero-grid{grid-template-columns:1fr;min-height:auto;gap:32px;padding:58px 0 68px}.tj-app-showcase{min-height:440px}.tj-phone{width:min(350px,90%)}.tj-floating-chip.one{left:8%}.tj-floating-chip.two{right:8%}.tj-service-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.tj-digital-grid{grid-template-columns:1fr}.tj-portal-band{grid-template-columns:1fr}.tj-portal-actions{grid-template-columns:1fr 1fr;min-width:0}.tj-trust-grid{grid-template-columns:1fr}.tj-trust-item{border-right:0;border-bottom:1px solid #E5EDF3}.tj-trust-item:last-child{border-bottom:0}
+    .tj-site-links{display:none}.tj-contact-band{grid-template-columns:1fr}.tj-hero-grid{grid-template-columns:1fr;min-height:auto;gap:32px;padding:58px 0 68px}.tj-app-showcase{min-height:440px}.tj-phone{width:min(350px,90%)}.tj-floating-chip.one{left:8%}.tj-floating-chip.two{right:8%}.tj-service-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.tj-digital-grid{grid-template-columns:1fr}.tj-portal-band{grid-template-columns:1fr}.tj-portal-actions{grid-template-columns:1fr 1fr;min-width:0}.tj-trust-grid{grid-template-columns:1fr}.tj-trust-item{border-right:0;border-bottom:1px solid #E5EDF3}.tj-trust-item:last-child{border-bottom:0}
   }
   @media(max-width:600px){
-    .tj-site-wrap{width:min(100% - 24px,1180px)}.tj-site-nav{min-height:68px}.tj-site-brand span{font-size:.86rem}.tj-site-brand img{width:45px;height:45px}.tj-site-actions .pwa-install-trigger{display:none}.tj-site-btn{min-height:44px;padding:0 14px}.tj-site-actions .dark{font-size:.8rem}.tj-hero-grid{padding:44px 0 54px}.tj-hero h1{font-size:2.35rem}.tj-hero-watermark{width:520px;right:-245px;top:39%;opacity:.055}.tj-hero-actions{display:grid;grid-template-columns:1fr}.tj-hero-actions .tj-site-btn{width:100%}.tj-hero-proof{display:grid;gap:12px}.tj-app-showcase{min-height:390px}.tj-phone{width:88%;border-width:7px;border-radius:32px;transform:none}.tj-floating-chip{display:none}.tj-site-section{padding:62px 0}.tj-section-head{display:block;margin-bottom:26px}.tj-service-grid,.tj-process-grid{grid-template-columns:1fr}.tj-service-card{min-height:auto}.tj-digital-panel{padding:27px 22px;border-radius:23px}.tj-portal-band{padding:30px 22px;border-radius:24px}.tj-portal-actions{grid-template-columns:1fr}.tj-footer-row{flex-direction:column;align-items:flex-start}.tj-trust-item{padding:16px 4px}.tj-phone-body{padding:14px}.tj-phone-top{height:64px}
+    .tj-site-wrap{width:min(100% - 24px,1180px)}.tj-site-nav{min-height:68px}.tj-site-brand span{font-size:.86rem}.tj-site-brand img{width:45px;height:45px}.tj-site-actions .pwa-install-trigger{display:none}.tj-site-btn{min-height:44px;padding:0 14px}.tj-site-actions .dark{font-size:.8rem}.tj-hero-grid{padding:44px 0 54px}.tj-hero h1{font-size:2.35rem}.tj-hero-watermark{width:500px;right:-205px;top:43%;opacity:.11}.tj-hero-actions{display:grid;grid-template-columns:1fr}.tj-hero-actions .tj-site-btn{width:100%}.tj-hero-proof{display:grid;gap:12px}.tj-app-showcase{min-height:390px}.tj-phone{width:88%;border-width:7px;border-radius:32px;transform:none}.tj-floating-chip{display:none}.tj-site-section{padding:62px 0}.tj-section-head{display:block;margin-bottom:26px}.tj-service-grid,.tj-process-grid{grid-template-columns:1fr}.tj-service-card{min-height:auto}.tj-digital-panel{padding:27px 22px;border-radius:23px}.tj-portal-band{padding:30px 22px;border-radius:24px}.tj-portal-actions{grid-template-columns:1fr}.tj-contact-band{padding:24px 20px;border-radius:22px}.tj-footer-row{flex-direction:column;align-items:flex-start}.tj-trust-item{padding:16px 4px}.tj-phone-body{padding:14px}.tj-phone-top{height:64px}
   }
 </style>
 
@@ -602,7 +612,7 @@ function TJVoltarLoginDireto(ev){
 
 
   <!-- ===== LANDING PAGE PÚBLICA TJ REFRIGERAÇÃO — V17 ===== -->
-  <!-- ===== LANDING PAGE V18: CTAs SIMPLIFICADOS + MARCA D'ÁGUA ===== -->
+  <!-- ===== LANDING PAGE V20: WHATSAPP + CONTATO REAL + LOGO TJ COMO MARCA D'ÁGUA ===== -->
   <div id="tj-landing">
     <header class="tj-site-header">
       <div class="tj-site-wrap tj-site-nav">
@@ -623,14 +633,14 @@ function TJVoltarLoginDireto(ev){
 
     <main>
       <section id="inicio" class="tj-hero">
-        <img class="tj-hero-watermark" src="./assets/tj-logo.png" alt="" aria-hidden="true">
+        <img class="tj-hero-watermark" src="./assets/tj-watermark.png" alt="" aria-hidden="true">
         <div class="tj-site-wrap tj-hero-grid">
           <div>
-            <div class="tj-eyebrow">❄️ Assistência técnica + acompanhamento digital</div>
-            <h1>Refrigeração técnica com atendimento <span>claro do início ao fim.</span></h1>
-            <p>A TJ Refrigeração reúne assistência técnica, orçamentos e acompanhamento digital em uma experiência simples, organizada e acessível pelo celular.</p>
+            <div class="tj-eyebrow">❄️ Manutenção e performance para cozinhas industriais</div>
+            <h1>Excelência em manutenção e performance para <span>cozinhas industriais.</span></h1>
+            <p>Atendimento técnico especializado, com comunicação direta pelo WhatsApp e acompanhamento digital para clientes da TJ Refrigeração.</p>
             <div class="tj-hero-actions">
-              <button type="button" class="tj-site-btn primary" onclick="TJAbrirCadastroPublico()">Solicitar orçamento</button>
+              <button type="button" class="tj-site-btn primary" onclick="TJAbrirWhatsAppOrcamento()">Solicitar orçamento</button>
               <button type="button" class="tj-site-btn ghost" onclick="TJMostrarLogin()">Área do Cliente</button>
             </div>
             <div class="tj-hero-proof" aria-label="Recursos disponíveis">
@@ -693,7 +703,7 @@ function TJVoltarLoginDireto(ev){
             </div>
           </div>
           <div class="tj-process-grid">
-            <article class="tj-process-card"><div class="tj-process-num">1</div><h3>Solicite</h3><p>Solicite seu orçamento e informe os dados necessários para que a TJ organize o atendimento.</p></article>
+            <article class="tj-process-card"><div class="tj-process-num">1</div><h3>Entre em contato</h3><p>Fale com a TJ pelo WhatsApp, explique sua necessidade e envie as primeiras informações sobre o equipamento ou serviço.</p></article>
             <article class="tj-process-card"><div class="tj-process-num">2</div><h3>Acompanhe</h3><p>Consulte status, mensagens, orçamento e agendamento conforme o atendimento evolui.</p></article>
             <article class="tj-process-card"><div class="tj-process-num">3</div><h3>Consulte o histórico</h3><p>Depois do serviço, as principais informações continuam organizadas para futuras consultas.</p></article>
           </div>
@@ -725,13 +735,41 @@ function TJVoltarLoginDireto(ev){
         </div>
       </section>
 
+      <section id="contato" class="tj-site-section alt">
+        <div class="tj-site-wrap">
+          <div class="tj-contact-band">
+            <div class="tj-contact-copy">
+              <div class="tj-section-kicker">Entre em contato</div>
+              <h2>Precisa de orçamento ou quer falar com a TJ?</h2>
+              <p>O primeiro contato pode ser feito diretamente com a empresa. Para clientes já cadastrados, o portal continua disponível para acompanhar chamados, orçamentos, equipamentos, histórico e agendamentos.</p>
+              <div class="tj-contact-list">
+                <div class="tj-contact-item"><div class="tj-contact-icon">💬</div><div><strong>WhatsApp / Telefone</strong><a href="tel:+5541997497054">(41) 99749-7054</a></div></div>
+                <div class="tj-contact-item"><div class="tj-contact-icon">✉️</div><div><strong>E-mail</strong><a href="mailto:refrigeracaotjcwba@gmail.com">refrigeracaotjcwba@gmail.com</a></div></div>
+                <div class="tj-contact-item"><div class="tj-contact-icon">🏢</div><div><strong>Empresa</strong><span>TJ REFRIGERACAO TECHNICAL ASSISTANCE LTDA<br>CNPJ 49.102.762/0001-98</span></div></div>
+              </div>
+            </div>
+            <div class="tj-contact-card">
+              <div>
+                <div class="tj-section-kicker">Atendimento comercial</div>
+                <h3>Solicite seu orçamento pelo WhatsApp.</h3>
+                <p>A mensagem já abre pronta para você iniciar a conversa com a TJ Refrigeração.</p>
+              </div>
+              <div>
+                <button type="button" class="tj-wa-btn" onclick="TJAbrirWhatsAppOrcamento()">💬 Falar com a TJ no WhatsApp</button>
+                <div class="tj-company-legal">TJ REFRIGERACAO TECHNICAL ASSISTANCE LTDA<br>CNPJ 49.102.762/0001-98</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section id="portal" class="tj-site-section">
         <div class="tj-site-wrap">
           <div class="tj-portal-band">
             <div>
               <div class="tj-section-kicker" style="color:#72D0F2">Portal TJ</div>
               <h2>Já é cliente? Acompanhe tudo pelo portal.</h2>
-              <p>Entre com sua conta para acessar chamados, orçamentos, equipamentos, histórico e agendamentos. Para uma nova solicitação comercial, use “Solicitar orçamento” no início da página.</p>
+              <p>Entre com sua conta para acessar chamados, orçamentos, equipamentos, histórico e agendamentos. Para uma nova solicitação comercial, fale diretamente com a TJ pelo WhatsApp.</p>
             </div>
             <div class="tj-portal-actions">
               <button type="button" class="tj-site-btn primary" onclick="TJMostrarLogin()">Área do Cliente</button>
@@ -745,7 +783,7 @@ function TJVoltarLoginDireto(ev){
     <footer class="tj-site-footer">
       <div class="tj-site-wrap tj-footer-row">
         <div class="tj-footer-brand"><img src="./assets/tj-logo.png" alt=""><span>TJ Refrigeração</span></div>
-        <div class="tj-footer-note">Assistência técnica • Portal do Cliente • Aplicativo PWA</div>
+        <div class="tj-footer-note">TJ REFRIGERACAO TECHNICAL ASSISTANCE LTDA • CNPJ 49.102.762/0001-98</div>
       </div>
     </footer>
   </div>
