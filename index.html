@@ -3231,11 +3231,11 @@ function TJVoltarLoginDireto(ev){
           var tr = document.createElement("tr");
 
           var tdDesc = document.createElement("td");
-          tdDesc.textContent = it[0];
+          tdDesc.textContent = Array.isArray(it) ? (it[0] || "") : (it.descricao || it.item || it.nome || "");
           var tdQtd = document.createElement("td");
-          tdQtd.textContent = it[1];
+          tdQtd.textContent = Array.isArray(it) ? (it[1] || "") : (it.qtd || it.quantidade || "");
           var tdVal = document.createElement("td");
-          tdVal.textContent = it[2];
+          tdVal.textContent = Array.isArray(it) ? (it[2] || "") : (it.valor || it.preco || "");
 
           tr.appendChild(tdDesc);
           tr.appendChild(tdQtd);
@@ -3261,7 +3261,7 @@ function TJVoltarLoginDireto(ev){
 
           var t = document.createElement("div");
           t.className = "timeline-title";
-          t.textContent = hItem[0] + " — " + hItem[1];
+          t.textContent = Array.isArray(hItem) ? ((hItem[0] || "") + " — " + (hItem[1] || "")) : ((hItem.data || "") + " — " + (hItem.evento || hItem.texto || hItem.descricao || ""));
 
           c.appendChild(t);
           divItem.appendChild(dot);
@@ -3624,6 +3624,14 @@ function TJVoltarLoginDireto(ev){
           for(var i=0;i<arr.length;i++){
             var a=Object.assign({},arr[i]);
             if(!a.clienteUid) a.clienteUid=doc.id;
+            if(!a.cliente || a.cliente===doc.id || (String(a.cliente).length>=20 && !/\s/.test(String(a.cliente)))) {
+              var mapaNomes=(window.TJFB&&window.TJFB.nomesClientesPorUid)||{};
+              var cliNome=mapaNomes[doc.id];
+              if(!cliNome && state.clientesFirebase){
+                for(var cn=0;cn<state.clientesFirebase.length;cn++) if(state.clientesFirebase[cn].uid===doc.id){ cliNome=state.clientesFirebase[cn].nome; break; }
+              }
+              a.cliente=cliNome||'Cliente sem nome cadastrado';
+            }
             lista.push(a);
           }
         });
@@ -4393,11 +4401,11 @@ function TJVoltarLoginDireto(ev){
             var itemP = atendData.pecas[p];
 
             var tdP1 = document.createElement("td");
-            tdP1.textContent = itemP[0];
+            tdP1.textContent = Array.isArray(itemP) ? (itemP[0] || "") : (itemP.descricao || itemP.item || itemP.nome || "");
             var tdP2 = document.createElement("td");
-            tdP2.textContent = itemP[1];
+            tdP2.textContent = Array.isArray(itemP) ? (itemP[1] || "") : (itemP.qtd || itemP.quantidade || "");
             var tdP3 = document.createElement("td");
-            tdP3.textContent = itemP[2];
+            tdP3.textContent = Array.isArray(itemP) ? (itemP[2] || "") : (itemP.valor || itemP.preco || "");
 
             rowP.appendChild(tdP1);
             rowP.appendChild(tdP2);
@@ -4442,10 +4450,15 @@ function TJVoltarLoginDireto(ev){
         var tit = document.createElement("div");
         tit.className = "timeline-title hist-emp-title";
         var nomeHistorico = h.cliente || "Cliente";
-        if (h.clienteUid && (!nomeHistorico || nomeHistorico === h.clienteUid)) {
-          for (var cH = 0; cH < (state.clientesFirebase || []).length; cH++) {
-            if (state.clientesFirebase[cH].uid === h.clienteUid) { nomeHistorico = state.clientesFirebase[cH].nome; break; }
+        if (h.clienteUid && (!nomeHistorico || nomeHistorico === h.clienteUid || (String(nomeHistorico).length>=20 && !/\s/.test(String(nomeHistorico))))) {
+          var mapaHist=(window.TJFB&&window.TJFB.nomesClientesPorUid)||{};
+          nomeHistorico=mapaHist[h.clienteUid]||'';
+          if(!nomeHistorico){
+            for (var cH = 0; cH < (state.clientesFirebase || []).length; cH++) {
+              if (state.clientesFirebase[cH].uid === h.clienteUid) { nomeHistorico = state.clientesFirebase[cH].nome; break; }
+            }
           }
+          if(!nomeHistorico || nomeHistorico===h.clienteUid) nomeHistorico='Cliente sem nome cadastrado';
         }
         tit.textContent = h.data + " — " + nomeHistorico + " — " + h.titulo;
 
@@ -5121,7 +5134,7 @@ function TJVoltarLoginDireto(ev){
         for (var o = 0; o < state.orcamentos.length; o++) {
           if (state.orcamentos[o].num === alvoOrcApr) {
             state.orcamentos[o].status = "Aprovado";
-            state.orcamentos[o].hist.push(["Hoje", "Aprovado pelo cliente"]);
+            state.orcamentos[o].hist.push({data:"Hoje", evento:"Aprovado pelo cliente"});
             break;
           }
         }
@@ -5156,7 +5169,7 @@ function TJVoltarLoginDireto(ev){
         for (var r = 0; r < state.orcamentos.length; r++) {
           if (state.orcamentos[r].num === alvoOrcRec) {
             state.orcamentos[r].status = "Recusado";
-            state.orcamentos[r].hist.push(["Hoje", "Recusado pelo cliente"]);
+            state.orcamentos[r].hist.push({data:"Hoje", evento:"Recusado pelo cliente"});
             break;
           }
         }
@@ -5363,7 +5376,7 @@ function TJVoltarLoginDireto(ev){
         if (!state.atendimentos[chamadoAtualNum].pecas) {
           state.atendimentos[chamadoAtualNum].pecas = [];
         }
-        state.atendimentos[chamadoAtualNum].pecas.push([pNome, pQtd, pVal]);
+        state.atendimentos[chamadoAtualNum].pecas.push({descricao:pNome, qtd:pQtd, valor:pVal});
 
         var chCli = "Empresa XYZ";
         for (var cIdx = 0; cIdx < state.chamados.length; cIdx++) {
@@ -5865,6 +5878,9 @@ function TJVoltarLoginDireto(ev){
 })();
 
 </script>
+
+<!-- ===== TJ V15: ORÇAMENTOS/FIRESTORE SEM ARRAYS ANINHADOS =====
+     Itens, histórico do orçamento e peças são persistidos como objetos. ===== -->
 </body>
 
 <!-- ===== AJUSTES TJ: ETAPA 8 (trilha de status) + ETAPA 9 (decisões e itens do orçamento) ===== -->
@@ -6319,20 +6335,60 @@ async function carregarDadosCliente(user,perfil){
 async function carregarDadosEmpresaFirebase(){
   if(!window.TJFB || !window.TJFB.db || !window.TJFB.auth || !window.TJFB.auth.currentUser) return [];
   try{
-    const [snapClients,snapData]=await Promise.all([
+    // V14: cruza clients + users + clientData para nunca exibir UID como nome do cliente.
+    const [snapClients,snapUsers,snapData]=await Promise.all([
       db.collection('clients').get(),
+      db.collection('users').get(),
       db.collection('clientData').get()
     ]);
-    const nomes={};
+
+    const cadastros={}, perfis={}, nomes={};
     snapClients.forEach(function(doc){
       const c=doc.data()||{};
-      nomes[doc.id]=c.nome||c.empresa||c.razaoSocial||c.email||'Cliente';
+      cadastros[doc.id]=c;
+      const n=c.nome||c.empresa||c.razaoSocial||c.email||'';
+      if(n && n!==doc.id) nomes[doc.id]=n;
     });
+    snapUsers.forEach(function(doc){
+      const u=doc.data()||{};
+      perfis[doc.id]=u;
+      const n=u.nome||u.empresa||u.razaoSocial||u.email||'';
+      if(!nomes[doc.id] && n && n!==doc.id) nomes[doc.id]=n;
+    });
+
+    function pareceUid(valor,uid){
+      if(!valor) return true;
+      valor=String(valor).trim();
+      if(!valor) return true;
+      if(uid && valor===uid) return true;
+      // UIDs do Firebase normalmente são sequências longas sem espaços.
+      return valor.length>=20 && !/\s/.test(valor) && /^[A-Za-z0-9_-]+$/.test(valor);
+    }
+    function nomeDentroDosDados(d,uid){
+      const listas=['chamados','orcamentos','equip','pedidos','historicoCliente','notificacoesCliente','contatosCliente','enderecosCliente','agendamentos'];
+      for(let i=0;i<listas.length;i++){
+        const arr=Array.isArray(d[listas[i]])?d[listas[i]]:[];
+        for(let j=0;j<arr.length;j++){
+          const n=arr[j]&&(arr[j].cliente||arr[j].clienteNome||arr[j].nomeCliente);
+          if(n && !pareceUid(n,uid)) return String(n).trim();
+        }
+      }
+      return '';
+    }
+    function resolverNome(uid,d){
+      const c=cadastros[uid]||{}, u=perfis[uid]||{};
+      const candidatos=[nomes[uid],c.nome,c.empresa,c.razaoSocial,u.nome,u.empresa,u.razaoSocial,c.email,u.email,nomeDentroDosDados(d||{},uid)];
+      for(let i=0;i<candidatos.length;i++){
+        if(candidatos[i] && !pareceUid(candidatos[i],uid)) return String(candidatos[i]).trim();
+      }
+      return 'Cliente sem nome cadastrado';
+    }
 
     const chamados=[], mensagens={}, atendimentos={}, orcamentos=[], equip=[], pedidos=[],
           historico=[], notificacoes=[], contatos=[], enderecos=[], agendamentos=[];
     snapData.forEach(function(doc){
-      const d=doc.data()||{}, uid=doc.id, nome=nomes[uid]||uid;
+      const d=doc.data()||{}, uid=doc.id, nome=resolverNome(uid,d);
+      nomes[uid]=nome;
       (Array.isArray(d.chamados)?d.chamados:[]).forEach(function(x){ chamados.push(Object.assign({},x,{clienteUid:uid,cliente:nome})); });
       Object.keys(d.mensagens||{}).forEach(function(k){ mensagens[k]=d.mensagens[k]; });
       Object.keys(d.atendimentos||{}).forEach(function(k){ atendimentos[k]=Object.assign({},d.atendimentos[k]||{},{clienteUid:uid,cliente:nome}); });
@@ -6357,11 +6413,26 @@ async function carregarDadosEmpresaFirebase(){
     state.contatosCliente=contatos;
     state.enderecosCliente=enderecos;
     state.agendamentos=agendamentos;
-    state.clientesFirebase=snapClients.docs.map(function(doc){
-      const c=doc.data()||{};
-      return {uid:doc.id,nome:c.nome||c.empresa||c.razaoSocial||c.email||'Cliente',empresa:c.empresa||'',tipo:c.tipoPessoa==='PJ'?'PJ':'PF',tel:c.telefone||c.tel||'Não informado',email:c.email||'Não informado'};
-    });
+
+    // Monta a lista de clientes por UID, inclusive cadastros antigos que existam só em users/clientData.
+    const uids={};
+    snapClients.forEach(function(doc){ uids[doc.id]=true; });
+    snapUsers.forEach(function(doc){ const u=doc.data()||{}; if(u.role!=='owner') uids[doc.id]=true; });
+    snapData.forEach(function(doc){ uids[doc.id]=true; });
+    state.clientesFirebase=Object.keys(uids).map(function(uid){
+      const c=cadastros[uid]||{}, u=perfis[uid]||{};
+      const nome=nomes[uid]||resolverNome(uid,{});
+      return {
+        uid:uid,
+        nome:nome,
+        empresa:c.empresa||c.razaoSocial||u.empresa||u.razaoSocial||'',
+        tipo:(c.tipoPessoa||u.tipoPessoa)==='PJ'?'PJ':'PF',
+        tel:c.telefone||c.tel||u.telefone||u.tel||'Não informado',
+        email:c.email||u.email||'Não informado'
+      };
+    }).filter(function(c){ return c.uid!==window.TJFB.auth.currentUser.uid; });
     state.clientesCadastrados=state.clientesFirebase.slice();
+    window.TJFB.nomesClientesPorUid=nomes;
     return true;
   }catch(e){
     console.error('[TJFB] dados do proprietário',e);
@@ -6371,22 +6442,64 @@ async function carregarDadosEmpresaFirebase(){
 }
 window.TJFB.carregarDadosEmpresaFirebase=carregarDadosEmpresaFirebase;
 
+// V15: converte estruturas antigas com arrays dentro de arrays para um formato aceito pelo Firestore.
+// O Firestore não aceita arrays aninhados, então itens/histórico de orçamento e peças viram objetos.
+window.TJFirestoreSafe=function(payload){
+  payload=payload||{};
+  var out=Object.assign({},payload);
+  function itemOrc(it){
+    if(Array.isArray(it)) return {descricao:String(it[0]||''),qtd:String(it[1]||''),valor:String(it[2]||'')};
+    it=it||{};
+    return {descricao:String(it.descricao||it.item||it.nome||''),qtd:String(it.qtd||it.quantidade||''),valor:String(it.valor||it.preco||'')};
+  }
+  function histOrc(h){
+    if(Array.isArray(h)) return {data:String(h[0]||''),evento:String(h[1]||'')};
+    h=h||{};
+    return {data:String(h.data||''),evento:String(h.evento||h.texto||h.descricao||'')};
+  }
+  function pecaAtend(p){
+    if(Array.isArray(p)) return {descricao:String(p[0]||''),qtd:String(p[1]||''),valor:String(p[2]||'')};
+    p=p||{};
+    return {descricao:String(p.descricao||p.item||p.nome||''),qtd:String(p.qtd||p.quantidade||''),valor:String(p.valor||p.preco||'')};
+  }
+  if(Array.isArray(out.orcamentos)){
+    out.orcamentos=out.orcamentos.map(function(o){
+      o=Object.assign({},o||{});
+      o.itens=(Array.isArray(o.itens)?o.itens:[]).map(itemOrc);
+      o.hist=(Array.isArray(o.hist)?o.hist:[]).map(histOrc);
+      return o;
+    });
+  }
+  if(out.atendimentos && typeof out.atendimentos==='object' && !Array.isArray(out.atendimentos)){
+    var ats={};
+    Object.keys(out.atendimentos).forEach(function(k){
+      var a=Object.assign({},out.atendimentos[k]||{});
+      a.pecas=(Array.isArray(a.pecas)?a.pecas:[]).map(pecaAtend);
+      ats[k]=a;
+    });
+    out.atendimentos=ats;
+  }
+  return out;
+};
+
 function snapshotCliente(){
   const nome=clienteAtualNome;
   function own(arr){return Array.isArray(arr)?arr.filter(function(x){return !x.cliente || x.cliente===nome;}):[];}
   const nums=own(state.chamados).map(function(x){return x.num;});
   const msgs={}; nums.forEach(function(n){ if(state.mensagens&&state.mensagens[n]) msgs[n]=state.mensagens[n]; });
   const ats={}; nums.forEach(function(n){ if(state.atendimentos&&state.atendimentos[n]) ats[n]=state.atendimentos[n]; });
-  return {
+  const snap={
     chamados:own(state.chamados), mensagens:msgs, atendimentos:ats,
     orcamentos:own(state.orcamentos), equip:own(state.equip), pedidos:own(state.pedidos),
     historicoCliente:Array.isArray(state.historicoCliente)?state.historicoCliente:[],
     notificacoesCliente:Array.isArray(state.notificacoesCliente)?state.notificacoesCliente:[],
     contatosCliente:Array.isArray(state.contatosCliente)?state.contatosCliente:[],
     enderecosCliente:Array.isArray(state.enderecosCliente)?state.enderecosCliente:[],
-    agendamentos:Array.isArray(state.agendamentos)?state.agendamentos:[],
-    atualizadoEm:firebase.firestore.FieldValue.serverTimestamp()
+    agendamentos:Array.isArray(state.agendamentos)?state.agendamentos:[]
   };
+  const safe=window.TJFirestoreSafe?window.TJFirestoreSafe(snap):snap;
+  safe.atualizadoEm=firebase.firestore.FieldValue.serverTimestamp();
+  return safe;
 }
 let saveTimer=null;
 function salvarDadosCliente(){
@@ -6734,7 +6847,7 @@ async function recarregarV13(){
   if(window.TJFB&&window.TJFB.carregarDadosEmpresaFirebase) await window.TJFB.carregarDadosEmpresaFirebase();
 }
 async function lerDados(uid){var snap=await window.TJFB.db.collection('clientData').doc(uid).get();return snap.exists?(snap.data()||{}):{};}
-async function gravarDados(uid, patch){patch=patch||{};patch.atualizadoEm=firebase.firestore.FieldValue.serverTimestamp();await window.TJFB.db.collection('clientData').doc(uid).set(patch,{merge:true});}
+async function gravarDados(uid, patch){patch=patch||{};if(window.TJFirestoreSafe)patch=window.TJFirestoreSafe(patch);patch.atualizadoEm=firebase.firestore.FieldValue.serverTimestamp();await window.TJFB.db.collection('clientData').doc(uid).set(patch,{merge:true});}
 async function removerRegistro(uid,campo,predicado){var d=await lerDados(uid),arr=Array.isArray(d[campo])?d[campo]:[];arr=arr.filter(function(x){return !predicado(x);});var p={};p[campo]=arr;await gravarDados(uid,p);}
 
 function preencherSelectClientes(id, selecionado){
@@ -6822,7 +6935,38 @@ async function salvarEquipAdmin(){
 async function excluirEquipAdmin(id){var e=(state.equip||[]).find(function(x){return x.id===id;});if(!e)return;var uid=uidRegistro(e);if(!uid)return avisoV13('Cliente do equipamento não identificado.');if(!confirm('Excluir permanentemente este equipamento?'))return;await removerRegistro(uid,'equip',function(x){return x.id===id;});await recarregarV13();abrirTela('tela-emp-equipamentos');avisoV13('Equipamento excluído.');}
 
 function abrirFormOrc(obj,uidPreferido){var uid=uidPreferido||uidRegistro(obj)||((clientesV13()[0]||{}).uid||'');preencherSelectClientes('novo-orc-cli',uid);$v('novo-orc-id').value=obj?obj.num:'';$v('novo-orc-uid-original').value=obj?uid:'';$v('admin-orc-titulo').textContent=obj?'Editar Orçamento #'+obj.num:'Emitir Novo Orçamento';$v('novo-orc-servico').value=(obj&&obj.servico)||'';$v('novo-orc-valor').value=(obj&&obj.total)||'';$v('novo-orc-status').value=(obj&&obj.status)||'Aguardando aprovação';abrirTela('tela-form-novo-orcamento');}
-async function salvarOrcAdmin(){var id=$v('novo-orc-id').value,uid=$v('novo-orc-cli').value,oldUid=$v('novo-orc-uid-original').value,cli=clientePorUid(uid),serv=$v('novo-orc-servico').value.trim(),val=$v('novo-orc-valor').value.trim();if(!uid||!cli||!serv||!val)return avisoV13('Preencha cliente, serviço e valor.');var novo=!id;if(novo)id=gerarNumero('',state.orcamentos,'num');if(oldUid&&oldUid!==uid)await removerRegistro(oldUid,'orcamentos',function(x){return String(x.num)===String(id);});var d=await lerDados(uid),arr=Array.isArray(d.orcamentos)?d.orcamentos:[],old=arr.find(function(x){return String(x.num)===String(id);});var rec=Object.assign({},old||{},{num:id,servico:serv,cliente:cli.nome,clienteUid:uid,status:$v('novo-orc-status').value,total:val,itens:(old&&old.itens)||[[serv,'1',val]],hist:(old&&old.hist)||[]});rec.hist=Array.isArray(rec.hist)?rec.hist:[];rec.hist.push([hoje(),novo?'Orçamento emitido pela TJ':'Orçamento atualizado pela TJ']);var idx=arr.findIndex(function(x){return String(x.num)===String(id);});if(idx>=0)arr[idx]=rec;else arr.unshift(rec);var hist=Array.isArray(d.historicoCliente)?d.historicoCliente:[];hist.unshift({data:hoje(),tipo:'orcamento',titulo:'Orçamento #'+id+(novo?' emitido':' atualizado'),desc:serv+' — '+val,status:rec.status});var nots=Array.isArray(d.notificacoesCliente)?d.notificacoesCliente:[];if(novo)nots.unshift({data:hoje(),titulo:'Novo orçamento disponível',desc:'Orçamento #'+id+' aguarda sua análise.',lida:false});await gravarDados(uid,{orcamentos:arr,historicoCliente:hist,notificacoesCliente:nots});await recarregarV13();orcamentoAtualNum=id;avisoV13(novo?'Orçamento criado.':'Orçamento atualizado.');abrirTela('tela-emp-orcamentos');}
+function lerItensOrcamentoTela(){
+  var itens=[];
+  var linhas=document.querySelectorAll('#tela-form-novo-orcamento .tj-corpo-itens .tj-linha-item');
+  for(var i=0;i<linhas.length;i++){
+    var ins=linhas[i].querySelectorAll('input');
+    if(ins.length<3)continue;
+    var desc=(ins[0].value||'').trim(), qtd=(ins[1].value||'1').trim(), valor=(ins[2].value||'').trim();
+    if(!desc && !valor)continue;
+    itens.push({descricao:desc||'Item do orçamento',qtd:qtd||'1',valor:valor||'0,00'});
+  }
+  return itens;
+}
+function normalizarItensOrcamento(lista){return (Array.isArray(lista)?lista:[]).map(function(it){return Array.isArray(it)?{descricao:String(it[0]||''),qtd:String(it[1]||''),valor:String(it[2]||'')}:Object.assign({},it||{});});}
+function normalizarHistOrcamento(lista){return (Array.isArray(lista)?lista:[]).map(function(h){return Array.isArray(h)?{data:String(h[0]||''),evento:String(h[1]||'')}:Object.assign({},h||{});});}
+async function salvarOrcAdmin(){
+  var id=$v('novo-orc-id').value,uid=$v('novo-orc-cli').value,oldUid=$v('novo-orc-uid-original').value,cli=clientePorUid(uid),serv=$v('novo-orc-servico').value.trim(),val=$v('novo-orc-valor').value.trim();
+  if(!uid||!cli||!serv||!val)return avisoV13('Preencha cliente, serviço e valor.');
+  var novo=!id;if(novo)id=gerarNumero('',state.orcamentos,'num');
+  if(oldUid&&oldUid!==uid)await removerRegistro(oldUid,'orcamentos',function(x){return String(x.num)===String(id);});
+  var d=await lerDados(uid),arr=Array.isArray(d.orcamentos)?d.orcamentos:[],old=arr.find(function(x){return String(x.num)===String(id);});
+  var itensTela=lerItensOrcamentoTela();
+  var itens=itensTela.length?itensTela:normalizarItensOrcamento(old&&old.itens);
+  if(!itens.length)itens=[{descricao:serv,qtd:'1',valor:val}];
+  var histOrc=normalizarHistOrcamento(old&&old.hist);
+  histOrc.push({data:hoje(),evento:novo?'Orçamento emitido pela TJ':'Orçamento atualizado pela TJ'});
+  var rec=Object.assign({},old||{},{num:id,servico:serv,cliente:cli.nome,clienteUid:uid,status:$v('novo-orc-status').value,total:val,itens:itens,hist:histOrc});
+  var idx=arr.findIndex(function(x){return String(x.num)===String(id);});if(idx>=0)arr[idx]=rec;else arr.unshift(rec);
+  var hist=Array.isArray(d.historicoCliente)?d.historicoCliente:[];hist.unshift({data:hoje(),tipo:'orcamento',titulo:'Orçamento #'+id+(novo?' emitido':' atualizado'),desc:serv+' — '+val,status:rec.status});
+  var nots=Array.isArray(d.notificacoesCliente)?d.notificacoesCliente:[];if(novo)nots.unshift({data:hoje(),titulo:'Novo orçamento disponível',desc:'Orçamento #'+id+' aguarda sua análise.',lida:false});
+  await gravarDados(uid,{orcamentos:arr,historicoCliente:hist,notificacoesCliente:nots});
+  await recarregarV13();orcamentoAtualNum=id;avisoV13(novo?'Orçamento criado e enviado ao cliente.':'Orçamento atualizado.');abrirTela('tela-emp-orcamentos');
+}
 async function excluirOrcAdmin(id){var o=(state.orcamentos||[]).find(function(x){return String(x.num)===String(id);});if(!o)return;var uid=uidRegistro(o);if(!uid)return avisoV13('Cliente do orçamento não identificado.');if(!confirm('Excluir o orçamento #'+id+'?'))return;await removerRegistro(uid,'orcamentos',function(x){return String(x.num)===String(id);});await recarregarV13();renderizarOrcamentosEmpresa();avisoV13('Orçamento excluído.');}
 renderizarOrcamentosEmpresa=function(){var box=$v('lista-emp-orcamentos');if(!box)return;box.innerHTML='';if(!(state.orcamentos||[]).length){box.innerHTML='<p class="admin-empty">Nenhum orçamento cadastrado.</p>';return;}(state.orcamentos||[]).forEach(function(o){var item=document.createElement('div');item.className='list-item admin-record';var top=document.createElement('div');top.className='list-header';var t=document.createElement('span');t.className='list-title';t.textContent='Orçamento #'+o.num+' — '+o.servico;top.appendChild(t);top.appendChild(criarBadge(o.status));var m=document.createElement('div');m.className='list-meta';m.textContent='Cliente: '+o.cliente+' • Total: '+o.total;item.appendChild(top);item.appendChild(m);var a=document.createElement('div');a.className='admin-card-actions';[['Ver','btn-tj-secondary','abrir-orc'],['✏️ Editar','btn-tj','admin-editar-orc'],['🗑️ Excluir','btn-tj-danger','admin-excluir-orc']].forEach(function(b){var bt=document.createElement('button');bt.type='button';bt.className=b[1];bt.textContent=b[0];bt.dataset.action=b[2];bt.dataset.id=o.num;a.appendChild(bt);});item.appendChild(a);box.appendChild(item);});};
 
