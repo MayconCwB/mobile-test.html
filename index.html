@@ -643,6 +643,231 @@ function TJVoltarLoginDireto(ev){
   }
 </style>
 
+
+<style id="tj-v25-design-system">
+/* ==========================================================
+   V25 — DESIGN SYSTEM REAL + IMPRESSÃO
+   ========================================================== */
+:root{
+  --tj-radius-xs:8px;
+  --tj-radius-sm:12px;
+  --tj-radius-md:16px;
+  --tj-radius-lg:20px;
+  --tj-shadow-sm:0 2px 10px rgba(15,42,66,.06);
+  --tj-shadow-md:0 10px 30px rgba(15,42,66,.09);
+  --tj-focus:0 0 0 3px rgba(46,155,214,.16);
+  --tj-surface-soft:#F8FAFC;
+  --tj-surface-blue:#F1F8FC;
+}
+html[data-theme="dark"]{
+  --tj-shadow-sm:0 2px 12px rgba(0,0,0,.18);
+  --tj-shadow-md:0 12px 34px rgba(0,0,0,.25);
+  --tj-surface-soft:#0A1B29;
+  --tj-surface-blue:#0C2333;
+}
+
+/* Estrutura geral do aplicativo */
+.content-area{
+  width:100%;
+  max-width:1220px;
+  margin:0 auto;
+  padding:22px 22px 38px;
+}
+.content-area>section:not(.hidden){width:100%;min-width:0;animation:tjV25In .16s ease-out}
+@keyframes tjV25In{from{opacity:.45;transform:translateY(3px)}to{opacity:1;transform:none}}
+
+/* Cards */
+.card-box{
+  position:relative;
+  background:var(--surface)!important;
+  border:1px solid var(--border)!important;
+  border-radius:var(--tj-radius-md)!important;
+  box-shadow:var(--tj-shadow-sm)!important;
+  padding:20px!important;
+  margin-bottom:16px!important;
+  overflow:hidden;
+}
+.card-box:before{
+  content:"";
+  position:absolute;
+  top:0;left:0;right:0;
+  height:3px;
+  background:linear-gradient(90deg,var(--accent-dark),var(--accent),#67D5F5);
+  opacity:.9;
+}
+.card-title{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:12px!important;
+  flex-wrap:wrap;
+  margin:0 0 8px!important;
+  padding:2px 0 12px!important;
+  border-bottom:1px solid var(--border);
+  color:var(--text)!important;
+  font-size:1.02rem!important;
+  line-height:1.3!important;
+  font-weight:800!important;
+  letter-spacing:.01em;
+}
+.card-subtitle{margin:0 0 18px!important;color:var(--text-muted)!important;line-height:1.55!important;font-size:.88rem!important}
+
+/* Voltar e toolbars de detalhe */
+.btn-voltar{
+  display:inline-flex!important;align-items:center;justify-content:center;
+  min-height:40px!important;padding:0 14px!important;margin:0 0 12px!important;
+  border:1px solid var(--border)!important;border-radius:999px!important;
+  background:var(--surface)!important;color:var(--accent-dark)!important;
+  font-weight:750!important;box-shadow:var(--tj-shadow-sm);text-decoration:none!important;
+}
+html[data-theme="dark"] .btn-voltar{color:#D7EDF9!important}
+.tj-detail-toolbar{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin:2px 0 16px}
+.tj-print-trigger{display:inline-flex!important;align-items:center;justify-content:center;gap:7px;white-space:nowrap}
+
+/* Formulários */
+.form-row{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important;align-items:start!important}
+.form-group{min-width:0!important;margin-bottom:15px!important}
+.form-label{
+  display:block!important;margin:0 0 7px!important;color:var(--text-muted)!important;
+  font-size:.72rem!important;line-height:1.25!important;font-weight:800!important;
+  letter-spacing:.045em!important;text-transform:uppercase!important;
+}
+.form-input,.form-select,.form-textarea,
+input.form-input[type="date"],input.form-input[type="time"]{
+  display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;
+  box-sizing:border-box!important;border:1px solid var(--border)!important;
+  border-radius:var(--tj-radius-sm)!important;background:var(--surface)!important;color:var(--text)!important;
+  padding:12px 13px!important;font-size:.92rem!important;line-height:1.35!important;
+  transition:border-color .15s ease,box-shadow .15s ease,background .15s ease!important;
+}
+.form-input,.form-select,input.form-input[type="date"],input.form-input[type="time"]{min-height:48px!important}
+.form-textarea{min-height:104px!important;resize:vertical!important}
+.form-input:focus,.form-select:focus,.form-textarea:focus,
+input.form-input[type="date"]:focus,input.form-input[type="time"]:focus{
+  outline:none!important;border-color:var(--accent)!important;box-shadow:var(--tj-focus)!important;
+}
+.form-input::placeholder,.form-textarea::placeholder{color:#94A3B8!important}
+
+/* Botões */
+.btn-tj,.btn-tj-secondary,.btn-tj-danger{
+  min-height:46px!important;padding:10px 15px!important;border-radius:11px!important;
+  font-size:.78rem!important;line-height:1.2!important;font-weight:850!important;letter-spacing:.02em!important;
+  text-align:center!important;white-space:normal;transition:transform .12s ease,box-shadow .12s ease,filter .12s ease!important;
+}
+.btn-tj{border:1px solid var(--accent-dark)!important;background:linear-gradient(135deg,var(--accent-dark),#125F91)!important;color:#fff!important;box-shadow:0 5px 14px rgba(11,42,74,.14)!important}
+.btn-tj-secondary{border:1px solid var(--border)!important;background:var(--surface)!important;color:var(--accent-dark)!important;box-shadow:none!important}
+.btn-tj-danger{border:1px solid #F5B6B6!important;background:#FFF5F5!important;color:#B42318!important}
+html[data-theme="dark"] .btn-tj-secondary{color:#D8EFFB!important;background:#0E2434!important;border-color:#315269!important}
+html[data-theme="dark"] .btn-tj-danger{background:#31181B!important;border-color:#6B3036!important;color:#FFB4B4!important}
+@media(hover:hover){.btn-tj:hover,.btn-tj-secondary:hover,.btn-tj-danger:hover{transform:translateY(-1px);filter:brightness(.99);box-shadow:var(--tj-shadow-sm)!important}}
+
+/* Listas e registros */
+.list-container{display:grid!important;gap:11px!important}
+.list-item{
+  position:relative!important;margin:0!important;padding:15px 16px!important;
+  border:1px solid var(--border)!important;border-radius:var(--tj-radius-sm)!important;
+  background:var(--surface)!important;box-shadow:none!important;overflow:hidden!important;
+}
+.list-item:before{content:"";position:absolute;left:0;top:11px;bottom:11px;width:3px;border-radius:0 3px 3px 0;background:var(--accent);opacity:.75}
+.list-header{display:flex!important;align-items:flex-start!important;justify-content:space-between!important;gap:10px!important;min-width:0!important;flex-wrap:wrap!important}
+.list-title{flex:1 1 240px!important;min-width:0!important;color:var(--text)!important;font-weight:800!important;line-height:1.35!important;overflow-wrap:anywhere}
+.list-meta,.admin-muted{color:var(--text-muted)!important;line-height:1.5!important;font-size:.82rem!important;margin-top:6px!important;overflow-wrap:anywhere!important}
+.admin-card-actions{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(128px,1fr))!important;gap:8px!important;margin-top:13px!important}
+.admin-card-actions>*{width:100%!important;min-width:0!important}
+.admin-empty{margin:0!important;padding:20px!important;text-align:center!important;color:var(--text-muted)!important;background:var(--tj-surface-soft)!important;border:1px dashed var(--border)!important;border-radius:var(--tj-radius-sm)!important}
+
+/* Badges */
+.badge{display:inline-flex!important;align-items:center!important;justify-content:center!important;max-width:100%!important;min-height:28px!important;padding:5px 10px!important;border-radius:999px!important;font-size:.69rem!important;line-height:1.1!important;font-weight:850!important;white-space:nowrap!important;flex:0 0 auto!important}
+
+/* KPIs e dashboard */
+.kpi-grid{gap:12px!important}
+.kpi-card{border:1px solid var(--border)!important;border-radius:var(--tj-radius-md)!important;background:var(--surface)!important;box-shadow:var(--tj-shadow-sm)!important;padding:16px!important;min-width:0!important}
+.kpi-atalho{cursor:pointer!important;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease!important}
+@media(hover:hover){.kpi-atalho:hover{transform:translateY(-2px);box-shadow:var(--tj-shadow-md)!important;border-color:rgba(46,155,214,.55)!important}}
+.kpi-tag{font-weight:800!important}.kpi-num{line-height:1.1!important}.kpi-destino{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:6px!important;margin-top:8px!important}
+
+/* Tabelas */
+.tj-table-shell{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--border);border-radius:var(--tj-radius-sm);background:var(--surface);margin-top:7px}
+.tj-table-shell>.table-custom{margin:0!important;border:0!important;border-radius:0!important;min-width:560px!important;width:100%!important;background:transparent!important}
+.table-custom{width:100%!important;border-collapse:collapse!important;color:var(--text)!important}
+.table-custom th{background:var(--tj-surface-soft)!important;color:var(--text-muted)!important;font-size:.69rem!important;text-transform:uppercase!important;letter-spacing:.045em!important;font-weight:850!important;border-color:var(--border)!important}
+.table-custom th,.table-custom td{padding:11px 12px!important;border-color:var(--border)!important;vertical-align:middle!important;overflow-wrap:anywhere!important}
+.table-custom td{background:var(--surface)!important;color:var(--text)!important;font-size:.84rem!important}
+
+/* Timeline */
+.timeline{min-width:0!important}.timeline-item{min-width:0!important}.timeline-content{min-width:0!important}.timeline-title{color:var(--text)!important;overflow-wrap:anywhere!important}.timeline-sub{color:var(--text-muted)!important;overflow-wrap:anywhere!important}
+
+/* Atendimento — agora com hierarquia visual de verdade */
+#tela-emp-atendimento .card-box:first-of-type>.form-row>div,
+#tela-cli-detalhe-chamado .card-box:first-of-type>.form-row>div{
+  background:var(--tj-surface-soft)!important;border:1px solid var(--border)!important;border-radius:var(--tj-radius-sm)!important;padding:13px 14px!important;min-width:0!important;
+}
+#tela-emp-atendimento .card-box:first-of-type>.form-group{
+  background:var(--tj-surface-soft)!important;border:1px solid var(--border)!important;border-radius:var(--tj-radius-sm)!important;padding:13px 14px!important;margin-bottom:12px!important;
+}
+#atend-emp-endereco,#atend-emp-equip-info,#atend-emp-diag-texto{color:var(--text)!important;line-height:1.5!important;margin:0!important}
+#atend-emp-botoes-acoes{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(175px,1fr))!important;gap:9px!important;margin-top:14px!important}
+#atend-emp-botoes-acoes>button{width:100%!important;min-width:0!important}
+#tela-emp-atendimento .chat-container,#tela-cli-detalhe-chamado .chat-container{
+  background:var(--tj-surface-soft)!important;border:1px solid var(--border)!important;border-radius:var(--tj-radius-sm)!important;padding:13px!important;
+}
+.chat-bubble{border-radius:14px!important;box-shadow:0 1px 1px rgba(15,42,66,.04)!important;overflow-wrap:anywhere!important}
+.tj-chat-compose{display:grid!important;grid-template-columns:minmax(0,1fr) 150px!important;gap:10px!important;align-items:end!important;margin-top:12px!important;width:100%!important}
+.tj-chat-compose .form-textarea{margin:0!important;min-height:92px!important}
+.tj-chat-compose .btn-tj{width:100%!important;min-width:0!important;height:48px!important;white-space:nowrap!important}
+
+/* Detalhe de orçamento */
+#tela-detalhe-orcamento #det-orc-servico{color:var(--text)!important;font-size:1rem!important;line-height:1.45!important}
+#tela-detalhe-orcamento #det-orc-cliente{display:block!important;padding:11px 13px!important;background:var(--tj-surface-soft)!important;border:1px solid var(--border)!important;border-radius:var(--tj-radius-sm)!important;text-transform:none!important;letter-spacing:0!important;font-size:.84rem!important}
+#det-orc-acoes-aprovacao{display:flex!important;flex-wrap:wrap!important;gap:8px!important;justify-content:flex-end!important}
+
+/* Modais */
+.modal-card,.auth-card{border-radius:var(--tj-radius-lg)!important;border:1px solid var(--border)!important;box-shadow:var(--tj-shadow-md)!important}
+
+/* Dark mode: elimina cores claras inline mais visíveis */
+html[data-theme="dark"] .card-box,html[data-theme="dark"] .list-item,html[data-theme="dark"] .kpi-card{background:#0D2030!important;border-color:#27465B!important}
+html[data-theme="dark"] .table-custom td{background:#0D2030!important;color:#E6F1F8!important}
+html[data-theme="dark"] .table-custom th{background:#091B29!important;color:#A8C1D0!important}
+html[data-theme="dark"] #det-orc-total{color:#7DD3FC!important}
+
+/* Mobile */
+@media(max-width:699px){
+  .content-area{padding:12px 10px 24px!important}
+  .card-box{padding:15px 13px!important;border-radius:14px!important;margin-bottom:12px!important}
+  .card-title{font-size:.98rem!important;padding-bottom:11px!important;align-items:flex-start!important}
+  .card-subtitle{margin-bottom:14px!important}
+  .form-row{grid-template-columns:minmax(0,1fr)!important;gap:0!important}
+  .form-input,.form-select,.form-textarea,input.form-input[type="date"],input.form-input[type="time"]{font-size:16px!important}
+  .admin-card-actions{grid-template-columns:1fr!important}
+  .tj-detail-toolbar{justify-content:stretch!important}.tj-detail-toolbar>*{width:100%!important}
+  #atend-emp-botoes-acoes{grid-template-columns:1fr!important}
+  .tj-chat-compose{grid-template-columns:1fr!important}.tj-chat-compose .btn-tj{height:auto!important;min-height:48px!important}
+  #det-orc-acoes-aprovacao{display:grid!important;grid-template-columns:1fr!important}#det-orc-acoes-aprovacao>*{width:100%!important}
+  .tj-table-shell>.table-custom{min-width:520px!important}
+  .badge{font-size:.66rem!important}
+}
+
+/* Impressão profissional */
+#tj-print-root{display:none}
+@media print{
+  @page{size:A4;margin:12mm}
+  body>*:not(#tj-print-root){display:none!important}
+  #tj-print-root{display:block!important;position:static!important;width:100%!important;background:#fff!important;color:#17202A!important;font-family:Arial,Helvetica,sans-serif!important}
+  #tj-print-root *{box-sizing:border-box!important;color:inherit}
+  .tj-print-header{display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:2px solid #0B2A4A;padding-bottom:12px;margin-bottom:18px}
+  .tj-print-header img{width:150px;height:auto;object-fit:contain}
+  .tj-print-company{text-align:right;font-size:10px;line-height:1.45;color:#475569!important}
+  .tj-print-title{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}
+  .tj-print-title h1{font-size:20px;margin:0;color:#0B2A4A!important}.tj-print-title span{font-size:11px;border:1px solid #CBD5E1;border-radius:999px;padding:5px 9px}
+  .tj-print-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}.tj-print-field{border:1px solid #DCE4EA;border-radius:7px;padding:8px 9px;min-height:48px}.tj-print-field b{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.04em;color:#64748B!important;margin-bottom:3px}.tj-print-field span{font-size:11px;line-height:1.4}
+  .tj-print-section{margin-top:15px}.tj-print-section h2{font-size:12px;margin:0 0 7px;color:#0B2A4A!important;text-transform:uppercase;letter-spacing:.03em}
+  .tj-print-table{width:100%;border-collapse:collapse;font-size:10px}.tj-print-table th,.tj-print-table td{border:1px solid #DCE4EA;padding:7px;text-align:left}.tj-print-table th{background:#F1F5F9!important}.tj-print-table .num{text-align:right;white-space:nowrap}.tj-print-total{font-size:14px;font-weight:800;text-align:right;margin-top:9px;color:#0B2A4A!important}
+  .tj-print-note{border:1px solid #DCE4EA;border-radius:7px;padding:9px;font-size:10px;line-height:1.5;white-space:pre-wrap}
+  .tj-print-footer{margin-top:20px;padding-top:10px;border-top:1px solid #DCE4EA;font-size:9px;color:#64748B!important;display:flex;justify-content:space-between;gap:10px}
+  .tj-print-signatures{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:35px}.tj-print-signature{border-top:1px solid #64748B;padding-top:5px;text-align:center;font-size:9px;color:#64748B!important}
+}
+</style>
+
 </head>
 <body>
 
@@ -1404,6 +1629,9 @@ function TJVoltarLoginDireto(ev){
               <span id="det-cli-titulo">CHAMADO #00482</span>
               <span id="det-cli-badge"></span>
             </div>
+            <div class="tj-detail-toolbar">
+              <button type="button" class="btn-tj-secondary tj-print-trigger" data-tj-print="chamado">🖨️ IMPRIMIR / SALVAR PDF</button>
+            </div>
             
             <div class="form-row" style="margin-bottom: 14px;">
               <div>
@@ -1491,6 +1719,9 @@ function TJVoltarLoginDireto(ev){
             <div class="card-title">
               <span id="det-orc-titulo">Orçamento #00231</span>
               <span id="det-orc-badge"></span>
+            </div>
+            <div class="tj-detail-toolbar">
+              <button type="button" class="btn-tj-secondary tj-print-trigger" data-tj-print="orcamento">🖨️ IMPRIMIR / SALVAR PDF</button>
             </div>
             <p id="det-orc-servico" style="font-size: 0.95rem; font-weight: 600; margin-bottom: 14px;">Serviço</p>
             <p id="det-orc-cliente" class="form-label" style="margin-bottom: 14px;">Cliente: Empresa XYZ</p>
@@ -1794,6 +2025,9 @@ function TJVoltarLoginDireto(ev){
             <div class="card-title">
               <span id="atend-emp-titulo">ATENDIMENTO #00482</span>
               <span id="atend-emp-badge"></span>
+            </div>
+            <div class="tj-detail-toolbar">
+              <button type="button" class="btn-tj-secondary tj-print-trigger" data-tj-print="chamado">🖨️ IMPRIMIR / SALVAR PDF</button>
             </div>
 
             <div class="form-row" style="margin-bottom: 12px;">
@@ -6317,6 +6551,70 @@ function TJVoltarLoginDireto(ev){
 
 <!-- ===== TJ V15: ORÇAMENTOS/FIRESTORE SEM ARRAYS ANINHADOS =====
      Itens, histórico do orçamento e peças são persistidos como objetos. ===== -->
+
+<script id="tj-v25-runtime">
+(function(){
+  'use strict';
+  function escV25(v){return String(v==null?'':v).replace(/[&<>\"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c];});}
+  function valor(v,fallback){var s=String(v==null?'':v).trim();return s||fallback||'Não informado';}
+  function hojeV25(){try{return new Date().toLocaleDateString('pt-BR');}catch(e){return '';}}
+  function acharChamado(){if(typeof state==='undefined'||!Array.isArray(state.chamados))return null;return state.chamados.find(function(x){return String(x.num)===String(chamadoAtualNum);})||null;}
+  function acharOrc(){if(typeof state==='undefined'||!Array.isArray(state.orcamentos))return null;return state.orcamentos.find(function(x){return String(x.num)===String(orcamentoAtualNum);})||null;}
+  function normalItem(it){if(Array.isArray(it))return {d:it[0]||'',q:it[1]||'',v:it[2]||''};return {d:it&&(it.descricao||it.item||it.nome)||'',q:it&&(it.qtd||it.quantidade)||'',v:it&&(it.valor||it.preco)||''};}
+  function printHeader(){return '<div class="tj-print-header"><img src="assets/tj-logo.png" alt="TJ Refrigeração"><div class="tj-print-company"><b>TJ REFRIGERAÇÃO TECHNICAL ASSISTANCE LTDA</b><br>CNPJ 49.102.762/0001-98<br>(41) 99749-7054<br>refrigeracaotjcwba@gmail.com</div></div>';}
+  function field(label,text){return '<div class="tj-print-field"><b>'+escV25(label)+'</b><span>'+escV25(valor(text,'—'))+'</span></div>';}
+  function criarRoot(conteudo){var antigo=document.getElementById('tj-print-root');if(antigo)antigo.remove();var root=document.createElement('div');root.id='tj-print-root';root.innerHTML=conteudo;document.body.appendChild(root);return root;}
+  function limparPrint(){var r=document.getElementById('tj-print-root');if(r)r.remove();}
+  function imprimirChamado(){
+    var ch=acharChamado();if(!ch){if(typeof toast==='function')toast('Chamado não encontrado para impressão.');return;}
+    var at=(state.atendimentos&&state.atendimentos[ch.num])||{};
+    var pecas=Array.isArray(at.pecas)?at.pecas:[];
+    var linhas='';
+    pecas.forEach(function(p){var n=normalItem(p);linhas+='<tr><td>'+escV25(valor(n.d,'Peça / insumo'))+'</td><td>'+escV25(valor(n.q,'1'))+'</td><td class="num">'+escV25(valor(n.v,'—'))+'</td></tr>';});
+    if(!linhas)linhas='<tr><td colspan="3">Nenhuma peça / insumo registrado.</td></tr>';
+    var html=printHeader()
+      +'<div class="tj-print-title"><h1>Chamado Técnico #'+escV25(ch.num)+'</h1><span>'+escV25(valor(ch.status,'Sem status'))+'</span></div>'
+      +'<div class="tj-print-grid">'+field('Cliente',ch.cliente)+field('Equipamento',ch.equip)+field('Prioridade',ch.prioridade||'Normal')+field('Previsão / agendamento',ch.agend||at.previsao)+field('Endereço / local',at.endereco)+field('Data de emissão',hojeV25())+'</div>'
+      +'<div class="tj-print-section"><h2>Descrição do problema</h2><div class="tj-print-note">'+escV25(valor(ch.problema||ch.desc,'Não informada'))+'</div></div>'
+      +(ch.observacoes?'<div class="tj-print-section"><h2>Observações</h2><div class="tj-print-note">'+escV25(ch.observacoes)+'</div></div>':'')
+      +'<div class="tj-print-section"><h2>Diagnóstico técnico</h2><div class="tj-print-note">'+escV25(valor(at.diag,'Nenhum diagnóstico registrado.'))+'</div></div>'
+      +'<div class="tj-print-section"><h2>Peças e insumos</h2><table class="tj-print-table"><thead><tr><th>Descrição</th><th>Qtd</th><th>Valor</th></tr></thead><tbody>'+linhas+'</tbody></table></div>'
+      +'<div class="tj-print-signatures"><div class="tj-print-signature">Responsável TJ Refrigeração</div><div class="tj-print-signature">Cliente / responsável</div></div>'
+      +'<div class="tj-print-footer"><span>Documento gerado pelo portal TJ Refrigeração.</span><span>Emissão: '+escV25(hojeV25())+'</span></div>';
+    criarRoot(html);setTimeout(function(){window.print();},120);
+  }
+  function imprimirOrcamento(){
+    var o=acharOrc();if(!o){if(typeof toast==='function')toast('Orçamento não encontrado para impressão.');return;}
+    var linhas='';(Array.isArray(o.itens)?o.itens:[]).forEach(function(it){var n=normalItem(it);linhas+='<tr><td>'+escV25(valor(n.d,'Item'))+'</td><td>'+escV25(valor(n.q,'1'))+'</td><td class="num">'+escV25(valor(n.v,'—'))+'</td></tr>';});
+    if(!linhas)linhas='<tr><td colspan="3">Nenhum item registrado.</td></tr>';
+    var html=printHeader()
+      +'<div class="tj-print-title"><h1>Orçamento #'+escV25(o.num)+'</h1><span>'+escV25(valor(o.status,'Sem status'))+'</span></div>'
+      +'<div class="tj-print-grid">'+field('Cliente',o.cliente)+field('Serviço',o.servico)+field('Status',o.status)+field('Data de emissão',hojeV25())+'</div>'
+      +'<div class="tj-print-section"><h2>Itens e serviços cotados</h2><table class="tj-print-table"><thead><tr><th>Descrição</th><th>Qtd</th><th>Valor</th></tr></thead><tbody>'+linhas+'</tbody></table><div class="tj-print-total">Total: '+escV25(valor(o.total,'R$ 0,00'))+'</div></div>'
+      +'<div class="tj-print-signatures"><div class="tj-print-signature">TJ Refrigeração</div><div class="tj-print-signature">Cliente / responsável</div></div>'
+      +'<div class="tj-print-footer"><span>Documento gerado pelo portal TJ Refrigeração.</span><span>Emissão: '+escV25(hojeV25())+'</span></div>';
+    criarRoot(html);setTimeout(function(){window.print();},120);
+  }
+  function envolverTabelas(){
+    document.querySelectorAll('.content-area .table-custom').forEach(function(t){
+      if(t.parentElement&&t.parentElement.classList.contains('tj-table-shell'))return;
+      var w=document.createElement('div');w.className='tj-table-shell';t.parentNode.insertBefore(w,t);w.appendChild(t);
+    });
+  }
+  function marcarVersao(){
+    var drawer=document.querySelector('.drawer-panel,.side-drawer,.sidebar');
+    if(!drawer||drawer.querySelector('.tj-v25-version'))return;
+    var v=document.createElement('div');v.className='tj-v25-version';v.textContent='TJ Refrigeração • v25';v.style.cssText='font-size:10px;opacity:.5;padding:10px 14px;text-align:center;';drawer.appendChild(v);
+  }
+  document.addEventListener('click',function(ev){var b=ev.target.closest('[data-tj-print]');if(!b)return;ev.preventDefault();if(b.getAttribute('data-tj-print')==='orcamento')imprimirOrcamento();else imprimirChamado();});
+  window.addEventListener('afterprint',limparPrint);
+  document.addEventListener('DOMContentLoaded',function(){envolverTabelas();marcarVersao();});
+  var mo=new MutationObserver(function(){envolverTabelas();});
+  document.addEventListener('DOMContentLoaded',function(){if(document.body)mo.observe(document.body,{childList:true,subtree:true});});
+  window.TJPrintV25={chamado:imprimirChamado,orcamento:imprimirOrcamento};
+})();
+</script>
+
 </body>
 
 <!-- ===== AJUSTES TJ: ETAPA 8 (trilha de status) + ETAPA 9 (decisões e itens do orçamento) ===== -->
