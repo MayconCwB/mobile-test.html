@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tj-refrigeracao-pwa-v20-whatsapp-contato';
+const CACHE_NAME = 'tj-refrigeracao-pwa-v22-ux-tema-atalhos';
 const APP_SHELL = [
   './index.html',
   './manifest.webmanifest',
