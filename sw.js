@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tj-refrigeracao-pwa-v25-design-impressao';
+const CACHE_NAME = 'tj-refrigeracao-pwa-v26-ui-responsiva';
 const APP_SHELL = [
   './index.html',
   './manifest.webmanifest',
