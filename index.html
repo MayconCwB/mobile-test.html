@@ -16,7 +16,7 @@
   <meta name="apple-mobile-web-app-title" content="TJ Refrigeração">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <script>
-  /* TJ v23 — tema Claro / Escuro / Sistema com preferência local */
+  /* TJ v24 — tema Claro / Escuro / Sistema com preferência local */
   (function(){
     var CHAVE='tj-theme-mode';
     var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
@@ -1443,7 +1443,7 @@ function TJVoltarLoginDireto(ev){
               <!-- Balões de chat -->
             </div>
 
-            <div style="display: flex; gap: 8px;">
+            <div class="tj-chat-compose">
               <textarea id="det-cli-msg-input" class="form-textarea" rows="2" placeholder="Escrever mensagem para a TJ Refrigeração..."></textarea>
               <button type="button" class="btn-tj" style="align-self: flex-end;" data-action="enviar-msg">
                 ENVIAR
@@ -1864,18 +1864,20 @@ function TJVoltarLoginDireto(ev){
           <!-- TABELA DE PEÇAS UTILIZADAS -->
           <div class="card-box">
             <div class="card-title" style="font-size: 0.95rem;">Peças e Insumos Utilizados</div>
-            <table class="table-custom">
-              <thead>
-                <tr>
-                  <th>Item</th>
-                  <th>Qtd</th>
-                  <th>Valor</th>
-                </tr>
-              </thead>
-              <tbody id="atend-emp-pecas-body">
-                <!-- Dinâmico -->
-              </tbody>
-            </table>
+            <div class="tj-table-wrap">
+              <table class="table-custom tj-table-atendimento">
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>Qtd</th>
+                    <th>Valor</th>
+                  </tr>
+                </thead>
+                <tbody id="atend-emp-pecas-body">
+                  <!-- Dinâmico -->
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <!-- SEÇÃO CONVERSA COM O CLIENTE -->
@@ -1887,7 +1889,7 @@ function TJVoltarLoginDireto(ev){
               <!-- Balões de chat sincronizados -->
             </div>
 
-            <div style="display: flex; gap: 8px;">
+            <div class="tj-chat-compose">
               <textarea id="atend-emp-msg-input" class="form-textarea" rows="2" placeholder="Escrever resposta para o cliente..."></textarea>
               <button type="button" class="btn-tj" style="align-self: flex-end;" data-action="enviar-msg-emp">
                 ENVIAR
@@ -6408,6 +6410,130 @@ html[data-theme="dark"] .tj-proximo-titulo{color:#EAF7FC}
   #tela-emp-novo-agendamento .form-row>.form-group{width:100%;max-width:100%}
   #tela-emp-novo-agendamento input[type="date"],#tela-emp-novo-agendamento input[type="time"]{width:100%!important;max-width:100%!important;min-width:0!important}
   .tj-proximo-card>.btn-tj{width:100%}
+}
+
+
+/* ===== TJ v24 — PADRONIZAÇÃO VISUAL GLOBAL / MOBILE =====
+   Camada apenas de UX/UI: não altera Firebase nem regras de negócio. */
+:root{
+  --tj-control-h:48px;
+  --tj-control-radius:10px;
+  --tj-card-radius:14px;
+  --tj-gap:12px;
+}
+
+/* Base segura contra estouro horizontal em qualquer módulo */
+.content-area,.card-box,.list-item,.form-row,.form-group,.chat-container,.tj-table-wrap{min-width:0;max-width:100%}
+.form-row>*{min-width:0}
+input,select,textarea,button{box-sizing:border-box}
+.form-input,.form-select,.form-textarea{
+  display:block;
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  border-radius:var(--tj-control-radius);
+  border:1px solid var(--border);
+  background:var(--surface);
+  color:var(--text);
+  padding:11px 12px;
+  font-size:.92rem;
+  line-height:1.35;
+  transition:border-color .16s ease,box-shadow .16s ease,background-color .16s ease;
+}
+.form-input,.form-select{min-height:var(--tj-control-h)}
+.form-textarea{min-height:104px;resize:vertical}
+.form-label{font-size:.82rem;font-weight:700;line-height:1.3;margin:0}
+.form-group{gap:7px;margin-bottom:14px}
+.form-row{gap:14px}
+.form-input:focus,.form-select:focus,.form-textarea:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(46,155,214,.15);
+}
+
+/* Cards, listas e títulos seguem a mesma geometria */
+.card-box{border-radius:var(--tj-card-radius);padding:18px;margin-bottom:14px;overflow:visible}
+.card-title{gap:10px;line-height:1.25;margin-bottom:12px}
+.card-subtitle{line-height:1.5;margin-bottom:14px}
+.list-item{border-radius:12px;padding:14px}
+.kpi-card{border-radius:12px}
+
+/* Botões: mesma altura e sem palavras quebradas */
+.btn-tj,.btn-tj-dark,.btn-tj-outline,.btn-tj-secondary,.btn-tj-danger,.btn-voltar,.tj-btn-decisao{
+  min-height:44px;
+  border-radius:10px;
+  padding:10px 14px;
+  line-height:1.2;
+  white-space:normal;
+  text-align:center;
+}
+
+/* Tabelas integradas ao tema, sem cabeçalho branco solto */
+.tj-table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--border);border-radius:12px;background:var(--surface)}
+.tj-table-wrap .table-custom{display:table;width:100%;min-width:420px;margin:0;white-space:normal;background:transparent}
+.table-custom th,.table-custom td{padding:11px 12px;vertical-align:middle}
+.table-custom th{background:var(--bg);color:var(--text-muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.03em}
+.table-custom tbody tr:last-child td{border-bottom:0}
+.tj-table-atendimento th:nth-child(2),.tj-table-atendimento td:nth-child(2){width:64px;text-align:center}
+.tj-table-atendimento th:nth-child(3),.tj-table-atendimento td:nth-child(3){width:96px;text-align:right;white-space:nowrap}
+
+/* Atendimento: conversa mais equilibrada */
+#tela-emp-atendimento .chat-container{background:var(--bg);border-radius:12px;padding:12px;gap:10px}
+#tela-emp-atendimento .chat-bubble{max-width:min(86%,560px);border-radius:14px;padding:10px 13px;overflow-wrap:anywhere}
+.tj-chat-compose{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:end;width:100%}
+.tj-chat-compose .form-textarea{margin:0;min-height:88px}
+.tj-chat-compose .btn-tj{min-width:112px;height:48px;white-space:nowrap;align-self:end}
+
+/* Ações do atendimento não ficam com tamanhos aleatórios */
+#atend-emp-botoes-acoes{align-items:stretch!important}
+#atend-emp-botoes-acoes>button{min-width:150px;flex:0 1 auto}
+#box-emp-diagnostico>div:last-child,#box-emp-peca>div:last-child{flex-wrap:wrap}
+
+/* Dark mode também cobre componentes que antes ficavam claros */
+html[data-theme="dark"] .table-custom th{background:#091B29;color:#A8C1D0;border-color:#24445A}
+html[data-theme="dark"] .tj-table-wrap{background:#0D2030;border-color:#24445A}
+html[data-theme="dark"] #tela-emp-atendimento .chat-container{background:#091B29;border-color:#24445A}
+html[data-theme="dark"] .modal-card,html[data-theme="dark"] .auth-card{background:#0D2030;color:var(--text)}
+html[data-theme="dark"] .modal-msg{color:var(--text)}
+
+@media(max-width:599px){
+  .content-area{padding:12px 10px 18px}
+  .card-box{padding:14px 13px;border-radius:13px;margin-bottom:12px}
+  .card-title{font-size:1rem;align-items:flex-start}
+  .form-row{grid-template-columns:minmax(0,1fr)!important;gap:0}
+  .form-group{width:100%;max-width:100%;min-width:0;margin-bottom:13px}
+  .form-input,.form-select,.form-textarea,
+  input.form-input[type="date"],input.form-input[type="time"]{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    font-size:16px;
+    border-radius:10px;
+  }
+  .form-input,.form-select,input.form-input[type="date"],input.form-input[type="time"]{min-height:48px}
+  .form-textarea{min-height:104px}
+
+  /* Grupos de ações ficam fáceis de tocar e alinhados */
+  .admin-card-actions{grid-template-columns:1fr!important}
+  .admin-card-actions>*{width:100%}
+  #atend-emp-botoes-acoes{display:grid!important;grid-template-columns:1fr!important;width:100%;gap:9px!important}
+  #atend-emp-botoes-acoes>button{width:100%;min-width:0;min-height:48px}
+  #box-emp-diagnostico>div:last-child,#box-emp-peca>div:last-child{display:grid!important;grid-template-columns:1fr!important;width:100%;gap:9px!important}
+  #box-emp-diagnostico>div:last-child>button,#box-emp-peca>div:last-child>button{width:100%}
+
+  /* Chat: campo e botão empilhados; nunca quebra ENVIAR */
+  .tj-chat-compose{grid-template-columns:1fr;gap:9px}
+  .tj-chat-compose .form-textarea{min-height:96px}
+  .tj-chat-compose .btn-tj{width:100%;min-width:0;height:auto;min-height:48px;white-space:nowrap}
+  #det-cli-msg-input+button{width:100%;min-height:48px;white-space:nowrap}
+
+  /* Tabela de peças usa a largura inteira, com rolagem só se realmente precisar */
+  .tj-table-wrap .table-custom{min-width:100%;font-size:.86rem}
+  .tj-table-atendimento th,.tj-table-atendimento td{padding:10px 9px}
+  .tj-table-atendimento th:nth-child(1),.tj-table-atendimento td:nth-child(1){min-width:0;white-space:normal;overflow-wrap:anywhere}
+
+  /* Breadcrumb e badges não forçam largura da tela */
+  .breadcrumb-row{max-width:100%;min-width:0}
+  .badge{max-width:100%;white-space:nowrap}
 }
 </style>
 <script>
