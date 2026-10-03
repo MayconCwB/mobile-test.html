@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#0B2A4A">
-  <title>TJ Refrigeração — Plataforma do Cliente</title>
+  <meta name="description" content="TJ Refrigeração — assistência técnica em refrigeração, solicitações, orçamentos, agendamentos e acompanhamento pelo portal do cliente.">
+  <title>TJ Refrigeração — Assistência Técnica e Portal do Cliente</title>
   <!-- PWA TJ Refrigeração -->
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="64x64" href="./assets/favicon-64.png">
@@ -447,6 +448,35 @@ table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 
     }
   </style>
 <script>
+function TJMostrarLanding(){
+  var landing=document.getElementById('tj-landing');
+  var auth=document.getElementById('auth-container');
+  var painel=document.getElementById('painel-principal');
+  if(landing) landing.classList.remove('hidden');
+  if(auth) auth.classList.add('hidden');
+  if(painel) painel.classList.add('hidden');
+  if(landing) landing.scrollTop=0;
+}
+function TJMostrarLogin(){
+  var landing=document.getElementById('tj-landing');
+  var landing=document.getElementById('tj-landing');
+  var auth=document.getElementById('auth-container');
+  var painel=document.getElementById('painel-principal');
+  var login=document.getElementById('tela-login');
+  var cadastro=document.getElementById('tela-cadastro');
+  var empresa=document.getElementById('tela-empresa-senha');
+  if(landing) landing.classList.add('hidden');
+  if(landing) landing.classList.add('hidden');
+  if(auth) auth.classList.remove('hidden');
+  if(painel) painel.classList.add('hidden');
+  if(cadastro) cadastro.classList.add('hidden');
+  if(empresa) empresa.classList.add('hidden');
+  if(login) login.classList.remove('hidden');
+}
+function TJAbrirCadastroPublico(){
+  TJMostrarLogin();
+  setTimeout(function(){ var b=document.querySelector('[data-action="abrir-cadastro"]'); if(b) b.click(); },0);
+}
 function TJVoltarLoginDireto(ev){
   if(ev){ ev.preventDefault(); ev.stopPropagation(); ev.stopImmediatePropagation(); }
   var auth=document.getElementById('auth-container');
@@ -478,9 +508,154 @@ function TJVoltarLoginDireto(ev){
 <style id="tj-admin-v13-css">
 .admin-action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.admin-card-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.admin-card-actions button{min-height:40px}.admin-muted{font-size:.78rem;color:#64748B}.list-item.admin-record{cursor:default}.list-item.admin-record .list-title{overflow-wrap:anywhere}.admin-empty{font-size:.88rem;color:#64748B;padding:8px 0}@media(max-width:520px){.admin-action-grid{grid-template-columns:1fr}.admin-card-actions{display:grid;grid-template-columns:1fr 1fr}.admin-card-actions .btn-tj-danger:last-child:nth-child(3){grid-column:1/-1}.card-title{gap:8px;flex-wrap:wrap}}
 </style>
+
+<style id="tj-landing-v16-css">
+  #tj-landing { width:100%; height:100dvh; min-height:0; background:#F7FAFC; color:#0F2740; overflow-x:hidden; overflow-y:auto; overscroll-behavior-y:contain; -webkit-overflow-scrolling:touch; }
+  .tj-site-wrap { width:min(1180px, calc(100% - 32px)); margin:0 auto; }
+  .tj-site-header { position:sticky; top:0; z-index:1200; background:rgba(255,255,255,.96); backdrop-filter:blur(12px); border-bottom:1px solid #E2E8F0; }
+  .tj-site-nav { min-height:76px; display:flex; align-items:center; justify-content:space-between; gap:18px; }
+  .tj-site-brand { display:flex; align-items:center; gap:12px; text-decoration:none; color:#0B2A4A; font-weight:850; letter-spacing:.03em; }
+  .tj-site-brand img { width:58px; height:58px; object-fit:contain; border-radius:14px; }
+  .tj-site-links { display:flex; align-items:center; gap:22px; }
+  .tj-site-links a { color:#334155; font-size:.92rem; font-weight:650; text-decoration:none; }
+  .tj-site-links a:hover { color:#168FD0; }
+  .tj-site-actions { display:flex; align-items:center; gap:10px; }
+  .tj-site-btn { border:0; border-radius:10px; min-height:44px; padding:0 18px; font-weight:750; font-size:.9rem; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; text-decoration:none; }
+  .tj-site-btn.primary { background:#118FCF; color:#fff; box-shadow:0 8px 20px rgba(17,143,207,.20); }
+  .tj-site-btn.dark { background:#0B2A4A; color:#fff; }
+  .tj-site-btn.ghost { background:#fff; border:1px solid #CBD5E1; color:#0B2A4A; }
+  .tj-hero { background:linear-gradient(135deg,#071F36 0%,#0B355C 56%,#0F6FA4 100%); color:#fff; position:relative; overflow:hidden; }
+  .tj-hero::after { content:""; position:absolute; width:560px; height:560px; border-radius:50%; right:-220px; top:-200px; background:radial-gradient(circle,rgba(88,195,239,.30),rgba(88,195,239,0) 68%); }
+  .tj-hero-grid { min-height:610px; display:grid; grid-template-columns:1.15fr .85fr; align-items:center; gap:56px; position:relative; z-index:1; padding:70px 0; }
+  .tj-eyebrow { display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.18); border-radius:999px; padding:8px 13px; font-size:.8rem; font-weight:750; margin-bottom:18px; }
+  .tj-hero h1 { font-size:clamp(2.15rem,5vw,4rem); line-height:1.02; letter-spacing:-.035em; max-width:760px; margin:0 0 20px; color:#fff; }
+  .tj-hero p { font-size:clamp(1rem,1.8vw,1.18rem); line-height:1.7; color:#D7E8F5; max-width:690px; margin:0 0 28px; }
+  .tj-hero-actions { display:flex; gap:12px; flex-wrap:wrap; }
+  .tj-hero-card { background:rgba(255,255,255,.96); border:1px solid rgba(255,255,255,.28); border-radius:28px; padding:24px; box-shadow:0 28px 70px rgba(0,0,0,.25); }
+  .tj-hero-card img { width:100%; max-width:410px; margin:auto; object-fit:contain; }
+  .tj-site-section { padding:78px 0; }
+  .tj-site-section.alt { background:#EEF6FB; }
+  .tj-section-kicker { color:#168FD0; text-transform:uppercase; letter-spacing:.12em; font-size:.76rem; font-weight:850; margin-bottom:8px; }
+  .tj-section-title { color:#0B2A4A; font-size:clamp(1.7rem,3vw,2.5rem); margin:0 0 12px; line-height:1.15; }
+  .tj-section-sub { color:#64748B; max-width:720px; font-size:1rem; line-height:1.65; margin:0 0 34px; }
+  .tj-service-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; }
+  .tj-service-card { background:#fff; border:1px solid #E2E8F0; border-radius:18px; padding:24px; box-shadow:0 8px 28px rgba(15,39,64,.06); }
+  .tj-service-icon { width:48px; height:48px; border-radius:14px; display:grid; place-items:center; font-size:1.45rem; background:#E6F5FC; margin-bottom:15px; }
+  .tj-service-card h3 { color:#0B2A4A; font-size:1.03rem; margin:0 0 8px; }
+  .tj-service-card p { color:#64748B; font-size:.9rem; line-height:1.55; margin:0; }
+  .tj-feature-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; }
+  .tj-feature { padding:22px 0; border-top:3px solid #2E9BD6; }
+  .tj-feature strong { display:block; color:#0B2A4A; font-size:1.05rem; margin-bottom:7px; }
+  .tj-feature span { color:#64748B; font-size:.92rem; line-height:1.55; }
+  .tj-portal-band { background:#0B2A4A; color:#fff; border-radius:28px; padding:42px; display:grid; grid-template-columns:1fr auto; align-items:center; gap:24px; box-shadow:0 20px 50px rgba(11,42,74,.18); }
+  .tj-portal-band h2 { margin:0 0 10px; color:#fff; font-size:clamp(1.5rem,3vw,2.2rem); }
+  .tj-portal-band p { margin:0; color:#C9DCEA; max-width:720px; line-height:1.6; }
+  .tj-site-footer { background:#071A2C; color:#BFD0DE; padding:34px 0; }
+  .tj-footer-row { display:flex; align-items:center; justify-content:space-between; gap:20px; }
+  .tj-footer-brand { display:flex; align-items:center; gap:10px; font-weight:750; color:#fff; }
+  .tj-footer-brand img { width:42px; height:42px; object-fit:contain; border-radius:10px; }
+  .tj-back-site { width:100%; margin-bottom:14px; }
+  @media (max-width:900px){
+    .tj-site-links{display:none}.tj-hero-grid{grid-template-columns:1fr;min-height:auto;gap:30px;padding:56px 0}.tj-hero-card{max-width:520px}.tj-service-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.tj-feature-grid{grid-template-columns:1fr}.tj-portal-band{grid-template-columns:1fr}.tj-portal-band .tj-site-btn{width:100%}
+  }
+  @media (max-width:560px){
+    .tj-site-wrap{width:min(100% - 24px,1180px)}.tj-site-nav{min-height:68px}.tj-site-brand span{font-size:.88rem}.tj-site-brand img{width:48px;height:48px}.tj-site-actions .pwa-install-trigger{display:none}.tj-site-btn{padding:0 14px}.tj-hero-grid{padding:42px 0}.tj-hero h1{font-size:2.25rem}.tj-hero-actions{display:grid;grid-template-columns:1fr}.tj-hero-actions .tj-site-btn{width:100%}.tj-service-grid{grid-template-columns:1fr}.tj-site-section{padding:58px 0}.tj-portal-band{padding:28px 22px;border-radius:22px}.tj-footer-row{flex-direction:column;align-items:flex-start}.tj-hero-card{border-radius:22px;padding:16px}
+  }
+</style>
+
 </head>
 <body>
 
+
+  <!-- ===== LANDING PAGE PÚBLICA TJ REFRIGERAÇÃO — V16 ===== -->
+  <div id="tj-landing">
+    <header class="tj-site-header">
+      <div class="tj-site-wrap tj-site-nav">
+        <a class="tj-site-brand" href="#inicio" aria-label="TJ Refrigeração — início">
+          <img src="./assets/tj-logo.png" alt="Logo TJ Refrigeração">
+          <span>TJ REFRIGERAÇÃO</span>
+        </a>
+        <nav class="tj-site-links" aria-label="Navegação principal">
+          <a href="#inicio">Início</a>
+          <a href="#servicos">Serviços</a>
+          <a href="#empresa">A TJ</a>
+          <a href="#portal">Portal do Cliente</a>
+        </nav>
+        <div class="tj-site-actions">
+          <button type="button" class="tj-site-btn ghost pwa-install-trigger">📲 Instalar app</button>
+          <button type="button" class="tj-site-btn dark" onclick="TJMostrarLogin()">Área do Cliente</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section id="inicio" class="tj-hero">
+        <div class="tj-site-wrap tj-hero-grid">
+          <div>
+            <div class="tj-eyebrow">❄️ Assistência técnica em refrigeração</div>
+            <h1>Refrigeração com atendimento organizado do chamado à conclusão.</h1>
+            <p>A TJ Refrigeração reúne assistência técnica, orçamentos, agendamentos e acompanhamento do atendimento em uma experiência simples para clientes residenciais e empresariais.</p>
+            <div class="tj-hero-actions">
+              <button type="button" class="tj-site-btn primary" onclick="TJAbrirCadastroPublico()">Solicitar atendimento</button>
+              <button type="button" class="tj-site-btn ghost" onclick="TJMostrarLogin()">Já sou cliente</button>
+            </div>
+          </div>
+          <div class="tj-hero-card" aria-label="Identidade visual TJ Refrigeração">
+            <img src="./assets/tj-logo.png" alt="TJ Refrigeração">
+          </div>
+        </div>
+      </section>
+
+      <section id="servicos" class="tj-site-section">
+        <div class="tj-site-wrap">
+          <div class="tj-section-kicker">Serviços</div>
+          <h2 class="tj-section-title">Atendimento técnico com informação centralizada</h2>
+          <p class="tj-section-sub">O portal foi pensado para organizar cada etapa do relacionamento com a TJ Refrigeração, mantendo cliente e empresa acompanhando a mesma solicitação.</p>
+          <div class="tj-service-grid">
+            <article class="tj-service-card"><div class="tj-service-icon">🔧</div><h3>Assistência técnica</h3><p>Abertura e acompanhamento de chamados de refrigeração com histórico do atendimento.</p></article>
+            <article class="tj-service-card"><div class="tj-service-icon">🧊</div><h3>Equipamentos</h3><p>Cadastro dos equipamentos atendidos para concentrar informações e ocorrências em um só lugar.</p></article>
+            <article class="tj-service-card"><div class="tj-service-icon">💰</div><h3>Orçamentos</h3><p>Envio e acompanhamento de propostas para que o cliente possa consultar e responder pelo portal.</p></article>
+            <article class="tj-service-card"><div class="tj-service-icon">📅</div><h3>Agendamentos</h3><p>Organização de visitas e atendimentos com consulta dos compromissos pela área do cliente.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section id="empresa" class="tj-site-section alt">
+        <div class="tj-site-wrap">
+          <div class="tj-section-kicker">TJ Refrigeração</div>
+          <h2 class="tj-section-title">Atendimento profissional também no digital</h2>
+          <p class="tj-section-sub">Além do serviço técnico, a plataforma ajuda a manter cada cliente informado e dá à TJ uma visão administrativa dos chamados, equipamentos, orçamentos, pedidos e agendamentos.</p>
+          <div class="tj-feature-grid">
+            <div class="tj-feature"><strong>Acompanhamento claro</strong><span>Cliente consulta o andamento das solicitações, histórico e informações relacionadas ao próprio atendimento.</span></div>
+            <div class="tj-feature"><strong>Gestão centralizada</strong><span>O proprietário administra clientes e os principais registros operacionais diretamente pelo sistema.</span></div>
+            <div class="tj-feature"><strong>Acesso pelo celular</strong><span>O portal pode ser instalado no Android e no iPhone como aplicativo PWA, mantendo a identidade da TJ.</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="portal" class="tj-site-section">
+        <div class="tj-site-wrap">
+          <div class="tj-portal-band">
+            <div>
+              <h2>Já possui cadastro na TJ Refrigeração?</h2>
+              <p>Acesse o portal para acompanhar chamados, orçamentos, equipamentos, histórico e agendamentos. Se ainda não possui conta, você também pode iniciar seu cadastro.</p>
+            </div>
+            <div style="display:grid;gap:10px;min-width:210px;">
+              <button type="button" class="tj-site-btn primary" onclick="TJMostrarLogin()">Entrar no portal</button>
+              <button type="button" class="tj-site-btn ghost" onclick="TJAbrirCadastroPublico()">Criar conta</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="tj-site-footer">
+      <div class="tj-site-wrap tj-footer-row">
+        <div class="tj-footer-brand"><img src="./assets/tj-logo.png" alt=""><span>TJ Refrigeração</span></div>
+        <div style="font-size:.82rem;">Assistência técnica • Portal do Cliente • Aplicativo PWA</div>
+      </div>
+    </footer>
+  </div>
 
   <!-- TOAST NOTIFICATION -->
   <div id="toast" class="toast-box">Aviso</div>
@@ -498,11 +673,12 @@ function TJVoltarLoginDireto(ev){
   </div>
 
   <!-- AUTH WRAPPER (LOGIN, CADASTRO, SENHA EMPRESA) -->
-  <div id="auth-container">
+  <div id="auth-container" class="hidden">
     
     <!-- TELA 1: LOGIN -->
     <section id="tela-login" class="auth-bg">
       <div class="auth-card">
+        <button type="button" class="btn-voltar tj-back-site" onclick="TJMostrarLanding()">‹ Voltar ao site</button>
         <div style="text-align: center; margin-bottom: 22px;">
           <img class="tj-login-logo" src="./assets/tj-logo.png" alt="TJ Refrigeração">
           <h1 style="font-size: 1.1rem; font-weight: 800; color: #0B2A4A; letter-spacing:.04em;">PORTAL TJ REFRIGERAÇÃO</h1>
@@ -4983,11 +5159,12 @@ function TJVoltarLoginDireto(ev){
         fecharDrawer();
         if (window.TJFB && window.TJFB.auth) { window.TJFB.auth.signOut().catch(function(){}); }
         historicoNavegacao = [];
-        document.getElementById("painel-principal").classList.add("hidden");
-        document.getElementById("auth-container").classList.remove("hidden");
-        document.getElementById("tela-empresa-senha").classList.add("hidden");
-        document.getElementById("tela-cadastro").classList.add("hidden");
-        document.getElementById("tela-login").classList.remove("hidden");
+        if (typeof TJMostrarLanding === "function") TJMostrarLanding();
+        else {
+          document.getElementById("painel-principal").classList.add("hidden");
+          document.getElementById("auth-container").classList.remove("hidden");
+          document.getElementById("tela-login").classList.remove("hidden");
+        }
         toast("Sessão finalizada com segurança.");
         return;
       }
@@ -6235,6 +6412,8 @@ function limpaSessao(){
   try{ localStorage.removeItem('tj_sessao'); }catch(e){}
 }
 function telaLogin(){
+  var landing=document.getElementById('tj-landing');
+  if(landing) landing.classList.add('hidden');
   document.getElementById('auth-container').classList.remove('hidden');
   document.getElementById('painel-principal').classList.add('hidden');
   document.getElementById('tela-empresa-senha').classList.add('hidden');
@@ -6269,6 +6448,8 @@ function atualizarIdentidadeEmpresa(perfil){
 }
 
 function telaApp(tipo){
+  var landing=document.getElementById('tj-landing');
+  if(landing) landing.classList.add('hidden');
   state.perfilSessao=tipo;
   if(tipo==='cliente') atualizarIdentidadeCliente(window.TJFB&&window.TJFB.perfilCliente||{});
   else atualizarIdentidadeEmpresa(window.TJFB&&window.TJFB.perfilEmpresa||{});
@@ -6708,7 +6889,7 @@ auth.onAuthStateChanged(async function(user){
     window.TJFB.perfilCliente={};
     window.TJFB.perfilEmpresa={};
     clienteAtualNome='';
-    telaLogin();
+    if(typeof TJMostrarLanding==='function') TJMostrarLanding(); else telaLogin();
     return;
   }
   try{
