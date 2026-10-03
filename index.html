@@ -3785,7 +3785,7 @@ html[data-theme="dark"] #det-orc-total{color:#7DD3FC!important}
           valor.style.fontWeight = "700";
           valor.style.color = "#0B2A4A";
           valor.style.marginTop = "4px";
-          valor.textContent = "Total: " + o.total;
+          valor.textContent = "Total: " + formatarMoedaBR(o.total);
 
           item.appendChild(top);
           item.appendChild(valor);
@@ -3821,7 +3821,7 @@ html[data-theme="dark"] #det-orc-total{color:#7DD3FC!important}
       if (cli) cli.textContent = "Cliente: " + orc.cliente;
 
       var tot = document.getElementById("det-orc-total");
-      if (tot) tot.textContent = orc.total;
+      if (tot) tot.textContent = formatarMoedaBR(orc.total);
 
       var body = document.getElementById("det-orc-itens-body");
       if (body) {
@@ -3835,7 +3835,7 @@ html[data-theme="dark"] #det-orc-total{color:#7DD3FC!important}
           var tdQtd = document.createElement("td");
           tdQtd.textContent = Array.isArray(it) ? (it[1] || "") : (it.qtd || it.quantidade || "");
           var tdVal = document.createElement("td");
-          tdVal.textContent = Array.isArray(it) ? (it[2] || "") : (it.valor || it.preco || "");
+          tdVal.textContent = formatarMoedaBR(Array.isArray(it) ? (it[2] || 0) : (it.valor || it.preco || 0));
 
           tr.appendChild(tdDesc);
           tr.appendChild(tdQtd);
@@ -4659,10 +4659,57 @@ html[data-theme="dark"] #det-orc-total{color:#7DD3FC!important}
 
     // 5. RELATÓRIOS EMPRESA
     function extrairValorNumerico(strValor) {
-      if (!strValor) return 0;
-      var limpo = strValor.replace("R$", "").replace(/\s/g, "").replace(/\./g, "").replace(",", ".");
+      if (strValor === null || strValor === undefined || strValor === "") return 0;
+      if (typeof strValor === "number") return isFinite(strValor) ? strValor : 0;
+
+      var limpo = String(strValor)
+        .replace(/R\$/gi, "")
+        .replace(/\s/g, "")
+        .replace(/[^0-9,.-]/g, "");
+      if (!limpo) return 0;
+
+      var temVirgula = limpo.indexOf(",") !== -1;
+      var temPonto = limpo.indexOf(".") !== -1;
+
+      if (temVirgula && temPonto) {
+        // O último separador é tratado como decimal: 1.234,56 ou 1,234.56.
+        if (limpo.lastIndexOf(",") > limpo.lastIndexOf(".")) {
+          limpo = limpo.replace(/\./g, "").replace(",", ".");
+        } else {
+          limpo = limpo.replace(/,/g, "");
+        }
+      } else if (temVirgula) {
+        var partesVirgula = limpo.split(",");
+        if (partesVirgula.length > 2) {
+          var decV = partesVirgula.pop();
+          limpo = partesVirgula.join("") + "." + decV;
+        } else {
+          limpo = limpo.replace(",", ".");
+        }
+      } else if (temPonto) {
+        var partesPonto = limpo.split(".");
+        if (partesPonto.length > 2) {
+          var decP = partesPonto.pop();
+          limpo = partesPonto.join("") + "." + decP;
+        } else if (partesPonto.length === 2 && partesPonto[1].length === 3) {
+          // 3.000 = três mil; 658.00 = seiscentos e cinquenta e oito reais.
+          limpo = partesPonto.join("");
+        }
+      }
+
       var n = parseFloat(limpo);
       return isNaN(n) ? 0 : n;
+    }
+
+    function formatarMoedaBR(valor) {
+      var numero = typeof valor === "number" ? valor : extrairValorNumerico(valor);
+      if (!isFinite(numero)) numero = 0;
+      return numero.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
     }
 
     function renderizarRelatoriosEmpresa() {
@@ -4704,7 +4751,7 @@ html[data-theme="dark"] #det-orc-total{color:#7DD3FC!important}
       if (elOrcAg) elOrcAg.textContent = String(orcAguardando);
       var elVal = document.getElementById("rel-kpi-valor-aprovado");
       if (elVal) {
-        elVal.textContent = "R$ " + somaAprovados.toLocaleString("pt-BR", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        elVal.textContent = formatarMoedaBR(somaAprovados);
       }
       var elTaxa = document.getElementById("rel-kpi-taxa-aprov");
       if (elTaxa) elTaxa.textContent = taxa + "%";
@@ -5792,30 +5839,35 @@ html[data-theme="dark"] #det-orc-total{color:#7DD3FC!important}
 
       if (acao === "aprovar-orc" || acao === "aprovar-orcamento") {
         var alvoOrcApr = id || orcamentoAtualNum;
+        var dataApr = new Date().toLocaleDateString("pt-BR");
+        var clienteApr = clienteAtualNome || "Cliente";
         for (var o = 0; o < state.orcamentos.length; o++) {
           if (state.orcamentos[o].num === alvoOrcApr) {
             state.orcamentos[o].status = "Aprovado";
-            state.orcamentos[o].hist.push({data:"Hoje", evento:"Aprovado pelo cliente"});
+            state.orcamentos[o].aprovadoEm = dataApr;
+            clienteApr = state.orcamentos[o].cliente || clienteApr;
+            state.orcamentos[o].hist = Array.isArray(state.orcamentos[o].hist) ? state.orcamentos[o].hist : [];
+            state.orcamentos[o].hist.push({data:dataApr, evento:"Aprovado pelo cliente"});
             break;
           }
         }
         state.historicoCliente.unshift({
-          data: "Hoje",
+          data: dataApr,
           tipo: "orcamento",
           titulo: "Orçamento #" + alvoOrcApr + " aprovado",
           desc: "Orçamento aprovado pelo cliente",
           status: "Aprovado"
         });
         state.historicoEmpresa.unshift({
-          data: "Hoje",
+          data: dataApr,
           tipo: "orcamento",
-          cliente: "Empresa XYZ",
+          cliente: clienteApr,
           titulo: "Orçamento #" + alvoOrcApr + " aprovado pelo cliente",
           desc: "Orçamento aprovado",
           status: "Aprovado"
         });
         state.notificacoesCliente.unshift({
-          data: "Hoje",
+          data: dataApr,
           titulo: "Orçamento aprovado",
           desc: "O orçamento #" + alvoOrcApr + " foi aprovado com sucesso.",
           lida: false
@@ -5827,24 +5879,29 @@ html[data-theme="dark"] #det-orc-total{color:#7DD3FC!important}
 
       if (acao === "recusar-orc" || acao === "recusar-orcamento") {
         var alvoOrcRec = id || orcamentoAtualNum;
+        var dataRec = new Date().toLocaleDateString("pt-BR");
+        var clienteRec = clienteAtualNome || "Cliente";
         for (var r = 0; r < state.orcamentos.length; r++) {
           if (state.orcamentos[r].num === alvoOrcRec) {
             state.orcamentos[r].status = "Recusado";
-            state.orcamentos[r].hist.push({data:"Hoje", evento:"Recusado pelo cliente"});
+            state.orcamentos[r].recusadoEm = dataRec;
+            clienteRec = state.orcamentos[r].cliente || clienteRec;
+            state.orcamentos[r].hist = Array.isArray(state.orcamentos[r].hist) ? state.orcamentos[r].hist : [];
+            state.orcamentos[r].hist.push({data:dataRec, evento:"Recusado pelo cliente"});
             break;
           }
         }
         state.historicoCliente.unshift({
-          data: "Hoje",
+          data: dataRec,
           tipo: "orcamento",
           titulo: "Orçamento #" + alvoOrcRec + " recusado",
           desc: "Orçamento recusado pelo cliente",
           status: "Recusado"
         });
         state.historicoEmpresa.unshift({
-          data: "Hoje",
+          data: dataRec,
           tipo: "orcamento",
-          cliente: "Empresa XYZ",
+          cliente: clienteRec,
           titulo: "Orçamento #" + alvoOrcRec + " recusado pelo cliente",
           desc: "Orçamento recusado",
           status: "Recusado"
@@ -6870,15 +6927,31 @@ function injetaTrilha(){
 }
 
 /* ============ ETAPA 9: decisões do cliente sobre o orçamento ============ */
+function dataDecisaoOrc(o,tipo){
+  if(!o)return '';
+  var campo=tipo==='aprovado'?o.aprovadoEm:o.recusadoEm;
+  if(campo && norm(campo)!=='atualizado' && norm(campo)!=='hoje') return String(campo);
+  var hist=Array.isArray(o.hist)?o.hist:[];
+  for(var h=hist.length-1;h>=0;h--){
+    var item=hist[h]||{};
+    var evento=Array.isArray(item)?(item[1]||''):(item.evento||item.texto||item.descricao||'');
+    var data=Array.isArray(item)?(item[0]||''):(item.data||'');
+    var alvo=tipo==='aprovado'?'aprov':'recus';
+    if(norm(evento).indexOf(alvo)!==-1 && data && norm(data)!=='atualizado'){
+      return norm(data)==='hoje'?'':String(data);
+    }
+  }
+  return '';
+}
 function leDec(){
   var d={};
   if(typeof state==='undefined'||!Array.isArray(state.orcamentos)) return d;
   for(var i=0;i<state.orcamentos.length;i++){
     var o=state.orcamentos[i];
     if(!o||!o.num) continue;
-    if(o.status==='Aprovado') d[o.num]={tipo:'aprovado',msg:'',data:'Atualizado'};
-    else if(o.status==='Recusado') d[o.num]={tipo:'recusado',msg:'',data:'Atualizado'};
-    else if(o.esclarecimento) d[o.num]={tipo:'esclarecimento',msg:o.esclarecimento,data:'Atualizado'};
+    if(o.status==='Aprovado') d[o.num]={tipo:'aprovado',msg:'',data:dataDecisaoOrc(o,'aprovado')};
+    else if(o.status==='Recusado') d[o.num]={tipo:'recusado',msg:'',data:dataDecisaoOrc(o,'recusado')};
+    else if(o.esclarecimento) d[o.num]={tipo:'esclarecimento',msg:o.esclarecimento,data:''};
   }
   return d;
 }
@@ -6886,11 +6959,21 @@ function salvaDec(d){ return d; }
 function esc(s){return (s||'').replace(/[<>&"]/g,function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c];});}
 function grava(id,tipo,msg){
   if(typeof state==='undefined'||!Array.isArray(state.orcamentos)) return;
+  var dataAgora=new Date().toLocaleDateString('pt-BR');
   for(var i=0;i<state.orcamentos.length;i++){
     if(String(state.orcamentos[i].num)===String(id)){
-      if(tipo==='aprovado') state.orcamentos[i].status='Aprovado';
-      if(tipo==='recusado') state.orcamentos[i].status='Recusado';
-      if(tipo==='esclarecimento') state.orcamentos[i].esclarecimento=msg;
+      var o=state.orcamentos[i];
+      if(tipo==='aprovado'){
+        o.status='Aprovado';o.aprovadoEm=dataAgora;
+        o.hist=Array.isArray(o.hist)?o.hist:[];
+        if(!o.hist.some(function(h){var e=Array.isArray(h)?h[1]:(h&&h.evento);return norm(e).indexOf('aprov')!==-1;})) o.hist.push({data:dataAgora,evento:'Aprovado pelo cliente'});
+      }
+      if(tipo==='recusado'){
+        o.status='Recusado';o.recusadoEm=dataAgora;
+        o.hist=Array.isArray(o.hist)?o.hist:[];
+        if(!o.hist.some(function(h){var e=Array.isArray(h)?h[1]:(h&&h.evento);return norm(e).indexOf('recus')!==-1;})) o.hist.push({data:dataAgora,evento:'Recusado pelo cliente'});
+      }
+      if(tipo==='esclarecimento') o.esclarecimento=msg;
       break;
     }
   }
@@ -6907,8 +6990,8 @@ function idDoOrcamento(el){
 }
 function chipDecisao(d){
   if(!d)return '';
-  if(d.tipo==='aprovado')return '<span class="tj-chip tj-chip-aprovado">✅ Aprovado em '+esc(d.data)+'</span>';
-  if(d.tipo==='recusado')return '<span class="tj-chip tj-chip-recusado">❌ Recusado em '+esc(d.data)+'</span>';
+  if(d.tipo==='aprovado')return '<span class="tj-chip tj-chip-aprovado">✅ '+(d.data?'Aprovado em '+esc(d.data):'Orçamento aprovado')+'</span>';
+  if(d.tipo==='recusado')return '<span class="tj-chip tj-chip-recusado">❌ '+(d.data?'Recusado em '+esc(d.data):'Orçamento recusado')+'</span>';
   return '<span class="tj-chip tj-chip-esclarecimento">💬 Esclarecimento solicitado</span>';
 }
 
@@ -7005,7 +7088,7 @@ function injetaEditorItens(){
         var v=parseFloat(String((ins[2]&&ins[2].value)||0).replace(',','.'))||0;
         soma+=q*v;
       });
-      editor.querySelector('.tj-total-itens').textContent='Total dos itens: R$ '+soma.toFixed(2).replace('.',',');
+      editor.querySelector('.tj-total-itens').textContent='Total dos itens: '+formatarMoedaBR(soma);
       if(campoTotal)campoTotal.value=soma?soma.toFixed(2):'';
     }
     function definirItens(itens){
@@ -7989,13 +8072,13 @@ async function salvarOrcAdmin(){
   histOrc.push({data:hoje(),evento:novo?'Orçamento emitido pela TJ':'Orçamento atualizado pela TJ'});
   var rec=Object.assign({},old||{},{num:id,servico:serv,cliente:cli.nome,clienteUid:uid,status:$v('novo-orc-status').value,total:val,itens:itens,hist:histOrc});
   var idx=arr.findIndex(function(x){return String(x.num)===String(id);});if(idx>=0)arr[idx]=rec;else arr.unshift(rec);
-  var hist=Array.isArray(d.historicoCliente)?d.historicoCliente:[];hist.unshift({data:hoje(),tipo:'orcamento',titulo:'Orçamento #'+id+(novo?' emitido':' atualizado'),desc:serv+' — '+val,status:rec.status});
+  var hist=Array.isArray(d.historicoCliente)?d.historicoCliente:[];hist.unshift({data:hoje(),tipo:'orcamento',titulo:'Orçamento #'+id+(novo?' emitido':' atualizado'),desc:serv+' — '+formatarMoedaBR(val),status:rec.status});
   var nots=Array.isArray(d.notificacoesCliente)?d.notificacoesCliente:[];if(novo)nots.unshift({data:hoje(),titulo:'Novo orçamento disponível',desc:'Orçamento #'+id+' aguarda sua análise.',lida:false});
   await gravarDados(uid,{orcamentos:arr,historicoCliente:hist,notificacoesCliente:nots});
   await recarregarV13();orcamentoAtualNum=id;avisoV13(novo?'Orçamento criado e enviado ao cliente.':'Orçamento atualizado.');abrirTela('tela-emp-orcamentos');
 }
 async function excluirOrcAdmin(id){var o=(state.orcamentos||[]).find(function(x){return String(x.num)===String(id);});if(!o)return;var uid=uidRegistro(o);if(!uid)return avisoV13('Cliente do orçamento não identificado.');if(!confirm('Excluir o orçamento #'+id+'?'))return;await removerRegistro(uid,'orcamentos',function(x){return String(x.num)===String(id);});await recarregarV13();renderizarOrcamentosEmpresa();avisoV13('Orçamento excluído.');}
-renderizarOrcamentosEmpresa=function(){var box=$v('lista-emp-orcamentos');if(!box)return;box.innerHTML='';if(!(state.orcamentos||[]).length){box.innerHTML='<p class="admin-empty">Nenhum orçamento cadastrado.</p>';return;}(state.orcamentos||[]).forEach(function(o){var item=document.createElement('div');item.className='list-item admin-record';var top=document.createElement('div');top.className='list-header';var t=document.createElement('span');t.className='list-title';t.textContent='Orçamento #'+o.num+' — '+o.servico;top.appendChild(t);top.appendChild(criarBadge(o.status));var m=document.createElement('div');m.className='list-meta';m.textContent='Cliente: '+o.cliente+' • Total: '+o.total;item.appendChild(top);item.appendChild(m);var a=document.createElement('div');a.className='admin-card-actions';[['Ver','btn-tj-secondary','abrir-orc'],['✏️ Editar','btn-tj','admin-editar-orc'],['🗑️ Excluir','btn-tj-danger','admin-excluir-orc']].forEach(function(b){var bt=document.createElement('button');bt.type='button';bt.className=b[1];bt.textContent=b[0];bt.dataset.action=b[2];bt.dataset.id=o.num;a.appendChild(bt);});item.appendChild(a);box.appendChild(item);});};
+renderizarOrcamentosEmpresa=function(){var box=$v('lista-emp-orcamentos');if(!box)return;box.innerHTML='';if(!(state.orcamentos||[]).length){box.innerHTML='<p class="admin-empty">Nenhum orçamento cadastrado.</p>';return;}(state.orcamentos||[]).forEach(function(o){var item=document.createElement('div');item.className='list-item admin-record';var top=document.createElement('div');top.className='list-header';var t=document.createElement('span');t.className='list-title';t.textContent='Orçamento #'+o.num+' — '+o.servico;top.appendChild(t);top.appendChild(criarBadge(o.status));var m=document.createElement('div');m.className='list-meta';m.textContent='Cliente: '+o.cliente+' • Total: '+formatarMoedaBR(o.total);item.appendChild(top);item.appendChild(m);var a=document.createElement('div');a.className='admin-card-actions';[['Ver','btn-tj-secondary','abrir-orc'],['✏️ Editar','btn-tj','admin-editar-orc'],['🗑️ Excluir','btn-tj-danger','admin-excluir-orc']].forEach(function(b){var bt=document.createElement('button');bt.type='button';bt.className=b[1];bt.textContent=b[0];bt.dataset.action=b[2];bt.dataset.id=o.num;a.appendChild(bt);});item.appendChild(a);box.appendChild(item);});};
 
 function abrirFormPedido(obj,uidPreferido){var uid=uidPreferido||uidRegistro(obj)||((clientesV13()[0]||{}).uid||'');preencherSelectClientes('admin-pedido-cliente',uid);$v('admin-pedido-id').value=obj?obj.num:'';$v('admin-pedido-uid-original').value=obj?uid:'';$v('admin-pedido-titulo').textContent=obj?'Editar Pedido #'+obj.num:'Cadastrar Pedido';$v('admin-pedido-peca').value=(obj&&obj.peca)||'';$v('admin-pedido-status').value=(obj&&obj.status)||'Solicitado';$v('admin-pedido-data').value=(obj&&obj.data)||hoje();abrirTela('tela-emp-form-pedido');}
 async function salvarPedido(){var id=$v('admin-pedido-id').value,uid=$v('admin-pedido-cliente').value,oldUid=$v('admin-pedido-uid-original').value,cli=clientePorUid(uid),peca=$v('admin-pedido-peca').value.trim();if(!uid||!cli||!peca)return avisoV13('Selecione o cliente e informe a peça.');var novo=!id;if(novo)id='PED-'+String(Date.now()).slice(-6);if(oldUid&&oldUid!==uid)await removerRegistro(oldUid,'pedidos',function(x){return x.num===id;});var d=await lerDados(uid),arr=Array.isArray(d.pedidos)?d.pedidos:[],rec={num:id,peca:peca,cliente:cli.nome,clienteUid:uid,status:$v('admin-pedido-status').value,data:$v('admin-pedido-data').value.trim()||hoje()},idx=arr.findIndex(function(x){return x.num===id;});if(idx>=0)arr[idx]=rec;else arr.unshift(rec);await gravarDados(uid,{pedidos:arr});await recarregarV13();avisoV13(novo?'Pedido cadastrado.':'Pedido atualizado.');abrirTela('tela-emp-pedidos');}
@@ -8387,7 +8470,7 @@ html[data-theme="dark"] #painel-principal .tj-dash-hero{background:linear-gradie
     normalizarControles();
     var drawer=document.querySelector('.drawer-panel,.side-drawer,.sidebar');
     var antigo=drawer&&drawer.querySelector('.tj-v25-version');if(antigo)antigo.remove();
-    if(drawer&&!drawer.querySelector('.tj-v26-version')){var v=document.createElement('div');v.className='tj-v26-version';v.textContent='TJ Refrigeração • v26';v.style.cssText='font-size:10px;opacity:.5;padding:10px 14px;text-align:center;';drawer.appendChild(v);}
+    if(drawer&&!drawer.querySelector('.tj-v27-version')){var v=document.createElement('div');v.className='tj-v27-version';v.textContent='TJ Refrigeração • v27';v.style.cssText='font-size:10px;opacity:.5;padding:10px 14px;text-align:center;';drawer.appendChild(v);}
   });
   var obs=new MutationObserver(normalizarControles);document.addEventListener('DOMContentLoaded',function(){if(document.body)obs.observe(document.body,{childList:true,subtree:true});});
 })();
