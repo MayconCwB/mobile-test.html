@@ -1,0 +1,206 @@
+rules_version = '2';
+// Prototype v30. Legacy arrays remain; customer mutations are constrained per operation.
+// users: immutable UID/email/role, active managed by owner; clients: personal fields.
+// clientData: operational lists/maps, owner authoritative; customer changes validated below.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function active(uid) {
+      return exists(/databases/$(database)/documents/users/$(uid))
+        && get(/databases/$(database)/documents/users/$(uid)).data.get('active', false) == true;
+    }
+    function owner() {
+      return signedIn() && active(request.auth.uid)
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'owner';
+    }
+    function self(uid) { return signedIn() && request.auth.uid == uid && active(uid); }
+    function text(v, max) { return v is string && v.size() <= max; }
+    function optionalText(d, key, max) { return !(key in d) || text(d[key], max); }
+    function validUser(d, uid) {
+      return d.keys().hasOnly(['uid','email','role','nome','tipoPessoa','telefone','empresa','razaoSocial','active','criadoEm','atualizadoEm','criadoPor','excluidoEm','excluidoPor'])
+        && d.role in ['cliente','owner'] && (!('uid' in d) || d.uid == uid)
+        && optionalText(d,'email',254) && optionalText(d,'nome',200)
+        && optionalText(d,'telefone',40) && optionalText(d,'empresa',200) && optionalText(d,'razaoSocial',200)
+        && (!('tipoPessoa' in d) || d.tipoPessoa in ['PF','PJ'])
+        && (!('active' in d) || d.active is bool)
+        && (!('criadoEm' in d) || d.criadoEm is timestamp)
+        && (!('atualizadoEm' in d) || d.atualizadoEm is timestamp)
+        && optionalText(d,'criadoPor',128) && optionalText(d,'excluidoPor',128)
+        && (!('excluidoEm' in d) || d.excluidoEm is timestamp);
+    }
+    function validClient(d, uid) {
+      return d.keys().hasOnly(['uid','email','nome','telefone','tel','tipoPessoa','empresa','razaoSocial','active','criadoEm','atualizadoEm','criadoPor','excluidoEm','excluidoPor'])
+        && (!('uid' in d) || d.uid == uid) && optionalText(d,'email',254)
+        && optionalText(d,'nome',200) && optionalText(d,'telefone',40) && optionalText(d,'tel',40)
+        && optionalText(d,'empresa',200) && optionalText(d,'razaoSocial',200)
+        && (!('tipoPessoa' in d) || d.tipoPessoa in ['PF','PJ']) && (!('active' in d) || d.active is bool)
+        && (!('criadoEm' in d) || d.criadoEm is timestamp) && (!('atualizadoEm' in d) || d.atualizadoEm is timestamp)
+        && optionalText(d,'criadoPor',128) && optionalText(d,'excluidoPor',128)
+        && (!('excluidoEm' in d) || d.excluidoEm is timestamp);
+    }
+    function newCustomer(d, uid) {
+      return d.uid == uid && d.email == request.auth.token.email && text(d.nome,200) && d.nome.size() > 0
+        && d.active == true && d.criadoEm == request.time && !('excluidoEm' in d) && !('excluidoPor' in d);
+    }
+    match /users/{uid} {
+      // A missing own profile may be checked during registration; existing inactive profiles cannot be read.
+      allow get: if owner() || (signedIn() && request.auth.uid == uid && (!exists(/databases/$(database)/documents/users/$(uid)) || active(uid)));
+      allow list: if owner();
+      allow create: if validUser(request.resource.data,uid) && request.resource.data.role == 'cliente'
+        && (owner() || (signedIn() && request.auth.uid == uid && newCustomer(request.resource.data,uid)
+          && !('criadoPor' in request.resource.data)));
+      allow update: if validUser(request.resource.data,uid)
+        && request.resource.data.role == resource.data.role
+        && (owner() || (self(uid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nome','telefone','empresa','razaoSocial','tipoPessoa','atualizadoEm'])));
+      allow delete: if owner() && uid != request.auth.uid;
+    }
+    match /clients/{uid} {
+      allow get: if owner() || self(uid);
+      allow list: if owner();
+      allow create: if validClient(request.resource.data,uid) && (owner()
+        || (signedIn() && request.auth.uid == uid && newCustomer(request.resource.data,uid)
+          && !('criadoPor' in request.resource.data)
+          && getAfter(/databases/$(database)/documents/users/$(uid)).data.role == 'cliente'
+          && getAfter(/databases/$(database)/documents/users/$(uid)).data.active == true));
+      allow update: if validClient(request.resource.data,uid) && (owner()
+        || (self(uid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nome','telefone','tel','empresa','razaoSocial','tipoPessoa','atualizadoEm'])));
+      allow delete: if owner();
+    }
+    function validData(d) {
+      return d.keys().hasOnly(['chamados','chamadoIds','orcamentos','equip','pedidos','historicoCliente','notificacoesCliente','contatosCliente','enderecosCliente','agendamentos','mensagens','atendimentos','atualizadoEm','clienteMutation'])
+        && (!('chamados' in d) || (d.chamados is list && d.chamados.size()<=500))
+        && (!('chamadoIds' in d) || (d.chamadoIds is list && d.chamadoIds.size()<=500))
+        && (!('orcamentos' in d) || (d.orcamentos is list && d.orcamentos.size()<=500))
+        && (!('equip' in d) || (d.equip is list && d.equip.size()<=500))
+        && (!('pedidos' in d) || (d.pedidos is list && d.pedidos.size()<=500))
+        && (!('historicoCliente' in d) || (d.historicoCliente is list && d.historicoCliente.size()<=1000))
+        && (!('notificacoesCliente' in d) || (d.notificacoesCliente is list && d.notificacoesCliente.size()<=500))
+        && (!('contatosCliente' in d) || (d.contatosCliente is list && d.contatosCliente.size()<=100))
+        && (!('enderecosCliente' in d) || (d.enderecosCliente is list && d.enderecosCliente.size()<=100))
+        && (!('agendamentos' in d) || (d.agendamentos is list && d.agendamentos.size()<=500))
+        && (!('mensagens' in d) || (d.mensagens is map && d.mensagens.size()<=500))
+        && (!('atendimentos' in d) || (d.atendimentos is map && d.atendimentos.size()<=500))
+        && (!('atualizadoEm' in d) || d.atualizadoEm is timestamp)
+        && (!('clienteMutation' in d) || (d.clienteMutation is map && d.clienteMutation.keys().hasOnly(['mensagemChamado']) && text(d.clienteMutation.get('mensagemChamado',''),40)));
+    }
+    function validCall(c, uid) {
+      return c is map && c.keys().hasOnly(['num','equip','cliente','clienteUid','problema','status','agend','criadoEm'])
+        && text(c.num,40) && c.num.matches('^[0-9]+$') && text(c.equip,200) && c.equip.size()>0
+        && text(c.problema,5000) && c.problema.size()>0 && c.clienteUid == uid
+        && c.cliente == get(/databases/$(database)/documents/users/$(uid)).data.nome
+        && c.status == 'Aguardando início' && c.agend == 'Aguardando agendamento' && text(c.criadoEm,40);
+    }
+    function newCall(a,b,uid) {
+      return b.size() == a.size()+1 && b == [b[0]].concat(a) && validCall(b[0],uid);
+    }
+    function validBudgetDecision(before,after) {
+      let old = before.removeAll(after);
+      let added = after.removeAll(before);
+      return before.size() == after.size() && old.size()==1 && added.size()==1
+        && old[0].status == 'Aguardando aprovação'
+        && added[0].diff(old[0]).affectedKeys().hasOnly(['status','aprovadoEm','recusadoEm','hist','esclarecimento'])
+        && ((added[0].status in ['Aprovado','Recusado']
+          && added[0].get('esclarecimento','') == old[0].get('esclarecimento','')
+          && validDecisionHistory(old[0],added[0]))
+          || (added[0].status == old[0].status && added[0].get('hist',[]) == old[0].get('hist',[])
+            && added[0].get('aprovadoEm','') == old[0].get('aprovadoEm','')
+            && added[0].get('recusadoEm','') == old[0].get('recusadoEm','')
+            && text(added[0].esclarecimento,2000) && added[0].esclarecimento.size()>0));
+    }
+    function validDecisionHistory(a,b) {
+      let hist = b.get('hist',[]);
+      let old = a.get('hist',[]);
+      let event = b.status == 'Aprovado' ? 'Aprovado pelo cliente' : 'Recusado pelo cliente';
+      let entry = hist[hist.size()-1];
+      return hist.size() == old.size()+1 && hist.size()<=500 && hist == old.concat([entry])
+        && entry is map && entry.keys().hasOnly(['data','evento']) && text(entry.data,10) && entry.evento==event
+        && (b.status == 'Aprovado' ? (text(b.aprovadoEm,10) && b.aprovadoEm==entry.data && b.get('recusadoEm','')==a.get('recusadoEm',''))
+          : (text(b.recusadoEm,10) && b.recusadoEm==entry.data && b.get('aprovadoEm','')==a.get('aprovadoEm','')));
+    }
+    function validMessage(m) {
+      return m is map && m.keys().hasOnly(['autor','texto','hora']) && m.autor=='cliente'
+        && text(m.texto,5000) && m.texto.size()>0 && text(m.hora,10);
+    }
+    function messages(a,b,key,newCalls,callAdded) {
+      let old = a.get(key,[]);
+      let next = b.get(key,[]);
+      return key.size()>0 && b.diff(a).affectedKeys().hasOnly([key]) && next is list && old is list
+        && next.size()==old.size()+1 && next.size()<=1000 && next==old.concat([next[next.size()-1]])
+        && validMessage(next[next.size()-1])
+        && (key in a || (callAdded && key == newCalls[0].num && next[0].texto==newCalls[0].problema));
+    }
+    function validContact(c) { return c is map && c.keys().hasOnly(['nome','cargo','tel']) && text(c.nome,200) && text(c.cargo,200) && text(c.tel,40); }
+    function validAddress(c) { return c is map && c.keys().hasOnly(['apelido','tipo','rua','num','cidade']) && text(c.apelido,100) && text(c.tipo,100) && text(c.rua,300) && text(c.num,30) && text(c.cidade,200); }
+    function validEquipment(c,uid) {
+      return c is map && c.keys().hasOnly(['id','cliente','clienteUid','nome','marca','modelo','sn','local','status'])
+        && text(c.id,80) && text(c.nome,200) && text(c.marca,100) && text(c.modelo,100) && text(c.sn,100)
+        && text(c.local,500) && text(c.status,50) && text(c.cliente,200) && c.get('clienteUid',uid)==uid;
+    }
+    function personalList(a,b,kind,uid) {
+      let removed = a.removeAll(b);
+      let added = b.removeAll(a);
+      return removed.size()<=1 && added.size()<=1 && b.size()>=a.size()-1 && b.size()<=a.size()+1
+        && (added.size()==0 || (kind=='contact' ? validContact(added[0]) : kind=='address' ? validAddress(added[0]) : validEquipment(added[0],uid)));
+    }
+    function markRead(a,b) {
+      let old = a.removeAll(b);
+      let added = b.removeAll(a);
+      return a.size()==b.size() && old.size()==1 && added.size()==1 && added[0].lida==true
+        && added[0].diff(old[0]).affectedKeys().hasOnly(['lida']);
+    }
+    function history(a,b,budget) {
+      let h = b[0];
+      return b.size()==a.size()+1 && b==[h].concat(a) && h is map
+        && h.keys().hasOnly(['data','tipo','titulo','desc','status']) && text(h.data,10) && text(h.titulo,200) && text(h.desc,6000)
+        && h.tipo=='orcamento' && h.status==budget.status && h.status in ['Aprovado','Recusado']
+        && h.titulo=='Orçamento #'+budget.num+(h.status=='Aprovado'?' aprovado':' recusado')
+        && h.desc==(h.status=='Aprovado'?'Orçamento aprovado pelo cliente':'Orçamento recusado pelo cliente');
+    }
+    function newCallOperation(a,b,uid) {
+      let c=b.chamados[0];
+      let key=c.num;
+      let msg=b.mensagens[key];
+      let at=b.atendimentos[key];
+      let h=b.historicoCliente[0];
+      return b.diff(a).affectedKeys().hasOnly(['chamados','chamadoIds','mensagens','atendimentos','historicoCliente','atualizadoEm','clienteMutation'])
+        && newCall(a.get('chamados',[]),b.chamados,uid)
+        && a.get('chamadoIds',[]).size()==a.get('chamados',[]).size()
+        && !a.get('chamadoIds',[]).hasAny([key]) && b.chamadoIds==[key].concat(a.get('chamadoIds',[]))
+        && !(key in a.get('mensagens',{})) && !(key in a.get('atendimentos',{}))
+        && b.mensagens.diff(a.get('mensagens',{})).affectedKeys().hasOnly([key])
+        && msg==[{'autor':'cliente','texto':c.problema,'hora':msg[0].hora}] && text(msg[0].hora,10)
+        && b.atendimentos.diff(a.get('atendimentos',{})).affectedKeys().hasOnly([key])
+        && at=={'endereco':at.endereco,'previsao':'Aguardando confirmação','diag':'','pecas':[]} && text(at.endereco,500)
+        && b.historicoCliente==[h].concat(a.get('historicoCliente',[]))
+        && h=={'data':h.data,'tipo':'chamado','titulo':'Chamado #'+key+' aberto','desc':c.equip+' — '+c.problema,'status':'Aberto'} && text(h.data,10)
+        && b.atualizadoEm==request.time;
+    }
+    function regularChanges(a,b,uid) {
+      let oldBudgets=a.get('orcamentos',[]);
+      let nextBudgets=b.get('orcamentos',[]);
+      let budgetChanged=nextBudgets!=oldBudgets;
+      let budgetOK=!budgetChanged || validBudgetDecision(oldBudgets,nextBudgets);
+      let fields=b.diff(a).affectedKeys();
+      return fields.hasOnly(['mensagens','orcamentos','equip','historicoCliente','notificacoesCliente','contatosCliente','enderecosCliente','atualizadoEm','clienteMutation'])
+        && budgetOK
+        && (!fields.hasAny(['mensagens']) || messages(a.get('mensagens',{}),b.get('mensagens',{}),b.get('clienteMutation',{}).get('mensagemChamado',''),[],false))
+        && (!fields.hasAny(['contatosCliente']) || personalList(a.get('contatosCliente',[]),b.get('contatosCliente',[]),'contact',uid))
+        && (!fields.hasAny(['enderecosCliente']) || personalList(a.get('enderecosCliente',[]),b.get('enderecosCliente',[]),'address',uid))
+        && (!fields.hasAny(['equip']) || personalList(a.get('equip',[]),b.get('equip',[]),'equipment',uid))
+        && (!fields.hasAny(['notificacoesCliente']) || markRead(a.get('notificacoesCliente',[]),b.get('notificacoesCliente',[])))
+        && (!fields.hasAny(['historicoCliente']) || (budgetChanged && history(a.get('historicoCliente',[]),b.get('historicoCliente',[]),nextBudgets.removeAll(oldBudgets)[0])))
+        && b.atualizadoEm==request.time;
+    }
+    function customerChanges(a,b,uid) {
+      return b.diff(a).affectedKeys().hasAny(['chamados']) ? newCallOperation(a,b,uid) : regularChanges(a,b,uid);
+    }
+    match /clientData/{uid} {
+      allow get: if owner() || self(uid);
+      allow list: if owner();
+      allow create: if validData(request.resource.data) && (owner() || (self(uid) && customerChanges({},request.resource.data,uid)));
+      allow update: if validData(request.resource.data) && (owner() || (self(uid) && customerChanges(resource.data,request.resource.data,uid)));
+      allow delete: if owner();
+    }
+    match /{document=**} { allow read,write: if false; }
+  }
+}

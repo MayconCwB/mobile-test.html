@@ -1,6 +1,8 @@
-const CACHE_NAME = 'tj-refrigeracao-pwa-v27-correcao-orcamentos';
+const CACHE_NAME = 'tj-refrigeracao-pwa-v30-regras-seguras';
 const APP_SHELL = [
   './index.html',
+  './assets/tj-core.js',
+  './assets/tj-orcamento-fluxo.js',
   './manifest.webmanifest',
   './assets/tj-logo.png',
   './assets/tj-watermark.png',
@@ -36,6 +38,7 @@ self.addEventListener('fetch', event => {
     event.respondWith(
       fetch(request)
         .then(response => {
+          if (!response.ok) return response;
           const copy = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put('./index.html', copy));
           return response;

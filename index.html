@@ -15,6 +15,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="TJ Refrigeração">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <script src="./assets/tj-core.js"></script>
   <script>
   /* TJ v24 — tema Claro / Escuro / Sistema com preferência local */
   (function(){
@@ -3874,7 +3875,7 @@ html[data-theme="dark"] #det-orc-total{color:#7DD3FC!important}
       var acoesBox = document.getElementById("det-orc-acoes-aprovacao");
       if (acoesBox) {
         while (acoesBox.firstChild) acoesBox.removeChild(acoesBox.firstChild);
-        if (orc.status === "Aguardando aprovação") {
+        if (state.perfilSessao === "cliente" && orc.status === "Aguardando aprovação") {
           var btnRec = document.createElement("button");
           btnRec.type = "button";
           btnRec.className = "btn-tj-secondary";
@@ -4080,13 +4081,13 @@ html[data-theme="dark"] #det-orc-total{color:#7DD3FC!important}
           if(String(lista[z].id||"")===String(idEdicao)){ agAtual=lista[z]; break; }
         }
 
-        var ag={
+        var ag=Object.assign({},agAtual||{}, {
           id:idEdicao || "AG-"+Date.now(),
           cliente:nome, clienteUid:uid, chamado:chamado,
           data:data, hora:hora, agend:formatarDataAgendamento(data,hora),
           tipo:tipo, local:local, observacoes:obs, status:status,
           criadoEmTexto:agAtual && agAtual.criadoEmTexto ? agAtual.criadoEmTexto : new Date().toLocaleString("pt-BR")
-        };
+        });
 
         var encontrado=false;
         for(var i=0;i<lista.length;i++){
@@ -5731,51 +5732,8 @@ html[data-theme="dark"] #det-orc-total{color:#7DD3FC!important}
       }
 
       if (acao === "enviar-chamado" || acao === "enviar-novo-chamado") {
-        var eqSel = document.getElementById("novo-chamado-equip");
-        var probEl = document.getElementById("novo-chamado-prob");
-        var probTxt = probEl ? probEl.value.trim() : "";
-        var eqNome = eqSel ? eqSel.value : "Câmara Frigorífica";
-
-        var novoNum = "0049" + (state.chamados.length + 1);
-        state.chamados.unshift({
-          num: novoNum,
-          equip: eqNome,
-          cliente: "Empresa XYZ",
-          status: "Aguardando início",
-          agend: "Aguardando agendamento"
-        });
-
-        state.mensagens[novoNum] = [
-          {autor: "cliente", texto: probTxt || "Equipamento com oscilação de temperatura.", hora: "Agora"}
-        ];
-
-        state.atendimentos[novoNum] = {
-          endereco: "Rua das Indústrias, 500 — Cozinha central",
-          previsao: "Aguardando confirmação",
-          diag: "",
-          pecas: []
-        };
-
-        state.historicoCliente.unshift({
-          data: "Hoje",
-          tipo: "chamado",
-          titulo: "Chamado #" + novoNum + " aberto",
-          desc: eqNome + " — " + (probTxt || "Problema reportado"),
-          status: "Aberto"
-        });
-
-        state.historicoEmpresa.unshift({
-          data: "Hoje",
-          tipo: "chamado",
-          cliente: "Empresa XYZ",
-          titulo: "Chamado #" + novoNum + " aberto",
-          desc: eqNome + " — " + (probTxt || "Problema reportado"),
-          status: "Aberto"
-        });
-
-        toast("Chamado enviado com sucesso! Nº " + novoNum);
-        chamadoAtualNum = novoNum;
-        abrirTela("tela-cli-detalhe-chamado");
+        if (window.TJFB && window.TJFB.enviarChamadoCliente) window.TJFB.enviarChamadoCliente();
+        else toast("Não foi possível conectar. Recarregue o aplicativo.");
         return;
       }
 
@@ -6958,6 +6916,7 @@ function leDec(){
 function salvaDec(d){ return d; }
 function esc(s){return (s||'').replace(/[<>&"]/g,function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c];});}
 function grava(id,tipo,msg){
+  if(window.TJFB&&window.TJFB.decidirOrcamento){window.TJFB.decidirOrcamento(id,tipo,msg);return;}
   if(typeof state==='undefined'||!Array.isArray(state.orcamentos)) return;
   var dataAgora=new Date().toLocaleDateString('pt-BR');
   for(var i=0;i<state.orcamentos.length;i++){
@@ -6996,11 +6955,15 @@ function chipDecisao(d){
 }
 
 function injetaAcoesOrcamento(){
+  if(state.perfilSessao!=='cliente'){document.querySelectorAll('.tj-barra-acoes').forEach(function(el){el.remove();});return;}
   folhasTexto('Valor Total:').forEach(function(folha){
     var card=folha.closest('table')||folha.parentElement.parentElement||folha.parentElement;
     if(!card)return;
-    if(card.nextElementSibling&&card.nextElementSibling.classList.contains('tj-barra-acoes'))return;
     var id=idDoOrcamento(folha);if(!id)return;
+    var orc=(state.orcamentos||[]).find(function(o){return String(o.num)===String(id);});
+    var existente=card.nextElementSibling&&card.nextElementSibling.classList.contains('tj-barra-acoes')?card.nextElementSibling:null;
+    if(!orc||orc.status!=='Aguardando aprovação'){if(existente)existente.remove();return;}
+    if(existente)return;
     var d=leDec()[id];
     var barra=document.createElement('div');barra.className='tj-barra-acoes';
     barra.innerHTML=(d?chipDecisao(d):'<span style="font-size:.8rem;opacity:.6">Aguardando sua decisão</span>')
@@ -7323,7 +7286,24 @@ async function carregarPerfil(user){
   return perfil||{};
 }
 
+let clienteBase=null;
+let clienteDadosUid='';
+let clienteConflito=false;
+let clienteFila=Promise.resolve();
+function copiarDados(v){return JSON.parse(JSON.stringify(v));}
+function limparDadosCliente(){
+  ['chamados','orcamentos','equip','pedidos','historicoCliente','notificacoesCliente','contatosCliente','enderecosCliente','agendamentos'].forEach(function(k){state[k]=[];});
+  state.mensagens={};state.atendimentos={};
+}
+function definirBaseCliente(user){
+  clienteDadosUid=user.uid;
+  clienteAtualUid=user.uid;
+  clienteConflito=false;
+  clienteBase=copiarDados(snapshotCliente());
+  delete clienteBase.atualizadoEm;
+}
 async function carregarDadosCliente(user,perfil){
+  clienteBase=null;clienteDadosUid='';limparDadosCliente();
   try{
     const snap=await db.collection('clientData').doc(user.uid).get();
     if(!snap.exists){
@@ -7339,7 +7319,8 @@ async function carregarDadosCliente(user,perfil){
       state.contatosCliente=[];
       state.enderecosCliente=[];
       state.agendamentos=[];
-      return false;
+      definirBaseCliente(user);
+      return true;
     }
     const d=snap.data()||{};
     state.chamados=Array.isArray(d.chamados)?d.chamados:[];
@@ -7353,8 +7334,9 @@ async function carregarDadosCliente(user,perfil){
     state.contatosCliente=Array.isArray(d.contatosCliente)?d.contatosCliente:[];
     state.enderecosCliente=Array.isArray(d.enderecosCliente)?d.enderecosCliente:[];
     state.agendamentos=Array.isArray(d.agendamentos)?d.agendamentos:[];
+    definirBaseCliente(user);
     return true;
-  }catch(e){ console.warn('[TJFB] dados do cliente não carregados:',e); return false; }
+  }catch(e){ limparDadosCliente();clienteBase=null;clienteDadosUid='';throw e; }
 }
 
 
@@ -7510,12 +7492,13 @@ window.TJFirestoreSafe=function(payload){
 
 function snapshotCliente(){
   const nome=clienteAtualNome;
-  function own(arr){return Array.isArray(arr)?arr.filter(function(x){return !x.cliente || x.cliente===nome;}):[];}
+  const uid=auth.currentUser&&auth.currentUser.uid;
+  function own(arr){return Array.isArray(arr)?arr.filter(function(x){return x.clienteUid?x.clienteUid===uid:(!x.cliente || x.cliente===nome);}):[];}
   const nums=own(state.chamados).map(function(x){return x.num;});
   const msgs={}; nums.forEach(function(n){ if(state.mensagens&&state.mensagens[n]) msgs[n]=state.mensagens[n]; });
   const ats={}; nums.forEach(function(n){ if(state.atendimentos&&state.atendimentos[n]) ats[n]=state.atendimentos[n]; });
   const snap={
-    chamados:own(state.chamados), mensagens:msgs, atendimentos:ats,
+    chamados:own(state.chamados), chamadoIds:nums.map(String), mensagens:msgs, atendimentos:ats,
     orcamentos:own(state.orcamentos), equip:own(state.equip), pedidos:own(state.pedidos),
     historicoCliente:Array.isArray(state.historicoCliente)?state.historicoCliente:[],
     notificacoesCliente:Array.isArray(state.notificacoesCliente)?state.notificacoesCliente:[],
@@ -7528,16 +7511,142 @@ function snapshotCliente(){
   return safe;
 }
 let saveTimer=null;
-function salvarDadosCliente(){
+async function gravarAlteracoesCliente(){
   const user=auth.currentUser;
-  if(!user||state.perfilSessao!=='cliente') return;
+  if(!user||state.perfilSessao!=='cliente'||clienteDadosUid!==user.uid||!clienteBase)
+    throw new Error('Os dados ainda não foram carregados. Entre novamente.');
+  if(clienteConflito) throw new Error('Os dados foram alterados em outra sessão. Recarregue antes de continuar.');
+  const uid=user.uid;
+  const atual=copiarDados(snapshotCliente());delete atual.atualizadoEm;
+  const base=copiarDados(clienteBase);
+  const chaves=Object.keys(atual).filter(function(k){return !window.TJCore.equal(atual[k],base[k]);});
+  if(!chaves.length)return;
+  const mensagemChaves=Array.from(new Set(Object.keys(atual.mensagens||{}).concat(Object.keys(base.mensagens||{}))))
+    .filter(function(k){return !window.TJCore.equal((atual.mensagens||{})[k],(base.mensagens||{})[k]);});
+  if(mensagemChaves.length>1)throw new Error('Envie as mensagens de um chamado por vez.');
+  await db.runTransaction(async function(tx){
+    const perfil=await tx.get(profileRef(uid));
+    const ref=db.collection('clientData').doc(uid);
+    const snap=await tx.get(ref);
+    if(!auth.currentUser||auth.currentUser.uid!==uid||clienteDadosUid!==uid)throw new Error('Sessão alterada.');
+    if(!perfil.exists||perfil.data().active!==true)throw new Error('Acesso desativado.');
+    const dadosRemotos=snap.exists?(snap.data()||{}):{};
+    if(chaves.includes('chamados')&&(dadosRemotos.chamados||[]).length&&!Array.isArray(dadosRemotos.chamadoIds))throw new Error('O cadastro de chamados precisa ser atualizado pela TJ antes de novas solicitações.');
+    const remoto=window.TJFirestoreSafe?window.TJFirestoreSafe(dadosRemotos):dadosRemotos;
+    const patch={};
+    chaves.forEach(function(k){
+      const anterior=Object.prototype.hasOwnProperty.call(remoto,k)?remoto[k]:(Array.isArray(base[k])?[]:{});
+      if(!window.TJCore.equal(anterior,base[k])){
+        const erro=new Error('Os dados foram atualizados em outra sessão. Recarregue antes de continuar.');
+        erro.code='tj/conflito';throw erro;
+      }
+      patch[k]=atual[k];
+    });
+    patch.atualizadoEm=firebase.firestore.FieldValue.serverTimestamp();
+    patch.clienteMutation={mensagemChamado:mensagemChaves[0]||''};
+    tx.set(ref,patch,{merge:true});
+  });
+  if(clienteDadosUid===uid&&clienteBase)chaves.forEach(function(k){clienteBase[k]=atual[k];});
+}
+function salvarClienteAgora(){
   clearTimeout(saveTimer);
-  saveTimer=setTimeout(function(){
-    db.collection('clientData').doc(user.uid).set(snapshotCliente(),{merge:true}).catch(function(e){console.warn('[TJFB] persistência:',e);});
-  },350);
+  const uid=auth.currentUser&&auth.currentUser.uid;
+  const tarefa=clienteFila.then(function(){
+    if(!uid||!auth.currentUser||auth.currentUser.uid!==uid)throw new Error('Sessão expirada.');
+    return gravarAlteracoesCliente();
+  });
+  clienteFila=tarefa.catch(function(e){
+    console.warn('[TJFB] persistência:',e);
+    if(e.code==='tj/conflito')clienteConflito=true;
+  });
+  return tarefa;
+}
+function salvarDadosCliente(){
+  if(!auth.currentUser||state.perfilSessao!=='cliente'||!clienteBase||clienteConflito)return;
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(function(){salvarClienteAgora().catch(function(e){aviso('Alterações não salvas: '+e.message);});},350);
 }
 window.TJFB.salvarDadosCliente=salvarDadosCliente;
+let decidindoOrcamento=false;
+window.TJFB.decidirOrcamento=async function(num,tipo,msg){
+  if(decidindoOrcamento)return;
+  const user=auth.currentUser;
+  if(!user||state.perfilSessao!=='cliente'||clienteDadosUid!==user.uid){aviso('Entre novamente antes de decidir.');return;}
+  const orc=state.orcamentos.find(function(o){return String(o.num)===String(num);});
+  if(!orc||orc.status!=='Aguardando aprovação'){aviso('Somente orçamentos pendentes podem receber uma decisão.');return;}
+  if(!['aprovado','recusado','esclarecimento'].includes(tipo))return;
+  if(tipo==='esclarecimento'&&(!String(msg||'').trim()||String(msg).length>2000)){aviso('Informe sua dúvida em até 2.000 caracteres.');return;}
+  decidindoOrcamento=true;
+  try{await salvarClienteAgora();}catch(e){decidindoOrcamento=false;aviso('Decisão não salva: '+e.message);return;}
+  const anterior=copiarDados(orc),data=new Date().toLocaleDateString('pt-BR');
+  let historico=null;
+  if(tipo==='esclarecimento')orc.esclarecimento=String(msg).trim();
+  else{
+    orc.status=tipo==='aprovado'?'Aprovado':'Recusado';
+    orc[tipo==='aprovado'?'aprovadoEm':'recusadoEm']=data;
+    orc.hist=Array.isArray(orc.hist)?orc.hist:[];
+    orc.hist.push({data:data,evento:orc.status+' pelo cliente'});
+    historico={data:data,tipo:'orcamento',titulo:'Orçamento #'+num+' '+orc.status.toLowerCase(),desc:'Orçamento '+orc.status.toLowerCase()+' pelo cliente',status:orc.status};
+    state.historicoCliente.unshift(historico);
+  }
+  try{await salvarClienteAgora();aviso(tipo==='esclarecimento'?'Pedido de esclarecimento salvo.':'Decisão salva com sucesso.');if(auth.currentUser&&auth.currentUser.uid===user.uid)renderizarDetalheOrcamento();}
+  catch(e){if(clienteDadosUid===user.uid){const idx=state.orcamentos.indexOf(orc);if(idx>=0)state.orcamentos[idx]=anterior;if(historico)state.historicoCliente=state.historicoCliente.filter(function(h){return h!==historico;});}aviso('Decisão não salva: '+e.message);}
+  finally{decidindoOrcamento=false;}
+};
+document.addEventListener('click',function(ev){
+  const alvo=ev.target.closest&&ev.target.closest('[data-action]');if(!alvo||state.perfilSessao!=='cliente')return;
+  const acao=alvo.dataset.action;
+  if(['aprovar-orc','aprovar-orcamento','recusar-orc','recusar-orcamento'].includes(acao)){
+    ev.preventDefault();ev.stopImmediatePropagation();
+    window.TJFB.decidirOrcamento(alvo.dataset.id||orcamentoAtualNum,acao.startsWith('aprovar')?'aprovado':'recusado','');
+  }
+  if(acao==='ler-notific'){
+    ev.preventDefault();ev.stopImmediatePropagation();
+    (async function(){try{for(const n of state.notificacoesCliente){if(n.lida===true)continue;const old=n.lida;n.lida=true;try{await salvarClienteAgora();}catch(e){n.lida=old;throw e;}}atualizarBadgeNotificacoes();renderizarNotificacoesCliente();aviso('Notificações atualizadas.');}catch(e){aviso('Não foi possível marcar todas as notificações: '+e.message);}})();
+  }
+},true);
+let enviandoChamado=false;
+window.TJFB.enviarChamadoCliente=async function(){
+  if(enviandoChamado)return;
+  const user=auth.currentUser;
+  if(!user||state.perfilSessao!=='cliente'||clienteDadosUid!==user.uid||!clienteBase||clienteConflito){aviso('Recarregue e entre novamente antes de enviar.');return;}
+  const equipamento=(document.getElementById('novo-chamado-equip')?.value||'').trim();
+  const problema=(document.getElementById('novo-chamado-prob')?.value||'').trim();
+  if(!equipamento||!problema){aviso('Selecione o equipamento e descreva o problema.');return;}
+  const anexos=window.TJAnexosSelecionados;
+  if(anexos&&(anexos.fotos.length||anexos.videos.length)){aviso('O envio de anexos ainda não está disponível. Remova os arquivos para enviar o chamado.');return;}
+  const num=String(Date.now())+String(Math.floor(Math.random()*1000000)).padStart(6,'0');
+  const data=new Date().toLocaleDateString('pt-BR');
+  const local=(state.enderecosCliente||[]).find(function(e){return e.tipo==='Atendimento';})||(state.enderecosCliente||[])[0];
+  const endereco=local?[local.rua,local.num,local.cidade].filter(Boolean).join(', '):'';
+  const registro={num:num,equip:equipamento,cliente:clienteAtualNome,clienteUid:user.uid,problema:problema,status:'Aguardando início',agend:'Aguardando agendamento',criadoEm:new Date().toISOString()};
+  const historico={data:data,tipo:'chamado',titulo:'Chamado #'+num+' aberto',desc:equipamento+' — '+problema,status:'Aberto'};
+  enviandoChamado=true;
+  const botoes=document.querySelectorAll('[data-action="enviar-chamado"],[data-action="enviar-novo-chamado"]');
+  botoes.forEach(function(b){b.disabled=true;});
+  try{await salvarClienteAgora();}catch(e){enviandoChamado=false;botoes.forEach(function(b){b.disabled=false;});aviso('Chamado não enviado: '+e.message);return;}
+  state.chamados.unshift(registro);
+  state.mensagens[num]=[{autor:'cliente',texto:problema,hora:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}];
+  state.atendimentos[num]={endereco:endereco,previsao:'Aguardando confirmação',diag:'',pecas:[]};
+  state.historicoCliente.unshift(historico);
+  try{
+    await salvarClienteAgora();
+    if(!auth.currentUser||auth.currentUser.uid!==user.uid)return;
+    chamadoAtualNum=num;
+    document.getElementById('novo-chamado-prob').value='';
+    aviso('Chamado salvo com sucesso! Nº '+num);
+    abrirTela('tela-cli-detalhe-chamado');
+  }catch(e){
+    if(clienteDadosUid===user.uid){
+      state.chamados=state.chamados.filter(function(c){return c!==registro;});
+      delete state.mensagens[num];delete state.atendimentos[num];
+      state.historicoCliente=state.historicoCliente.filter(function(h){return h!==historico;});
+    }
+    aviso('Chamado não enviado: '+e.message);
+  }finally{enviandoChamado=false;botoes.forEach(function(b){b.disabled=false;});}
+};
 
+let cadastroEmAndamento=false;
 async function fazerCadastro(){
   const nome=(document.getElementById('cad-nome')?.value||'').trim();
   const telefone=(document.getElementById('cad-tel')?.value||'').trim();
@@ -7549,19 +7658,24 @@ async function fazerCadastro(){
   if(senha.length<6){ aviso('A senha precisa ter pelo menos 6 caracteres.'); return; }
   if(senha!==senha2){ aviso('As senhas não conferem.'); return; }
   try{
+    cadastroEmAndamento=true;
     const cred=await auth.createUserWithEmailAndPassword(email,senha);
     const tipoPessoa=(typeof tipoCadastroSelecionado!=='undefined'&&tipoCadastroSelecionado==='pj')?'PJ':'PF';
     const dados={uid:cred.user.uid,email:email,tipoPessoa:tipoPessoa,nome:nome,telefone:telefone,active:true,criadoEm:firebase.firestore.FieldValue.serverTimestamp()};
-    await clientRef(cred.user.uid).set(dados,{merge:true});
-    await profileRef(cred.user.uid).set({uid:cred.user.uid,email:email,role:'cliente',nome:nome,tipoPessoa:tipoPessoa,active:true,criadoEm:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+    const cadastroBatch=db.batch();
+    cadastroBatch.set(clientRef(cred.user.uid),dados,{merge:true});
+    cadastroBatch.set(profileRef(cred.user.uid),{uid:cred.user.uid,email:email,role:'cliente',nome:nome,tipoPessoa:tipoPessoa,active:true,criadoEm:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+    await cadastroBatch.commit();
     clienteAtualNome=nome;
     window.TJFB.perfilCliente=dados;
     atualizarIdentidadeCliente(dados);
     state.perfilSessao='cliente';
     guardaSessao(cred.user,'cliente');
+    await carregarDadosCliente(cred.user,dados);
     aviso('Conta criada com sucesso!');
     telaApp('cliente');
   }catch(e){ console.error('[TJFB] cadastro',e); aviso(msgErro(e)); }
+  finally{cadastroEmAndamento=false;}
 }
 
 async function cadastrarClientePeloProprietario(){
@@ -7607,8 +7721,8 @@ async function cadastrarClientePeloProprietario(){
       criadoEm:firebase.firestore.FieldValue.serverTimestamp()
     };
 
-    await dbSec.collection('clients').doc(uid).set(dadosCliente,{merge:true});
-    await dbSec.collection('users').doc(uid).set({
+    await db.collection('clients').doc(uid).set(dadosCliente,{merge:true});
+    await db.collection('users').doc(uid).set({
       uid:uid,
       email:email,
       role:'cliente',
@@ -7731,11 +7845,14 @@ document.addEventListener('input',function(ev){
   if(state.perfilSessao==='cliente' && ev.target && ev.target.closest && ev.target.closest('#painel-principal')) salvarDadosCliente();
 },true);
 
-// Persiste as alterações feitas pelo protótipo sem precisar reescrever todos os módulos agora.
+// Verifica alterações locais; dados sem mudanças não geram escritas no banco.
 setInterval(salvarDadosCliente,4000);
 
 auth.onAuthStateChanged(async function(user){
+  if(cadastroEmAndamento)return;
   if(!user){
+    clearTimeout(saveTimer);clienteBase=null;clienteDadosUid='';clienteConflito=false;
+    clienteAtualUid='';state.perfilSessao=null;limparDadosCliente();
     limpaSessao();
     try{ localStorage.removeItem('tj_login_intencao'); }catch(e){}
     window.TJFB.perfilCliente={};
@@ -7748,7 +7865,7 @@ auth.onAuthStateChanged(async function(user){
     const sessao=JSON.parse(localStorage.getItem('tj_sessao')||'null');
     const intencao=localStorage.getItem('tj_login_intencao') || (sessao&&sessao.tipo) || '';
     const perfil=await carregarPerfil(user);
-    if(perfil && perfil.active===false){
+    if(!perfil || perfil.active!==true){
       try{ localStorage.removeItem('tj_sessao'); localStorage.removeItem('tj_login_intencao'); }catch(e){}
       await auth.signOut();
       aviso('Este acesso foi desativado pela TJ Refrigeração.');
@@ -7879,7 +7996,7 @@ function clientePorUid(uid){return clientesV13().find(function(c){return c.uid==
 function clientePorNome(nome){return clientesV13().find(function(c){return c.nome===nome;})||null;}
 function uidRegistro(obj){return (obj&&obj.clienteUid)||((obj&&obj.cliente)?((clientePorNome(obj.cliente)||{}).uid||''):'');}
 function limparCampos(ids){ids.forEach(function(id){var e=$v(id);if(e)e.value='';});}
-function gerarNumero(prefix, arr, prop){var max=0;(arr||[]).forEach(function(x){var n=parseInt(String(x[prop]||'').replace(/\D/g,''),10);if(!isNaN(n)&&n>max)max=n;});return prefix+String(max+1).padStart(5,'0');}
+function gerarNumero(prefix, arr, prop){return window.TJCore.nextNumber(prefix,arr,prop);}
 function hoje(){return new Date().toLocaleDateString('pt-BR');}
 function camposAgendamento(valor){
   var r={data:'',hora:''},v=String(valor||'').trim();
@@ -7904,7 +8021,7 @@ async function recarregarV13(){
   if(window.TJFB&&window.TJFB.carregarDadosEmpresaFirebase) await window.TJFB.carregarDadosEmpresaFirebase();
 }
 async function lerDados(uid){var snap=await window.TJFB.db.collection('clientData').doc(uid).get();return snap.exists?(snap.data()||{}):{};}
-async function gravarDados(uid, patch){patch=patch||{};if(window.TJFirestoreSafe)patch=window.TJFirestoreSafe(patch);patch.atualizadoEm=firebase.firestore.FieldValue.serverTimestamp();await window.TJFB.db.collection('clientData').doc(uid).set(patch,{merge:true});}
+async function gravarDados(uid, patch){patch=patch||{};if(Array.isArray(patch.chamados))patch.chamadoIds=patch.chamados.map(function(c){return String(c.num);});if(window.TJFirestoreSafe)patch=window.TJFirestoreSafe(patch);patch.atualizadoEm=firebase.firestore.FieldValue.serverTimestamp();await window.TJFB.db.collection('clientData').doc(uid).set(patch,{merge:true});}
 async function removerRegistro(uid,campo,predicado){var d=await lerDados(uid),arr=Array.isArray(d[campo])?d[campo]:[];arr=arr.filter(function(x){return !predicado(x);});var p={};p[campo]=arr;await gravarDados(uid,p);}
 
 function preencherSelectClientes(id, selecionado){
@@ -8081,7 +8198,7 @@ async function excluirOrcAdmin(id){var o=(state.orcamentos||[]).find(function(x)
 renderizarOrcamentosEmpresa=function(){var box=$v('lista-emp-orcamentos');if(!box)return;box.innerHTML='';if(!(state.orcamentos||[]).length){box.innerHTML='<p class="admin-empty">Nenhum orçamento cadastrado.</p>';return;}(state.orcamentos||[]).forEach(function(o){var item=document.createElement('div');item.className='list-item admin-record';var top=document.createElement('div');top.className='list-header';var t=document.createElement('span');t.className='list-title';t.textContent='Orçamento #'+o.num+' — '+o.servico;top.appendChild(t);top.appendChild(criarBadge(o.status));var m=document.createElement('div');m.className='list-meta';m.textContent='Cliente: '+o.cliente+' • Total: '+formatarMoedaBR(o.total);item.appendChild(top);item.appendChild(m);var a=document.createElement('div');a.className='admin-card-actions';[['Ver','btn-tj-secondary','abrir-orc'],['✏️ Editar','btn-tj','admin-editar-orc'],['🗑️ Excluir','btn-tj-danger','admin-excluir-orc']].forEach(function(b){var bt=document.createElement('button');bt.type='button';bt.className=b[1];bt.textContent=b[0];bt.dataset.action=b[2];bt.dataset.id=o.num;a.appendChild(bt);});item.appendChild(a);box.appendChild(item);});};
 
 function abrirFormPedido(obj,uidPreferido){var uid=uidPreferido||uidRegistro(obj)||((clientesV13()[0]||{}).uid||'');preencherSelectClientes('admin-pedido-cliente',uid);$v('admin-pedido-id').value=obj?obj.num:'';$v('admin-pedido-uid-original').value=obj?uid:'';$v('admin-pedido-titulo').textContent=obj?'Editar Pedido #'+obj.num:'Cadastrar Pedido';$v('admin-pedido-peca').value=(obj&&obj.peca)||'';$v('admin-pedido-status').value=(obj&&obj.status)||'Solicitado';$v('admin-pedido-data').value=(obj&&obj.data)||hoje();abrirTela('tela-emp-form-pedido');}
-async function salvarPedido(){var id=$v('admin-pedido-id').value,uid=$v('admin-pedido-cliente').value,oldUid=$v('admin-pedido-uid-original').value,cli=clientePorUid(uid),peca=$v('admin-pedido-peca').value.trim();if(!uid||!cli||!peca)return avisoV13('Selecione o cliente e informe a peça.');var novo=!id;if(novo)id='PED-'+String(Date.now()).slice(-6);if(oldUid&&oldUid!==uid)await removerRegistro(oldUid,'pedidos',function(x){return x.num===id;});var d=await lerDados(uid),arr=Array.isArray(d.pedidos)?d.pedidos:[],rec={num:id,peca:peca,cliente:cli.nome,clienteUid:uid,status:$v('admin-pedido-status').value,data:$v('admin-pedido-data').value.trim()||hoje()},idx=arr.findIndex(function(x){return x.num===id;});if(idx>=0)arr[idx]=rec;else arr.unshift(rec);await gravarDados(uid,{pedidos:arr});await recarregarV13();avisoV13(novo?'Pedido cadastrado.':'Pedido atualizado.');abrirTela('tela-emp-pedidos');}
+async function salvarPedido(){var id=$v('admin-pedido-id').value,uid=$v('admin-pedido-cliente').value,oldUid=$v('admin-pedido-uid-original').value,cli=clientePorUid(uid),peca=$v('admin-pedido-peca').value.trim();if(!uid||!cli||!peca)return avisoV13('Selecione o cliente e informe a peça.');var novo=!id;if(novo)id=gerarNumero('PED-',state.pedidos,'num');if(oldUid&&oldUid!==uid)await removerRegistro(oldUid,'pedidos',function(x){return x.num===id;});var d=await lerDados(uid),arr=Array.isArray(d.pedidos)?d.pedidos:[],rec=Object.assign({},arr.find(function(x){return x.num===id;})||{},{num:id,peca:peca,cliente:cli.nome,clienteUid:uid,status:$v('admin-pedido-status').value,data:$v('admin-pedido-data').value.trim()||hoje()}),idx=arr.findIndex(function(x){return x.num===id;});if(idx>=0)arr[idx]=rec;else arr.unshift(rec);await gravarDados(uid,{pedidos:arr});await recarregarV13();avisoV13(novo?'Pedido cadastrado.':'Pedido atualizado.');abrirTela('tela-emp-pedidos');}
 async function excluirPedido(id){var p=(state.pedidos||[]).find(function(x){return x.num===id;});if(!p)return;var uid=uidRegistro(p);if(!uid)return avisoV13('Cliente do pedido não identificado.');if(!confirm('Excluir o pedido '+id+'?'))return;await removerRegistro(uid,'pedidos',function(x){return x.num===id;});await recarregarV13();renderizarPedidosEmpresa();avisoV13('Pedido excluído.');}
 var renderPedidosOriginal=renderizarPedidosEmpresa;renderizarPedidosEmpresa=function(){var box=$v('lista-emp-pedidos');if(!box)return;box.innerHTML='';if(!(state.pedidos||[]).length){box.innerHTML='<p class="admin-empty">Nenhum pedido cadastrado.</p>';return;}(state.pedidos||[]).forEach(function(p){var item=document.createElement('div');item.className='list-item admin-record';var top=document.createElement('div');top.className='list-header';var t=document.createElement('span');t.className='list-title';t.textContent=p.num+' — '+p.peca;top.appendChild(t);top.appendChild(criarBadge(p.status));var m=document.createElement('div');m.className='list-meta';m.textContent='Cliente: '+p.cliente+' • Data: '+p.data;item.appendChild(top);item.appendChild(m);var a=document.createElement('div');a.className='admin-card-actions';[['Abrir','btn-tj-secondary','abrir-pedido'],['✏️ Editar','btn-tj','admin-editar-pedido'],['🗑️ Excluir','btn-tj-danger','admin-excluir-pedido']].forEach(function(b){var bt=document.createElement('button');bt.type='button';bt.className=b[1];bt.textContent=b[0];bt.dataset.action=b[2];bt.dataset.id=p.num;a.appendChild(bt);});item.appendChild(a);box.appendChild(item);});};
 
@@ -8470,9 +8587,10 @@ html[data-theme="dark"] #painel-principal .tj-dash-hero{background:linear-gradie
     normalizarControles();
     var drawer=document.querySelector('.drawer-panel,.side-drawer,.sidebar');
     var antigo=drawer&&drawer.querySelector('.tj-v25-version');if(antigo)antigo.remove();
-    if(drawer&&!drawer.querySelector('.tj-v27-version')){var v=document.createElement('div');v.className='tj-v27-version';v.textContent='TJ Refrigeração • v27';v.style.cssText='font-size:10px;opacity:.5;padding:10px 14px;text-align:center;';drawer.appendChild(v);}
+    if(drawer&&!drawer.querySelector('.tj-v29-version')){var v=document.createElement('div');v.className='tj-v29-version';v.textContent='TJ Refrigeração • v30';v.style.cssText='font-size:10px;opacity:.5;padding:10px 14px;text-align:center;';drawer.appendChild(v);}
   });
   var obs=new MutationObserver(normalizarControles);document.addEventListener('DOMContentLoaded',function(){if(document.body)obs.observe(document.body,{childList:true,subtree:true});});
 })();
 </script>
+<script src="./assets/tj-orcamento-fluxo.js"></script>
 </html>
