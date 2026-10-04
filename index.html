@@ -1247,7 +1247,7 @@ html[data-theme="dark"] #det-orc-total{color:#7DD3FC!important}
             <span class="drawer-card-icon">💰</span>
             <span class="drawer-card-content">
               <span class="drawer-card-title">Orçamentos</span>
-              <span class="drawer-card-desc">Aprovar e acompanhar valores</span>
+              <span class="drawer-card-desc">Solicitar, aprovar e acompanhar valores</span>
             </span>
             <span class="drawer-card-arrow">→</span>
           </button>
@@ -1271,7 +1271,7 @@ html[data-theme="dark"] #det-orc-total{color:#7DD3FC!important}
             <span class="drawer-card-icon">❄️</span>
             <span class="drawer-card-content">
               <span class="drawer-card-title">Meus equipamentos</span>
-              <span class="drawer-card-desc">Equipamentos mantidos pela TJ</span>
+              <span class="drawer-card-desc">Cadastrar e acompanhar equipamentos</span>
             </span>
             <span class="drawer-card-arrow">→</span>
           </button>
@@ -1524,7 +1524,7 @@ html[data-theme="dark"] #det-orc-total{color:#7DD3FC!important}
           <button type="button" class="btn-voltar" data-action="voltar">‹ Voltar</button>
           <div class="card-box">
             <div class="card-title">Meus equipamentos</div>
-            <p class="card-subtitle">Equipamentos da sua empresa cadastrados e mantidos pela TJ Refrigeração.</p>
+            <p class="card-subtitle">Cadastre seus equipamentos e acompanhe a manutenção pela TJ Refrigeração.</p>
             <div id="lista-cli-equipamentos" class="list-container">
               <!-- Somente leitura -->
             </div>
@@ -2295,6 +2295,7 @@ html[data-theme="dark"] #det-orc-total{color:#7DD3FC!important}
             <div class="form-group">
               <label class="form-label" for="form-equip-status">Status Operacional</label>
               <select id="form-equip-status" class="form-select">
+                <option value="Cadastrado">Cadastrado</option>
                 <option value="Operando">Operando</option>
                 <option value="Em manutenção">Em manutenção</option>
                 <option value="Parado">Parado</option>
@@ -3486,7 +3487,7 @@ html[data-theme="dark"] #det-orc-total{color:#7DD3FC!important}
 
       for (var i = 0; i < state.equip.length; i++) {
         var eq = state.equip[i];
-        if (eq.cliente === clienteAtualNome) {
+        if (eq.clienteUid ? eq.clienteUid === (window.TJFB && window.TJFB.auth.currentUser && window.TJFB.auth.currentUser.uid) : eq.cliente === clienteAtualNome) {
           var item = document.createElement("div");
           item.style.padding = "14px";
           item.style.border = "1px solid #E2E8F0";
@@ -3596,7 +3597,7 @@ html[data-theme="dark"] #det-orc-total{color:#7DD3FC!important}
 
       for (var i = 0; i < state.equip.length; i++) {
         var eq = state.equip[i];
-        if (eq.cliente === clienteAtualNome) {
+        if (eq.clienteUid ? eq.clienteUid === (window.TJFB && window.TJFB.auth.currentUser && window.TJFB.auth.currentUser.uid) : eq.cliente === clienteAtualNome) {
           var opt = document.createElement("option");
           opt.value = eq.nome;
           opt.textContent = eq.nome + " (" + eq.marca + " " + eq.modelo + ")";
@@ -4425,7 +4426,7 @@ html[data-theme="dark"] #det-orc-total{color:#7DD3FC!important}
         var eqAchados = 0;
         for (var e = 0; e < state.equip.length; e++) {
           var eq = state.equip[e];
-          if (eq.cliente === clienteAtualNome) {
+          if (eq.clienteUid ? eq.clienteUid === (window.TJFB && window.TJFB.auth.currentUser && window.TJFB.auth.currentUser.uid) : eq.cliente === clienteAtualNome) {
             eqAchados++;
             var itE = document.createElement("div");
             itE.className = "list-item";
@@ -7567,6 +7568,8 @@ function salvarDadosCliente(){
   saveTimer=setTimeout(function(){salvarClienteAgora().catch(function(e){aviso('Alterações não salvas: '+e.message);});},350);
 }
 window.TJFB.salvarDadosCliente=salvarDadosCliente;
+window.TJFB.salvarClienteAgora=salvarClienteAgora;
+window.TJFB.atualizarDadosCliente=async function(){await salvarClienteAgora();await carregarDadosCliente(auth.currentUser,window.TJFB.perfilCliente);};
 let decidindoOrcamento=false;
 window.TJFB.decidirOrcamento=async function(num,tipo,msg){
   if(decidindoOrcamento)return;
@@ -8587,10 +8590,11 @@ html[data-theme="dark"] #painel-principal .tj-dash-hero{background:linear-gradie
     normalizarControles();
     var drawer=document.querySelector('.drawer-panel,.side-drawer,.sidebar');
     var antigo=drawer&&drawer.querySelector('.tj-v25-version');if(antigo)antigo.remove();
-    if(drawer&&!drawer.querySelector('.tj-v29-version')){var v=document.createElement('div');v.className='tj-v29-version';v.textContent='TJ Refrigeração • v30';v.style.cssText='font-size:10px;opacity:.5;padding:10px 14px;text-align:center;';drawer.appendChild(v);}
+    if(drawer&&!drawer.querySelector('.tj-v29-version')){var v=document.createElement('div');v.className='tj-v29-version';v.textContent='TJ Refrigeração • v31';v.style.cssText='font-size:10px;opacity:.5;padding:10px 14px;text-align:center;';drawer.appendChild(v);}
   });
   var obs=new MutationObserver(normalizarControles);document.addEventListener('DOMContentLoaded',function(){if(document.body)obs.observe(document.body,{childList:true,subtree:true});});
 })();
 </script>
 <script src="./assets/tj-orcamento-fluxo.js"></script>
+<script src="./assets/tj-cadastros.js"></script>
 </html>

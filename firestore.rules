@@ -201,6 +201,40 @@ service cloud.firestore {
       allow update: if validData(request.resource.data) && (owner() || (self(uid) && customerChanges(resource.data,request.resource.data,uid)));
       allow delete: if owner();
     }
+    function validPart(d) {
+      return d.keys().hasAll(['nome','codigo','marca','descricao','unidade','custoCentavos','precoCentavos','estoque','ativo','criadoEm','atualizadoEm'])
+        && d.keys().hasOnly(['nome','codigo','marca','descricao','unidade','custoCentavos','precoCentavos','estoque','ativo','criadoEm','atualizadoEm'])
+        && text(d.nome,200) && d.nome.size()>0 && text(d.codigo,80) && d.codigo.size()>0
+        && text(d.marca,100) && text(d.descricao,2000) && d.unidade in ['un','kg','m','l','kit']
+        && d.custoCentavos is int && d.custoCentavos>=0 && d.custoCentavos<=99999999
+        && d.precoCentavos is int && d.precoCentavos>=0 && d.precoCentavos<=99999999
+        && d.estoque is int && d.estoque>=0 && d.estoque<=1000000 && d.ativo is bool
+        && d.criadoEm is timestamp && d.atualizadoEm==request.time;
+    }
+    match /pecas/{id} {
+      allow read: if owner();
+      allow create: if owner() && validPart(request.resource.data) && request.resource.data.criadoEm==request.time;
+      allow update: if owner() && validPart(request.resource.data) && request.resource.data.criadoEm==resource.data.criadoEm;
+      allow delete: if owner();
+    }
+    function validRequest(d) {
+      return d.keys().hasAll(['clienteUid','clienteNome','equipamentoId','equipamentoNome','descricao','status','criadoEm','atualizadoEm'])
+        && d.keys().hasOnly(['clienteUid','clienteNome','equipamentoId','equipamentoNome','descricao','status','criadoEm','atualizadoEm','orcamentoNum'])
+        && text(d.clienteUid,128) && text(d.clienteNome,200) && text(d.equipamentoId,80) && d.equipamentoId.size()>0
+        && text(d.equipamentoNome,200) && d.equipamentoNome.size()>0 && text(d.descricao,5000) && d.descricao.size()>0
+        && d.status in ['Solicitado','Recusado','Orçamento enviado'] && d.criadoEm is timestamp && d.atualizadoEm==request.time
+        && (d.status=='Orçamento enviado' ? text(d.orcamentoNum,40) && d.orcamentoNum.size()>0 : !('orcamentoNum' in d));
+    }
+    match /solicitacoesOrcamento/{id} {
+      allow read: if owner() || self(resource.data.clienteUid);
+      allow create: if validRequest(request.resource.data) && self(request.resource.data.clienteUid)
+        && request.resource.data.clienteNome==get(/databases/$(database)/documents/users/$(request.auth.uid)).data.nome
+        && request.resource.data.status=='Solicitado' && request.resource.data.criadoEm==request.time;
+      allow update: if owner() && validRequest(request.resource.data) && resource.data.status=='Solicitado'
+        && request.resource.data.status in ['Recusado','Orçamento enviado']
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','orcamentoNum','atualizadoEm']);
+      allow delete: if owner();
+    }
     match /{document=**} { allow read,write: if false; }
   }
 }

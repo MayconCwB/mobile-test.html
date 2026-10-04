@@ -1,8 +1,9 @@
-const CACHE_NAME = 'tj-refrigeracao-pwa-v30-regras-seguras';
+const CACHE_NAME = 'tj-refrigeracao-pwa-v31-cadastros';
 const APP_SHELL = [
   './index.html',
   './assets/tj-core.js',
   './assets/tj-orcamento-fluxo.js',
+  './assets/tj-cadastros.js',
   './manifest.webmanifest',
   './assets/tj-logo.png',
   './assets/tj-watermark.png',
